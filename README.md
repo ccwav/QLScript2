@@ -1,18 +1,169 @@
-# QLScript2
-新QLScript
+# QLScript_New
 
-Working.........
-Just Wait....
+青龙拉库命令:
 
-进度，变量整理完毕......
+	不包含sendNotify:
 
-今日进度: 新建文件夹，变量整理完成后拿起3DS玩大逆转裁判.
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "sendNotify|NoUsed" "ql"
+
+	包含sendNotify:
+
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify"
 
 
-大逆转裁判通关后安排:
+# 1. 注意事项: 
+（1）如果发现账户名称不能被正确处理，请手动删除ql\scripts\CKName_cache.json 文件.
+	
+（2）另外某些账号如果服务器返回空有可能不会被正确处理，请知悉.
 
-jd_CheckCK 优化和加入分组推送提醒功能，Pen...
+（3）ql.js 是jd_CheckCK.js和sendNotify.js的依赖,	只要你使用了这两个脚本就一定保证放在同个文件夹里面.
+	
+（4）使用Ninjia要注意Extra.sh中把 cp sendNotify.js /ql/scripts/sendNotify.js 这一句删除，不然每次重启容器sendNotify.js都会被覆盖.
+  
+# 2. 关于群组
+原通知配置变量加上数字，组成新的通知群组.通知脚本目前支援5组变量.
 
-sendNotify 增加获取微信名字功能，Pen...
+例子:企业微信配置了QYWX_AM和QYWX_AM2,兑换通知时推送到的QYWX_AM2配置的企业微信.即群组2.
+	
+(PS:例子使用了企业微信的变量QYWX_AM,实际是所有推送变量后加数字都会有效.)
 
-jd_bean_change 增加获取健康专区能量，白嫖榜增加显示每周一早上提醒健康商品，Pen...
+# 3. jd_bean_change.js  
+京东资产变动 + 白嫖榜 + 京东月资产变动,注意事项: 
+
+	如果你遇到TG报错，请参考https://github.com/ccwav/QLScript/issues/8	
+	如果你遇到Bark报错，请参考https://github.com/ccwav/QLScript/issues/7
+
+变量列表:
+
+    (1) EANCHANGE_PERSENT  分段通知	
+        例子 :  export BEANCHANGE_PERSENT="10"  	
+	    总共有22个账号,结果会分成3条推送通知，1~10为第一条推送，11~20为第二条推送，剩余的为第三条推送
+    
+    (2) BEANCHANGE_USERGP2 BEANCHANGE_USERGP3 BEANCHANGE_USERGP4  根据Pt_Pin的值进行分组通知
+        注意：分组通知会强制禁用BEANCHANGE_PERSENT变量!	
+	    分组通知的通知标题为 脚本名+"#"+分组数值
+	    主要用于搭配通知脚本的分组通知使用.
+    
+    (3) BEANCHANGE_ENABLEMONTH
+        每月1号17点后如果执行资产查询，开启京东月资产变动的统计和推送.	
+	    拆分通知和分组通知的变量都可以兼容.	
+	    标题按照分组分别为 京东月资产变动 京东月资产变动#2 京东月资产变动#3 	
+	    开启 :  export BEANCHANGE_ENABLEMONTH="true"  	
+    
+    
+  
+# 4. jd_CheckCK.js  
+京东CK检测,不正常的自动禁用，正常的如果是禁用状态则自动启用.配合通知脚本CK触发使用.也可以直接task.
+兼容jd_bean_change的BEANCHANGE_USERGP2 BEANCHANGE_USERGP3 BEANCHANGE_USERGP4变量.
+变量列表:
+	
+	显示正常CK:  export CHECKCK_SHOWSUCCESSCK="true"
+	永远通知CK状态:  export CHECKCK_CKALWAYSNOTIFY="true"
+	停用自动启用CK:  export CHECKCK_CKAUTOENABLE="false"	
+	服务器空数据等错误不触发通知:  export CHECKCK_CKNOWARNERROR="true"
+  
+	BEANCHANGE_USERGP2 BEANCHANGE_USERGP3 BEANCHANGE_USERGP4  根据Pt_Pin的值进行分组通知        
+	分组通知的通知标题为 脚本名+"#"+分组数值
+	主要用于搭配通知脚本的分组通知使用.
+  
+  
+# 5. sendNotify.js
+发送通知脚本Pro.
+
+变量列表:
+
+    (1) NOTIFY_SKIP_LIST
+    如果通知标题在此变量里面存在(&隔开),则用屏蔽不发送通知.(PS: Ningjia 作者写的功能，继承过来.)	
+    例子 :  export NOTIFY_SKIP_LIST="京东CK检测&京东资产变动"
+    
+    (2) NOTIFY_GROUP2_LIST NOTIFY_GROUP3_LIST NOTIFY_GROUP4_LIST NOTIFY_GROUP5_LIST
+    如果通知标题在此变量里面存在(&隔开),则用第2/3/4/5套推送变量进行配置.
+    
+    (3) NOTIFY_SHOWNAMETYPE
+    export NOTIFY_SHOWNAMETYPE="1"    不做任何变动
+    export NOTIFY_SHOWNAMETYPE="2"    效果是 :  账号名称：别名(备注)	
+    export NOTIFY_SHOWNAMETYPE="3"    效果是 :  账号名称：pin(备注)
+    export NOTIFY_SHOWNAMETYPE="4"    效果是 :  账号名称：备注
+    
+    (4) NOTIFY_SKIP_NAMETYPELIST
+    单独指定某些脚本不做NOTIFY_SHOWNAMETYPE变量处理
+	  例子 :  export NOTIFY_SKIP_NAMETYPELIST="东东农场&东东工厂"
+    
+    (5) NOTIFY_COMPTOGROUP2
+    东东农场 东东萌宠 京喜工厂 汪汪乐园养joy的兑换通知和脚本任务更新的通知推送到群组2,可自行删减.	
+    export NOTIFY_COMPTOGROUP2="东东农场&东东萌宠&京喜工厂&汪汪乐园养joy&脚本任务更新"	
+    
+    (6) NOTIFY_NOREMIND
+    东东农场 东东萌宠 京喜工厂 汪汪乐园养joy的兑换通知和脚本任务更新的通知进行屏蔽,可自行删减.	
+    export NOTIFY_NOREMIND="京喜工厂&汪汪乐园养joy"
+    
+    (7) NOTIFY_NOCKFALSE
+    屏蔽任务脚本的ck失效通知
+    export NOTIFY_NOCKFALSE="true"
+    
+    (8) NOTIFY_AUTHOR
+    指定通知底部显示 本通知 By 后面显示的字符,默认是ccwav Mod
+    
+    (9) NOTIFY_NOLOGINSUCCESS
+    屏蔽青龙登陆成功通知，登陆失败不屏蔽(新版貌似可以直接设定了)
+    export NOTIFY_NOLOGINSUCCESS="true" 
+    
+    (10) NOTIFY_CUSTOMNOTIFY
+    强大的自定义通知，格式为 脚本名称&推送组别&推送类型 (推送组别总共5组)
+    推送类型: Server酱&pushplus&Bark&TG机器人&钉钉&企业微信机器人&企业微信应用消息&iGotNotify&gobotNotify	
+    export NOTIFY_CUSTOMNOTIFY=["京东资产变动&组1&Server酱&Bark&企业微信应用消息","京东白嫖榜&组2&钉钉&pushplus"] 
+    
+    (11) NOTIFY_CKTASK
+    当接收到发送CK失效通知和Ninja 运行通知时候执行子线程任务,支持js py ts 
+    例子: export NOTIFY_CKTASK="jd_CheckCK.js"
+    
+# 6. jd_speed_sign_Part1~jd_speed_sign_Part3
+简单粗暴的极速版的分任务版，将总ck数除以3后平均分配成三个任务同时执行.
+
+如果使用请务必禁用其他库的jd_speed_sign脚本.感谢jd_speed_sign原作者。
+	
+例子 : 有24个ck，则Part1 执行1~8,Part2 执行9~16，Part3 执行17以后剩下的所有ck.
+
+# 7. jd_priceProtect_Mod.js
+京东价格保护通知版,仅仅是保价成功加上了通知，改了执行时间,没有什么技术含量...
+
+# 8. jd_big_winner_Mod.js
+省钱大赢家之翻翻乐分组版本,兼容资产通知查询的分组变量BEANCHANGE_USERGP2 ~ BEANCHANGE_USERGP4
+
+标题为省钱大赢家之翻翻乐 省钱大赢家之翻翻乐#2 省钱大赢家之翻翻乐#3 省钱大赢家之翻翻乐#4
+
+
+#分组应用总结实例:
+
+    ##CK失效时执行脚本
+    export NOTIFY_CKTASK="ccwav_QLScript2_jd_CheckCK.js"
+
+    ##开启月结资产推送
+    export BEANCHANGE_ENABLEMONTH="true"
+
+    ##分组2推送
+    export NOTIFY_COMPTOGROUP2="东东农场&东东萌宠&汪汪乐园养joy&脚本任务更新"
+    export QYWX_AM2=""
+    export PUSH_PLUS_TOKEN2="ABCDEFGHIJKLMN"
+    export PUSH_PLUS_USER2="Group2";
+    export BEANCHANGE_USERGP2="账号1pin&账号5pin&账号8pin"
+    export NOTIFY_GROUP2_LIST="京东资产变动#2&京东白嫖榜#2&京东月资产变动#2&省钱大赢家之翻翻乐#2&京东CK检测#2"
+    
+    ##分组3推送
+    export QYWX_AM3=""
+    export PUSH_PLUS_TOKEN3="ABCDEFGHIJKLMN"
+    export PUSH_PLUS_USER3="Group3";
+    export BEANCHANGE_USERGP2="账号2pin&账号3pin&账号4pin"
+    export NOTIFY_GROUP3_LIST="京东资产变动#3&京东白嫖榜#3&京东月资产变动#3&省钱大赢家之翻翻乐#3&京东CK检测#3"
+    
+    ##分组4推送
+    export QYWX_AM4="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaxxxxxxx"
+    export BEANCHANGE_USERGP4="账号10pin&账号11pin&账号12pin"
+    export NOTIFY_GROUP4_LIST="京东资产变动#4&京东白嫖榜#4&京东月资产变动#4&省钱大赢家之翻翻乐#4&Ninja 运行通知&京东CK检测#4"
+    
+    ##分组5推送
+    export QYWX_AM5=""
+    export PUSH_PLUS_TOKEN5="ABCDEFGHIJKLMN"
+    export PUSH_PLUS_USER5="Group5";
+    export NOTIFY_GROUP5_LIST="京东资产变动&京东白嫖榜&京东月资产变动&省钱大赢家之翻翻乐&京东CK检测"
+

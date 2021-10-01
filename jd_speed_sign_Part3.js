@@ -1,7 +1,7 @@
 /*
 cron "0 7 * * *" jd_speed_sign_Part3.js, tag:京东极速版任务1
 */
-
+ //详细说明参考 https://github.com/ccwav/QLScript2.
 const $ = new Env('京东极速版任务3');
 
 const notify = $.isNode() ? require('./sendNotify') : '';

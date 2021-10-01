@@ -1,8 +1,8 @@
 /*
 cron "40 8,10,12,14 * * *" ZY_big_winner_Mod.js
 省钱大赢家之翻翻乐分组版本,兼容资产通知查询的变量，标题为 省钱大赢家之翻翻乐#2 省钱大赢家之翻翻乐#3 省钱大赢家之翻翻乐#4 省钱大赢家之翻翻乐
-默认不拉取. 
  */
+ //详细说明参考 https://github.com/ccwav/QLScript2.
 const $ = new Env('省钱大赢家之翻翻乐');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;

@@ -1,5 +1,5 @@
 /*
-cron "30 10,22 * * *" jd_bean_change.js, tag:资产变化强化版by-ccwav
+cron "15 9,18 * * *" jd_bean_change.js, tag:资产变化强化版by-ccwav
  */
 
  //详细说明参考 https://github.com/ccwav/QLScript2.
@@ -747,7 +747,7 @@ async function Monthbean() {
 	allyesterdayArr = [];
 	do {
 		let response = await getJingBeanBalanceDetail(allpage);
-		await $.wait(2000);
+		await $.wait(1000);
 		// console.log(`第${allpage}页: ${JSON.stringify(response)}`);
 		if (response && response.code === "0") {
 			allpage++;

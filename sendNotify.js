@@ -751,7 +751,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		const titleIndex3 = notifySkipRemarkList.findIndex((item) => item === text);
 
 		if (text == "京东到家果园互助码:") {
-			ShowRemarkType = "3";
+			ShowRemarkType = "1";
 			if (desp) {
 				var arrTemp = desp.split(",");
 				var allCode = "";
@@ -768,7 +768,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			}
 		}
 
-		if (ShowRemarkType != "3" && titleIndex3 == -1) {
+		if (ShowRemarkType != "1" && titleIndex3 == -1) {
 			console.log("正在处理账号Remark.....");
 			//开始读取青龙变量列表
 			const envs = await getEnvs();
@@ -819,7 +819,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 						if (ShowRemarkType == "2") {
 							$.Remark = $.nickName + "(" + $.Remark + ")";
 						}
-						if (ShowRemarkType == "4") {
+						if (ShowRemarkType == "3") {
 							$.Remark = $.UserName + "(" + $.Remark + ")";
 						}
 						try {

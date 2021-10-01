@@ -133,7 +133,7 @@
 标题为省钱大赢家之翻翻乐 省钱大赢家之翻翻乐#2 省钱大赢家之翻翻乐#3 省钱大赢家之翻翻乐#4
 
 
-#分组应用总结实例:
+# 分组应用总结实例:
 
     ##CK失效时执行脚本
     export NOTIFY_CKTASK="ccwav_QLScript2_jd_CheckCK.js"

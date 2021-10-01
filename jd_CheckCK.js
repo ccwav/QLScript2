@@ -1,7 +1,7 @@
 /*
 cron "30 * * * *" jd_CheckCK.js, tag:京东CK检测by-ccwav
  */
- //详细说明参考 https://github.com/ccwav/QLScript2.
+//详细说明参考 https://github.com/ccwav/QLScript2.
 const $ = new Env('京东CK检测');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
@@ -263,116 +263,116 @@ if ($.isNode() && process.env.CHECKCK_CKNOWARNERROR) {
 	}
 
 	if ($.isNode()) {
+		if (MessageUserGp2) {
+			if (OErrorMessageGp2) {
+				allMessageGp2 += `👇👇👇👇👇检测出错账号👇👇👇👇👇\n` + OErrorMessageGp2 + `\n\n`;
+			}
+			if (DisableMessageGp2) {
+				allMessageGp2 += `👇👇👇👇👇自动禁用账号👇👇👇👇👇\n` + DisableMessageGp2 + `\n\n`;
+			}
+			if (EnableMessageGp2) {
+				if (CKAutoEnable == "true") {
+					allMessageGp2 += `👇👇👇👇👇自动启用账号👇👇👇👇👇\n` + EnableMessageGp2 + `\n\n`;
+				} else {
+					allMessageGp2 += `👇👇👇👇👇账号已恢复👇👇👇👇👇\n` + EnableMessageGp2 + `\n\n`;
+				}
+			}
 
-		if (OErrorMessageGp2) {
-			allMessageGp2 += `👇👇👇👇👇检测出错账号👇👇👇👇👇\n` + OErrorMessageGp2 + `\n\n`;
-		}
-		if (DisableMessageGp2) {
-			allMessageGp2 += `👇👇👇👇👇自动禁用账号👇👇👇👇👇\n` + DisableMessageGp2 + `\n\n`;
-		}
-		if (EnableMessageGp2) {
-			if (CKAutoEnable == "true") {
-				allMessageGp2 += `👇👇👇👇👇自动启用账号👇👇👇👇👇\n` + EnableMessageGp2 + `\n\n`;
+			if (ErrorMessageGp2) {
+				allMessageGp2 += `👇👇👇👇👇失效账号👇👇👇👇👇\n` + ErrorMessageGp2 + `\n\n`;
 			} else {
-				allMessageGp2 += `👇👇👇👇👇账号已恢复👇👇👇👇👇\n` + EnableMessageGp2 + `\n\n`;
+				allMessageGp2 += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
+			}
+
+			if (ShowSuccess == "true" && SuccessMessage) {
+				allMessageGp2 += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessageGp2 + `\n`;
+			}
+
+			if (NoWarnError == "true") {
+				OErrorMessageGp2 = "";
+			}
+
+			if ($.isNode() && (EnableMessageGp2 || DisableMessageGp2 || OErrorMessageGp2 || CKAlwaysNotify == "true")) {
+				console.log("京东CK检测#2：");
+				console.log(allMessageGp2);
+				await notify.sendNotify("京东CK检测#2", `${allMessageGp2}`, {
+					url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`
+				})
 			}
 		}
+		if (MessageUserGp3) {
+			if (OErrorMessageGp3) {
+				allMessageGp3 += `👇👇👇👇👇检测出错账号👇👇👇👇👇\n` + OErrorMessageGp3 + `\n\n`;
+			}
+			if (DisableMessageGp3) {
+				allMessageGp3 += `👇👇👇👇👇自动禁用账号👇👇👇👇👇\n` + DisableMessageGp3 + `\n\n`;
+			}
+			if (EnableMessageGp3) {
+				if (CKAutoEnable == "true") {
+					allMessageGp3 += `👇👇👇👇👇自动启用账号👇👇👇👇👇\n` + EnableMessageGp3 + `\n\n`;
+				} else {
+					allMessageGp3 += `👇👇👇👇👇账号已恢复👇👇👇👇👇\n` + EnableMessageGp3 + `\n\n`;
+				}
+			}
 
-		if (ErrorMessageGp2) {
-			allMessageGp2 += `👇👇👇👇👇失效账号👇👇👇👇👇\n` + ErrorMessageGp2 + `\n\n`;
-		} else {
-			allMessageGp2 += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
-		}
-		
-
-		if (ShowSuccess == "true" && SuccessMessage) {
-			allMessageGp2 += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessageGp2 + `\n`;
-		}
-
-		if (NoWarnError == "true") {
-			OErrorMessageGp2 = "";
-		}
-
-		if ($.isNode() && (EnableMessageGp2 || DisableMessageGp2 || ErrorMessageGp2 || OErrorMessageGp2 || CKAlwaysNotify == "true")) {
-			console.log("京东CK检测#2：");
-			console.log(allMessageGp2);
-			await notify.sendNotify("京东CK检测#2", `${allMessageGp2}`, {
-				url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`
-			})
-		}
-
-		if (OErrorMessageGp3) {
-			allMessageGp3 += `👇👇👇👇👇检测出错账号👇👇👇👇👇\n` + OErrorMessageGp3 + `\n\n`;
-		}
-		if (DisableMessageGp3) {
-			allMessageGp3 += `👇👇👇👇👇自动禁用账号👇👇👇👇👇\n` + DisableMessageGp3 + `\n\n`;
-		}
-		if (EnableMessageGp3) {
-			if (CKAutoEnable == "true") {
-				allMessageGp3 += `👇👇👇👇👇自动启用账号👇👇👇👇👇\n` + EnableMessageGp3 + `\n\n`;
+			if (ErrorMessageGp3) {
+				allMessageGp3 += `👇👇👇👇👇失效账号👇👇👇👇👇\n` + ErrorMessageGp3 + `\n\n`;
 			} else {
-				allMessageGp3 += `👇👇👇👇👇账号已恢复👇👇👇👇👇\n` + EnableMessageGp3 + `\n\n`;
+				allMessageGp3 += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
+			}
+
+			if (ShowSuccess == "true" && SuccessMessage) {
+				allMessageGp3 += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessageGp3 + `\n`;
+			}
+
+			if (NoWarnError == "true") {
+				OErrorMessageGp3 = "";
+			}
+
+			if ($.isNode() && (EnableMessageGp3 || DisableMessageGp3 || OErrorMessageGp3 || CKAlwaysNotify == "true")) {
+				console.log("京东CK检测#3：");
+				console.log(allMessageGp3);
+				await notify.sendNotify("京东CK检测#3", `${allMessageGp3}`, {
+					url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`
+				})
 			}
 		}
-
-		if (ErrorMessageGp3) {
-			allMessageGp3 += `👇👇👇👇👇失效账号👇👇👇👇👇\n` + ErrorMessageGp3 + `\n\n`;
-		} else {
-			allMessageGp3 += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
-		}
-		
-
-		if (ShowSuccess == "true" && SuccessMessage) {
-			allMessageGp3 += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessageGp3 + `\n`;
-		}
-
-		if (NoWarnError == "true") {
-			OErrorMessageGp3 = "";
-		}
-
-		if ($.isNode() && (EnableMessageGp3 || DisableMessageGp3 || ErrorMessageGp3 || OErrorMessageGp3 || CKAlwaysNotify == "true")) {
-			console.log("京东CK检测#3：");
-		console.log(allMessageGp3);
-			await notify.sendNotify("京东CK检测#3", `${allMessageGp3}`, {
-				url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`
-			})
-		}
-
-		if (OErrorMessageGp4) {
-			allMessageGp4 += `👇👇👇👇👇检测出错账号👇👇👇👇👇\n` + OErrorMessageGp4 + `\n\n`;
-		}
-		if (DisableMessageGp4) {
-			allMessageGp4 += `👇👇👇👇👇自动禁用账号👇👇👇👇👇\n` + DisableMessageGp4 + `\n\n`;
-		}
-		if (EnableMessageGp4) {
-			if (CKAutoEnable == "true") {
-				allMessageGp4 += `👇👇👇👇👇自动启用账号👇👇👇👇👇\n` + EnableMessageGp4 + `\n\n`;
-			} else {
-				allMessageGp4 += `👇👇👇👇👇账号已恢复👇👇👇👇👇\n` + EnableMessageGp4 + `\n\n`;
+		if (MessageUserGp4) {
+			if (OErrorMessageGp4) {
+				allMessageGp4 += `👇👇👇👇👇检测出错账号👇👇👇👇👇\n` + OErrorMessageGp4 + `\n\n`;
 			}
-		}
+			if (DisableMessageGp4) {
+				allMessageGp4 += `👇👇👇👇👇自动禁用账号👇👇👇👇👇\n` + DisableMessageGp4 + `\n\n`;
+			}
+			if (EnableMessageGp4) {
+				if (CKAutoEnable == "true") {
+					allMessageGp4 += `👇👇👇👇👇自动启用账号👇👇👇👇👇\n` + EnableMessageGp4 + `\n\n`;
+				} else {
+					allMessageGp4 += `👇👇👇👇👇账号已恢复👇👇👇👇👇\n` + EnableMessageGp4 + `\n\n`;
+				}
+			}
 
-		if (ErrorMessageGp4) {
-			allMessageGp4 += `👇👇👇👇👇失效账号👇👇👇👇👇\n` + ErrorMessageGp4 + `\n\n`;
-		} else {
-			allMessageGp4 += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
-		}
-		
+			if (ErrorMessageGp4) {
+				allMessageGp4 += `👇👇👇👇👇失效账号👇👇👇👇👇\n` + ErrorMessageGp4 + `\n\n`;
+			} else {
+				allMessageGp4 += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
+			}
 
-		if (ShowSuccess == "true" && SuccessMessage) {
-			allMessageGp4 += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessageGp4 + `\n`;
-		}
+			if (ShowSuccess == "true" && SuccessMessage) {
+				allMessageGp4 += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessageGp4 + `\n`;
+			}
 
-		if (NoWarnError == "true") {
-			OErrorMessageGp4 = "";
-		}
+			if (NoWarnError == "true") {
+				OErrorMessageGp4 = "";
+			}
 
-		if ($.isNode() && (EnableMessageGp4 || DisableMessageGp4 || ErrorMessageGp4 || OErrorMessageGp4 || CKAlwaysNotify == "true")) {
-			console.log("京东CK检测#4：");
-		console.log(allMessageGp4);
-			await notify.sendNotify("京东CK检测#4", `${allMessageGp4}`, {
-				url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`
-			})
+			if ($.isNode() && (EnableMessageGp4 || DisableMessageGp4 || OErrorMessageGp4 || CKAlwaysNotify == "true")) {
+				console.log("京东CK检测#4：");
+				console.log(allMessageGp4);
+				await notify.sendNotify("京东CK检测#4", `${allMessageGp4}`, {
+					url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`
+				})
+			}
 		}
 
 		if (OErrorMessage) {
@@ -394,7 +394,7 @@ if ($.isNode() && process.env.CHECKCK_CKNOWARNERROR) {
 		} else {
 			allMessage += `👇👇👇👇👇失效账号👇👇👇👇👇\n 一个失效的都没有呢，羡慕啊...\n\n`;
 		}
-		
+
 		if (ShowSuccess == "true" && SuccessMessage) {
 			allMessage += `👇👇👇👇👇有效账号👇👇👇👇👇\n` + SuccessMessage + `\n`;
 		}
@@ -403,7 +403,7 @@ if ($.isNode() && process.env.CHECKCK_CKNOWARNERROR) {
 			OErrorMessage = "";
 		}
 
-		if ($.isNode() && (EnableMessage || DisableMessage || ErrorMessage || OErrorMessage || CKAlwaysNotify == "true")) {
+		if ($.isNode() && (EnableMessage || DisableMessage || OErrorMessage || CKAlwaysNotify == "true")) {
 			console.log("京东CK检测：");
 			console.log(allMessage);
 			await notify.sendNotify(`${$.name}`, `${allMessage}`, {

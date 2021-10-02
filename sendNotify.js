@@ -867,8 +867,23 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 	PushErrorTime = 0;
 	await pushPlusNotify(text, desp); //pushplus(推送加)
 	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime - 1) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime - 1));
+		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
+		await $.wait(60000 * (PushErrorTime));
+		await pushPlusNotify(text, desp); //pushplus(推送加)
+	}
+	if (PushErrorTime > 0) {
+		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
+		await $.wait(60000 * (PushErrorTime));
+		await pushPlusNotify(text, desp); //pushplus(推送加)
+	}
+	if (PushErrorTime > 0) {
+		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
+		await $.wait(60000 * (PushErrorTime));
+		await pushPlusNotify(text, desp); //pushplus(推送加)
+	}
+	if (PushErrorTime > 0) {
+		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
+		await $.wait(60000 * (PushErrorTime));
 		await pushPlusNotify(text, desp); //pushplus(推送加)
 	}
 

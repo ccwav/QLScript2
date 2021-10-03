@@ -4,7 +4,7 @@ cron "58 7,15,23 * * *" jd_joy_reward_Mod.js
  //Mod by ccwav
 // prettier-ignore
 const $ = new Env('宠汪汪积分兑换有就换版');
-const zooFaker = require('./JDJRValidator_Pure');
+const zooFaker = require('./utils/JDJRValidator_Pure');
 // $.get = zooFaker.injectToRequest2($.get.bind($));
 // $.post = zooFaker.injectToRequest2($.post.bind($));
 let allMessage = '';

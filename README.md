@@ -4,11 +4,11 @@
 
 	不包含sendNotify:
 
-	ql repo https://github.com/ccwav/QLScript2.git "jd_" "sendNotify|NoUsed" "ql"
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|utils"
 
 	包含sendNotify:
 
-	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify"
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify|utils"
 
 
 # 1. 注意事项: 

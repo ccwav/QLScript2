@@ -10,7 +10,10 @@
 
 	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify|utils"
 
+频道:
 
+	https://t.me/ccwav
+	
 # 1. 注意事项: 
 （1）如果发现账户名称不能被正确处理，请手动删除ql\scripts\CKName_cache.json 文件.
 	
@@ -30,8 +33,7 @@
 # 3. jd_bean_change.js  
 京东资产变动 + 白嫖榜 + 京东月资产变动,注意事项: 
 
-	如果你遇到TG报错，请参考https://github.com/ccwav/QLScript/issues/8	
-	如果你遇到Bark报错，请参考https://github.com/ccwav/QLScript/issues/7
+	如果你遇到TG Bark报错，那是因为报文过长，请使用分段通知功能.
 
 变量列表:
 

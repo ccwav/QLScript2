@@ -135,7 +135,10 @@
 # 9. jd_joy_reward_Mod.js
 宠汪汪积分兑换有就换版
 
-增加变量 export JOY_GET20WHEN16="true"  控制16点才触发20京豆兑换.
+变量列表:
+
+    export JOY_GET20WHEN16="true"  
+    控制16点才触发20京豆兑换.
 
 # 分组应用总结实例:
 

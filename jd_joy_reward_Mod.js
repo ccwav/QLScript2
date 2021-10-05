@@ -16,6 +16,9 @@ let Today = new Date();
 let strDisable20 = "false";
 if ($.isNode() && process.env.JOY_GET20WHEN16) {
 	strDisable20 = process.env.JOY_GET20WHEN16;
+	if (strDisable20 != "false") {
+		console.log("检测到16点时段才抢20京豆");
+	}
 }
 
 //IOS等用户直接用NobyDa的jd cookie
@@ -133,7 +136,10 @@ async function joyReward() {
 				}
 				if (time >= 16 && time < 24) {
 					giftSaleInfos = 'beanConfigs16';
-					strDisable20 = "false";
+					if (strDisable20 != "false") {
+						console.log("现在是16点时段，执行抢20京豆");
+						strDisable20 = "false";
+					}
 				}
 
 				console.log(`debug场次:${giftSaleInfos}\n`)

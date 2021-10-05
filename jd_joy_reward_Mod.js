@@ -1,5 +1,5 @@
 /*
-cron "59 7,15,23 * * *" jd_joy_reward_Mod.js
+cron "58 7,15,23 * * *" jd_joy_reward_Mod.js
  */
 //Mod by ccwav
 // prettier-ignore
@@ -76,8 +76,8 @@ Date.prototype.Format = function (fmt) { //author: meizz
 			}
 			// console.log(`本地时间与京东服务器时间差(毫秒)：${await get_diff_time()}`);
 			$.validate = '';
-			$.validate = await zooFaker.injectToRequest()
-				console.log(`脚本开始请求时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
+			$.validate = await zooFaker.injectToRequest();
+			console.log(`脚本开始请求时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
 			await joyReward();
 		}
 	}
@@ -94,13 +94,24 @@ Date.prototype.Format = function (fmt) { //author: meizz
 
 async function joyReward() {
 	try {
-		if (new Date().getMinutes() === 59) {
-			let nowtime = new Date().Format("s.S")
-				let starttime = process.env.JOY_STARTTIME ? process.env.JOY_STARTTIME : 60;
+		let starttime = process.env.JOY_STARTTIME ? process.env.JOY_STARTTIME : 60;
+		let nowtime = new Date().getSeconds();
+		let sleeptime =0;
+		
+		if (new Date().getMinutes() == 58) {
+			sleeptime = (60 - nowtime) * 1000;
+			console.log(`请等待时间到达59分`+`等待时间 ${sleeptime / 1000}`);
+			await $.wait(sleeptime);
+		}
+
+		if (new Date().getMinutes() == 59) {
+			console.log(`脚本现在时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
+			nowtime = new Date().getSeconds();			 
 			if (nowtime < 59) {
-				let sleeptime = (starttime - nowtime) * 1000;
+				nowtime = new Date().getSeconds()+1;				
+				sleeptime = (starttime - nowtime) * 1000;
 				console.log(`等待时间 ${sleeptime / 1000}`);
-				await zooFaker.sleep(sleeptime)
+				await $.wait(sleeptime);
 			}
 		}
 		var llSuccess = false;
@@ -283,6 +294,7 @@ async function joyReward() {
 			} else {
 				console.log(`${$.name}getExchangeRewards异常,${JSON.stringify($.getExchangeRewardsRes)}`)
 			}
+			await $.wait(300);
 		}
 	} catch (e) {
 		$.logErr(e)

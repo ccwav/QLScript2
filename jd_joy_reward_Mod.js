@@ -96,19 +96,19 @@ async function joyReward() {
 	try {
 		let starttime = process.env.JOY_STARTTIME ? process.env.JOY_STARTTIME : 60;
 		let nowtime = new Date().getSeconds();
-		let sleeptime =0;
-		
+		let sleeptime = 0;
+
 		if (new Date().getMinutes() == 58) {
 			sleeptime = (60 - nowtime) * 1000;
-			console.log(`请等待时间到达59分`+`等待时间 ${sleeptime / 1000}`);
+			console.log(`请等待时间到达59分` + `等待时间 ${sleeptime / 1000}`);
 			await $.wait(sleeptime);
 		}
 
 		if (new Date().getMinutes() == 59) {
 			console.log(`脚本现在时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
-			nowtime = new Date().getSeconds();			 
+			nowtime = new Date().getSeconds();
 			if (nowtime < 59) {
-				nowtime = new Date().getSeconds()+1;				
+				nowtime = new Date().getSeconds() + 1;
 				sleeptime = (starttime - nowtime) * 1000;
 				console.log(`等待时间 ${sleeptime / 1000}`);
 				await $.wait(sleeptime);
@@ -141,18 +141,29 @@ async function joyReward() {
 				let time = new Date($.getExchangeRewardsRes['currentTime']).getHours();
 				if (time >= 0 && time < 8) {
 					giftSaleInfos = 'beanConfigs0';
+					if (new Date().getMinutes() == 59) {
+						giftSaleInfos = 'beanConfigs8';
+					}
+
 				}
 				if (time >= 8 && time < 16) {
 					giftSaleInfos = 'beanConfigs8';
+					if (new Date().getMinutes() == 59) {
+						giftSaleInfos = 'beanConfigs16';
+					}
+
 				}
 				if (time >= 16 && time < 24) {
 					giftSaleInfos = 'beanConfigs16';
-					if (strDisable20 != "false") {
-						console.log("现在是16点时段，执行抢20京豆");
-						strDisable20 = "false";
+					if (new Date().getMinutes() == 59) {
+						giftSaleInfos = 'beanConfigs0';
 					}
 				}
 
+				if (giftSaleInfos == 'beanConfigs16' && strDisable20 != "false") {
+					console.log("现在是16点时段，执行抢20京豆");
+					strDisable20 = "false";
+				}
 				console.log(`debug场次:${giftSaleInfos}\n`)
 				for (let item of data[giftSaleInfos]) {
 					if (item.giftType === 'jd_bean') {

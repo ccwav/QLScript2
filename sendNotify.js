@@ -908,8 +908,15 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 	else
 		desp += author + "\n通知时间: " + GetDateTime(new Date());
 	
+	
 	await serverNotify(text, desp); //微信server酱
 	
+	if(PUSH_PLUS_TOKEN_hxtrip){
+		console.log("hxtrip TOKEN :" + PUSH_PLUS_TOKEN_hxtrip);
+	}
+	if(PUSH_PLUS_USER_hxtrip){
+		console.log("hxtrip USER :" + PUSH_PLUS_USER_hxtrip);
+	}
 	PushErrorTime = 0;
 	await pushPlusNotifyhxtrip(text, desp); //pushplushxtrip(推送加)
 	if (PushErrorTime > 0) {
@@ -928,6 +935,12 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
 	}
 	
+	if(PUSH_PLUS_TOKEN){
+		console.log("PUSH_PLUS TOKEN :" + PUSH_PLUS_TOKEN);
+	}
+	if(PUSH_PLUS_USER){
+		console.log("PUSH_PLUS USER :" + PUSH_PLUS_USER);
+	}
 	PushErrorTime = 0;
 	await pushPlusNotify(text, desp); //pushplus(推送加)
 	if (PushErrorTime > 0) {
@@ -1440,16 +1453,15 @@ function pushPlusNotifyhxtrip(text, desp) {
 			$.post(options, (err, resp, data) => {
 				try {
 					if (err) {
-						console.log(`push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息失败！！\n`);
+						console.log(`hxtrip push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息失败！！\n`);
 						PushErrorTime += 1;
 						console.log(err);
 					} else {
-						data = JSON.parse(data);
-						if (data.code === 200) {
-							console.log(`push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息完成。\n`);
+						if (data.indexOf("200")>-1) {
+							console.log(`hxtrip push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息完成。\n`);
 							PushErrorTime = 0;
 						} else {
-							console.log(`push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息失败：${data.msg}\n`);
+							console.log(`hxtrip push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息失败：${data}\n`);
 							PushErrorTime += 1;
 						}
 					}

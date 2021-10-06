@@ -118,6 +118,10 @@
     (11) NOTIFY_CKTASK
     当接收到发送CK失效通知和Ninja 运行通知时候执行子线程任务,支持js py ts 
     例子: export NOTIFY_CKTASK="jd_CheckCK.js"
+	
+	(12) PUSH_PLUS_TOKEN_hxtrip 和 PUSH_PLUS_USER_hxtrip
+    增加pushplus.hxtrip.com的推送加接口，貌似更稳定,普通用法和NOTIFY_CUSTOMNOTIFY用法同PUSH_PLUS.
+    
     
 # 6. jd_speed_sign_Part1~jd_speed_sign_Part3
 简单粗暴的极速版的分任务版，将总ck数除以3后平均分配成三个任务同时执行.

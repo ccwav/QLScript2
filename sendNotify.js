@@ -84,7 +84,8 @@ let IGOT_PUSH_KEY = '';
 //PUSH_PLUS_USER： 一对多推送的“群组编码”（一对多推送下面->您的群组(如无则新建)->群组编码，如果您是创建群组人。也需点击“查看二维码”扫描绑定，否则不能接受群组消息推送）
 let PUSH_PLUS_TOKEN = '';
 let PUSH_PLUS_USER = '';
-
+let PUSH_PLUS_TOKEN_hxtrip = '';
+let PUSH_PLUS_USER_hxtrip = '';
 /**
  * sendNotify 推送通知功能
  * @param text 通知头
@@ -149,6 +150,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		IGOT_PUSH_KEY = '';
 		PUSH_PLUS_TOKEN = '';
 		PUSH_PLUS_USER = '';
+		PUSH_PLUS_TOKEN_hxtrip = '';
+		PUSH_PLUS_USER_hxtrip = '';
 		Notify_CKTask = "";
 
 		//变量开关
@@ -161,7 +164,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		var Use_qywxamNotify = true;
 		var Use_iGotNotify = true;
 		var Use_gobotNotify = true;
-
+		var Use_pushPlushxtripNotify = true;
 		if (process.env.NOTIFY_COMPTOGROUP2) {
 			Notify_CompToGroup2 = process.env.NOTIFY_COMPTOGROUP2;
 		}
@@ -314,6 +317,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 							console.log("关闭所有通知变量...");
 							Use_serverNotify = false;
 							Use_pushPlusNotify = false;
+							Use_pushPlushxtripNotify = false;
 							Use_BarkNotify = false;
 							Use_tgBotNotify = false;
 							Use_ddBotNotify = false;
@@ -332,6 +336,10 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 								case "pushplus":
 									Use_pushPlusNotify = true;
 									console.log("自定义设定启用pushplus(推送加)进行通知...");
+									break;
+								case "pushplushxtrip":
+									Use_pushPlushxtripNotify = true;
+									console.log("自定义设定启用pushplus_hxtrip(推送加)进行通知...");
 									break;
 								case "Bark":
 									Use_BarkNotify = true;
@@ -450,6 +458,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER;
 			}
+			
+			if (process.env.PUSH_PLUS_TOKEN_hxtrip && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip;
+			}
+			if (process.env.PUSH_PLUS_USER_hxtrip && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip;
+			}
 			break;
 
 		case 2:
@@ -522,6 +537,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			}
 			if (process.env.PUSH_PLUS_USER2 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER2;
+			}
+			
+			if (process.env.PUSH_PLUS_TOKEN_hxtrip2 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip2;
+			}
+			if (process.env.PUSH_PLUS_USER_hxtrip2 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip2;
 			}
 			break;
 
@@ -596,6 +618,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER3 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER3;
 			}
+			
+			if (process.env.PUSH_PLUS_TOKEN_hxtrip3 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip3;
+			}
+			if (process.env.PUSH_PLUS_USER_hxtrip3 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip3;
+			}
 			break;
 
 		case 4:
@@ -669,6 +698,15 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER4 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER4;
 			}
+			
+			
+			if (process.env.PUSH_PLUS_TOKEN_hxtrip4 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip4;
+			}
+			if (process.env.PUSH_PLUS_USER_hxtrip4 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip4;
+			}
+			
 			break;
 
 		case 5:
@@ -741,6 +779,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			}
 			if (process.env.PUSH_PLUS_USER5 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER5;
+			}			
+			
+			if (process.env.PUSH_PLUS_TOKEN_hxtrip5 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip5;
+			}
+			if (process.env.PUSH_PLUS_USER_hxtrip5 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip5;
 			}
 			break;
 
@@ -864,13 +909,27 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		desp += author + "\n通知时间: " + GetDateTime(new Date());
 	
 	await serverNotify(text, desp); //微信server酱
+	
 	PushErrorTime = 0;
-	await pushPlusNotify(text, desp); //pushplus(推送加)
+	await pushPlusNotifyhxtrip(text, desp); //pushplushxtrip(推送加)
 	if (PushErrorTime > 0) {
 		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
 		await $.wait(60000 * (PushErrorTime));
-		await pushPlusNotify(text, desp); //pushplus(推送加)
+		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
 	}
+	if (PushErrorTime > 0) {
+		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
+		await $.wait(60000 * (PushErrorTime));
+		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
+	}
+	if (PushErrorTime > 0) {
+		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
+		await $.wait(60000 * (PushErrorTime));
+		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
+	}
+	
+	PushErrorTime = 0;
+	await pushPlusNotify(text, desp); //pushplus(推送加)
 	if (PushErrorTime > 0) {
 		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
 		await $.wait(60000 * (PushErrorTime));
@@ -1346,6 +1405,52 @@ function iGotNotify(text, desp, params = {}) {
 							console.log('iGot发送通知消息成功🎉\n');
 						} else {
 							console.log(`iGot发送通知消息失败：${data.errMsg}\n`);
+						}
+					}
+				} catch (e) {
+					$.logErr(e, resp);
+				}
+				finally {
+					resolve(data);
+				}
+			});
+		} else {
+			resolve();
+		}
+	});
+}
+function pushPlusNotifyhxtrip(text, desp) {
+	return new Promise((resolve) => {
+		if (PUSH_PLUS_TOKEN_hxtrip) {
+			desp = desp.replace(/[\n\r]/g, '<br>'); // 默认为html, 不支持plaintext
+			const body = {
+				token: `${PUSH_PLUS_TOKEN_hxtrip}`,
+				title: `${text}`,
+				content: `${desp}`,
+				topic: `${PUSH_PLUS_USER_hxtrip}`,
+			};
+			const options = {
+				url: `http://pushplus.hxtrip.com/send`,
+				body: JSON.stringify(body),
+				headers: {
+					'Content-Type': ' application/json',
+				},
+				timeout,
+			};
+			$.post(options, (err, resp, data) => {
+				try {
+					if (err) {
+						console.log(`push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息失败！！\n`);
+						PushErrorTime += 1;
+						console.log(err);
+					} else {
+						data = JSON.parse(data);
+						if (data.code === 200) {
+							console.log(`push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息完成。\n`);
+							PushErrorTime = 0;
+						} else {
+							console.log(`push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息失败：${data.msg}\n`);
+							PushErrorTime += 1;
 						}
 					}
 				} catch (e) {

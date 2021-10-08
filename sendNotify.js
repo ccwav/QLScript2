@@ -9,7 +9,7 @@
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
  */
- //详细说明参考 https://github.com/ccwav/QLScript2.
+//详细说明参考 https://github.com/ccwav/QLScript2.
 const querystring = require('querystring');
 const exec = require('child_process').exec;
 const $ = new Env();
@@ -97,7 +97,6 @@ let PUSH_PLUS_USER_hxtrip = '';
 let PushErrorTime = 0;
 let strTitle = "";
 let ShowRemarkType = "1";
-let Notify_CompToGroup2 = "";
 let Notify_NoCKFalse = "false";
 let Notify_NoLoginSuccess = "false";
 let UseGroupNotify = 1;
@@ -165,9 +164,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		var Use_iGotNotify = true;
 		var Use_gobotNotify = true;
 		var Use_pushPlushxtripNotify = true;
-		if (process.env.NOTIFY_COMPTOGROUP2) {
-			Notify_CompToGroup2 = process.env.NOTIFY_COMPTOGROUP2;
-		}
+
 		if (process.env.NOTIFY_NOCKFALSE) {
 			Notify_NoCKFalse = process.env.NOTIFY_NOCKFALSE;
 		}
@@ -212,33 +209,23 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			return;
 		}
 
-		//检查脚本名称是否需要通知到Group2,Group2读取原环境配置的变量名后加2的值.例如: QYWX_AM2
-		const notifyGroup2List = process.env.NOTIFY_GROUP2_LIST ? process.env.NOTIFY_GROUP2_LIST.split('&') : [];
-		const titleIndex2 = notifyGroup2List.findIndex((item) => item === text);
-		const notifyGroup3List = process.env.NOTIFY_GROUP3_LIST ? process.env.NOTIFY_GROUP3_LIST.split('&') : [];
-		const titleIndexGp3 = notifyGroup3List.findIndex((item) => item === text);
-		const notifyGroup4List = process.env.NOTIFY_GROUP4_LIST ? process.env.NOTIFY_GROUP4_LIST.split('&') : [];
-		const titleIndexGp4 = notifyGroup4List.findIndex((item) => item === text);
-		const notifyGroup5List = process.env.NOTIFY_GROUP5_LIST ? process.env.NOTIFY_GROUP5_LIST.split('&') : [];
-		const titleIndexGp5 = notifyGroup5List.findIndex((item) => item === text);
-
 		if (text.indexOf("已可领取") != -1) {
 			if (text.indexOf("农场") != -1) {
-				strTitle = "东东农场";
+				strTitle = "东东农场领取";
 			} else {
-				strTitle = "东东萌宠";
+				strTitle = "东东萌宠领取";
 			}
 		}
 		if (text.indexOf("汪汪乐园养joy") != -1) {
-			strTitle = "汪汪乐园养joy";
+			strTitle = "汪汪乐园养joy领取";
 		}
 
 		if (text == "京喜工厂") {
 			if (desp.indexOf("元造进行兑换") != -1) {
-				strTitle = "京喜工厂";
+				strTitle = "京喜工厂领取";
 			}
 		}
-		strTitle
+
 		if (text.indexOf("任务") != -1 && (text.indexOf("新增") != -1 || text.indexOf("删除") != -1)) {
 			strTitle = "脚本任务更新";
 		}
@@ -250,12 +237,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 				console.log(`${text} 在领取信息黑名单中，已跳过推送`);
 				return;
 			}
-			const notifyCompToGroup2 = Notify_CompToGroup2 ? Notify_CompToGroup2.split('&') : [];
-			titleIndex = notifyCompToGroup2.findIndex((item) => item === strTitle);
-			if (titleIndex !== -1) {
-				console.log(`${strTitle}领取信息推送至群组2`);
-				UseGroupNotify = 2;
-			}
+		} else {
+			strTitle = text;
 		}
 
 		if (Notify_NoLoginSuccess == "true") {
@@ -265,21 +248,37 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			}
 		}
 
+		//检查脚本名称是否需要通知到Group2,Group2读取原环境配置的变量名后加2的值.例如: QYWX_AM2
+		const notifyGroup2List = process.env.NOTIFY_GROUP2_LIST ? process.env.NOTIFY_GROUP2_LIST.split('&') : [];
+		const titleIndex2 = notifyGroup2List.findIndex((item) => item === strTitle);
+		const notifyGroup3List = process.env.NOTIFY_GROUP3_LIST ? process.env.NOTIFY_GROUP3_LIST.split('&') : [];
+		const titleIndexGp3 = notifyGroup3List.findIndex((item) => item === strTitle);
+		const notifyGroup4List = process.env.NOTIFY_GROUP4_LIST ? process.env.NOTIFY_GROUP4_LIST.split('&') : [];
+		const titleIndexGp4 = notifyGroup4List.findIndex((item) => item === strTitle);
+		const notifyGroup5List = process.env.NOTIFY_GROUP5_LIST ? process.env.NOTIFY_GROUP5_LIST.split('&') : [];
+		const titleIndexGp5 = notifyGroup5List.findIndex((item) => item === strTitle);
+		const notifyGroup6List = process.env.NOTIFY_GROUP6_LIST ? process.env.NOTIFY_GROUP6_LIST.split('&') : [];
+		const titleIndexGp6 = notifyGroup6List.findIndex((item) => item === strTitle);
+
 		if (titleIndex2 !== -1) {
-			console.log(`${text} 在群组2推送名单中，初始化群组推送`);
+			console.log(`${strTitle} 在群组2推送名单中，初始化群组推送`);
 			UseGroupNotify = 2;
 		}
 		if (titleIndexGp3 !== -1) {
-			console.log(`${text} 在群组3推送名单中，初始化群组推送`);
+			console.log(`${strTitle} 在群组3推送名单中，初始化群组推送`);
 			UseGroupNotify = 3;
 		}
 		if (titleIndexGp4 !== -1) {
-			console.log(`${text} 在群组4推送名单中，初始化群组推送`);
+			console.log(`${strTitle} 在群组4推送名单中，初始化群组推送`);
 			UseGroupNotify = 4;
 		}
 		if (titleIndexGp5 !== -1) {
-			console.log(`${text} 在群组5推送名单中，初始化群组推送`);
+			console.log(`${strTitle} 在群组5推送名单中，初始化群组推送`);
 			UseGroupNotify = 5;
+		}
+		if (titleIndexGp6 !== -1) {
+			console.log(`${strTitle} 在群组6推送名单中，初始化群组推送`);
+			UseGroupNotify = 6;
 		}
 		if (process.env.NOTIFY_CUSTOMNOTIFY) {
 			strCustom = process.env.NOTIFY_CUSTOMNOTIFY;
@@ -290,7 +289,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			for (var Tempj in strCustomArr) {
 				strCustomTempArr = strCustomArr[Tempj].split("&");
 				if (strCustomTempArr.length > 1) {
-					if (text == strCustomTempArr[0]) {
+					if (strTitle == strCustomTempArr[0]) {
 						console.log("检测到自定义设定,开始执行配置...");
 						if (strCustomTempArr[1] == "组1") {
 							console.log("自定义设定强制使用组1配置通知...");
@@ -308,9 +307,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 							console.log("自定义设定强制使用组4配置通知...");
 							UseGroupNotify = 4;
 						}
-						if (strCustomTempArr[5] == "组5") {
+						if (strCustomTempArr[1] == "组5") {
 							console.log("自定义设定强制使用组5配置通知...");
 							UseGroupNotify = 5;
+						}
+						if (strCustomTempArr[1] == "组6") {
+							console.log("自定义设定强制使用组6配置通知...");
+							UseGroupNotify = 6;
 						}
 
 						if (strCustomTempArr.length > 2) {
@@ -458,7 +461,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER;
 			}
-			
+
 			if (process.env.PUSH_PLUS_TOKEN_hxtrip && Use_pushPlushxtripNotify) {
 				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip;
 			}
@@ -538,7 +541,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER2 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER2;
 			}
-			
+
 			if (process.env.PUSH_PLUS_TOKEN_hxtrip2 && Use_pushPlushxtripNotify) {
 				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip2;
 			}
@@ -618,7 +621,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER3 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER3;
 			}
-			
+
 			if (process.env.PUSH_PLUS_TOKEN_hxtrip3 && Use_pushPlushxtripNotify) {
 				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip3;
 			}
@@ -698,15 +701,14 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			if (process.env.PUSH_PLUS_USER4 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER4;
 			}
-			
-			
+
 			if (process.env.PUSH_PLUS_TOKEN_hxtrip4 && Use_pushPlushxtripNotify) {
 				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip4;
 			}
 			if (process.env.PUSH_PLUS_USER_hxtrip4 && Use_pushPlushxtripNotify) {
 				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip4;
 			}
-			
+
 			break;
 
 		case 5:
@@ -779,8 +781,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			}
 			if (process.env.PUSH_PLUS_USER5 && Use_pushPlusNotify) {
 				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER5;
-			}			
-			
+			}
+
 			if (process.env.PUSH_PLUS_TOKEN_hxtrip5 && Use_pushPlushxtripNotify) {
 				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip5;
 			}
@@ -789,11 +791,90 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			}
 			break;
 
+		case 6:
+			//==========================第六套环境变量赋值=========================
+
+			if (process.env.GOBOT_URL6 && Use_gobotNotify) {
+				GOBOT_URL = process.env.GOBOT_URL6;
+			}
+			if (process.env.GOBOT_TOKEN6 && Use_gobotNotify) {
+				GOBOT_TOKEN = process.env.GOBOT_TOKEN6;
+			}
+			if (process.env.GOBOT_QQ6 && Use_gobotNotify) {
+				GOBOT_QQ = process.env.GOBOT_QQ6;
+			}
+
+			if (process.env.PUSH_KEY6 && Use_serverNotify) {
+				SCKEY = process.env.PUSH_KEY6;
+			}
+
+			if (process.env.BARK_PUSH6 && Use_BarkNotify) {
+				if (process.env.BARK_PUSH6.indexOf('https') > -1 || process.env.BARK_PUSH6.indexOf('http') > -1) {
+					//兼容BARK自建用户
+					BARK_PUSH = process.env.BARK_PUSH6;
+				} else {
+					BARK_PUSH = `https://api.day.app/${process.env.BARK_PUSH6}`;
+				}
+				if (process.env.BARK_SOUND6) {
+					BARK_SOUND = process.env.BARK_SOUND6;
+				}
+				if (process.env.BARK_GROUP6) {
+					BARK_GROUP = process.env.BARK_GROUP6;
+				}
+			}
+			if (process.env.TG_BOT_TOKEN6 && Use_tgBotNotify) {
+				TG_BOT_TOKEN = process.env.TG_BOT_TOKEN6;
+			}
+			if (process.env.TG_USER_ID6 && Use_tgBotNotify) {
+				TG_USER_ID = process.env.TG_USER_ID6;
+			}
+			if (process.env.TG_PROXY_AUTH6 && Use_tgBotNotify)
+				TG_PROXY_AUTH = process.env.TG_PROXY_AUTH6;
+			if (process.env.TG_PROXY_HOST6 && Use_tgBotNotify)
+				TG_PROXY_HOST = process.env.TG_PROXY_HOST6;
+			if (process.env.TG_PROXY_PORT6 && Use_tgBotNotify)
+				TG_PROXY_PORT = process.env.TG_PROXY_PORT6;
+			if (process.env.TG_API_HOST6 && Use_tgBotNotify)
+				TG_API_HOST = process.env.TG_API_HOST6;
+
+			if (process.env.DD_BOT_TOKEN6 && Use_ddBotNotify) {
+				DD_BOT_TOKEN = process.env.DD_BOT_TOKEN6;
+				if (process.env.DD_BOT_SECRET6) {
+					DD_BOT_SECRET = process.env.DD_BOT_SECRET6;
+				}
+			}
+
+			if (process.env.QYWX_KEY6 && Use_qywxBotNotify) {
+				QYWX_KEY = process.env.QYWX_KEY6;
+			}
+
+			if (process.env.QYWX_AM6 && Use_qywxamNotify) {
+				QYWX_AM = process.env.QYWX_AM6;
+			}
+
+			if (process.env.IGOT_PUSH_KEY6 && Use_iGotNotify) {
+				IGOT_PUSH_KEY = process.env.IGOT_PUSH_KEY6;
+			}
+
+			if (process.env.PUSH_PLUS_TOKEN6 && Use_pushPlusNotify) {
+				PUSH_PLUS_TOKEN = process.env.PUSH_PLUS_TOKEN6;
+			}
+			if (process.env.PUSH_PLUS_USER6 && Use_pushPlusNotify) {
+				PUSH_PLUS_USER = process.env.PUSH_PLUS_USER6;
+			}
+
+			if (process.env.PUSH_PLUS_TOKEN_hxtrip6 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_TOKEN_hxtrip = process.env.PUSH_PLUS_TOKEN_hxtrip6;
+			}
+			if (process.env.PUSH_PLUS_USER_hxtrip6 && Use_pushPlushxtripNotify) {
+				PUSH_PLUS_USER_hxtrip = process.env.PUSH_PLUS_USER_hxtrip6;
+			}
+			break;
 		}
 
 		//检查是否在不使用Remark进行名称替换的名单
 		const notifySkipRemarkList = process.env.NOTIFY_SKIP_NAMETYPELIST ? process.env.NOTIFY_SKIP_NAMETYPELIST.split('&') : [];
-		const titleIndex3 = notifySkipRemarkList.findIndex((item) => item === text);
+		const titleIndex3 = notifySkipRemarkList.findIndex((item) => item === strTitle);
 
 		if (text == "京东到家果园互助码:") {
 			ShowRemarkType = "1";
@@ -907,14 +988,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		desp += '\n\n本通知 By ' + strAuthor + "\n通知时间: " + GetDateTime(new Date());
 	else
 		desp += author + "\n通知时间: " + GetDateTime(new Date());
-	
-	
+
 	await serverNotify(text, desp); //微信server酱
-	
-	if(PUSH_PLUS_TOKEN_hxtrip){
+
+	if (PUSH_PLUS_TOKEN_hxtrip) {
 		console.log("hxtrip TOKEN :" + PUSH_PLUS_TOKEN_hxtrip);
 	}
-	if(PUSH_PLUS_USER_hxtrip){
+	if (PUSH_PLUS_USER_hxtrip) {
 		console.log("hxtrip USER :" + PUSH_PLUS_USER_hxtrip);
 	}
 	PushErrorTime = 0;
@@ -934,11 +1014,11 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		await $.wait(60000 * (PushErrorTime));
 		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
 	}
-	
-	if(PUSH_PLUS_TOKEN){
+
+	if (PUSH_PLUS_TOKEN) {
 		console.log("PUSH_PLUS TOKEN :" + PUSH_PLUS_TOKEN);
 	}
-	if(PUSH_PLUS_USER){
+	if (PUSH_PLUS_USER) {
 		console.log("PUSH_PLUS USER :" + PUSH_PLUS_USER);
 	}
 	PushErrorTime = 0;
@@ -1457,7 +1537,7 @@ function pushPlusNotifyhxtrip(text, desp) {
 						PushErrorTime += 1;
 						console.log(err);
 					} else {
-						if (data.indexOf("200")>-1) {
+						if (data.indexOf("200") > -1) {
 							console.log(`hxtrip push+发送${PUSH_PLUS_USER_hxtrip ? '一对多' : '一对一'}通知消息完成。\n`);
 							PushErrorTime = 0;
 						} else {

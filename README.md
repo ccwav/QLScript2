@@ -91,12 +91,11 @@
     单独指定某些脚本不做NOTIFY_SHOWNAMETYPE变量处理
 	  例子 :  export NOTIFY_SKIP_NAMETYPELIST="东东农场&东东工厂"
     
-    (5) NOTIFY_COMPTOGROUP2
-    东东农场 东东萌宠 京喜工厂 汪汪乐园养joy的兑换通知和脚本任务更新的通知推送到群组2,可自行删减.	
-    export NOTIFY_COMPTOGROUP2="东东农场&东东萌宠&京喜工厂&汪汪乐园养joy&脚本任务更新"	
+    (5) 特殊标题控制，可以自行加载到第二点的变量中控制
+    东东农场领取 东东萌宠领取 京喜工厂领取 汪汪乐园养joy领取 脚本任务更新
     
     (6) NOTIFY_NOREMIND
-    东东农场 东东萌宠 京喜工厂 汪汪乐园养joy的兑换通知和脚本任务更新的通知进行屏蔽,可自行删减.	
+    对 东东农场领取 东东萌宠领取 京喜工厂领取 汪汪乐园养joy领取 脚本任务更新的通知进行屏蔽,可自行删减.	
     export NOTIFY_NOREMIND="京喜工厂&汪汪乐园养joy"
     
     (7) NOTIFY_NOCKFALSE
@@ -154,8 +153,7 @@
     ##开启月结资产推送
     export BEANCHANGE_ENABLEMONTH="true"
 
-    ##分组2推送
-    export NOTIFY_COMPTOGROUP2="东东农场&东东萌宠&汪汪乐园养joy&脚本任务更新"
+    ##分组2推送    
     export QYWX_AM2=""
     export PUSH_PLUS_TOKEN2="ABCDEFGHIJKLMN"
     export PUSH_PLUS_USER2="Group2";
@@ -179,4 +177,10 @@
     export PUSH_PLUS_TOKEN5="ABCDEFGHIJKLMN"
     export PUSH_PLUS_USER5="Group5";
     export NOTIFY_GROUP5_LIST="京东资产变动&京东白嫖榜&京东月资产变动&省钱大赢家之翻翻乐&京东CK检测"
+	
+	 
+	##分组6推送
+	export QYWX_AM6="bbbbbbbbbbbbbbbbbbsccccccccccccccccc"
+	export NOTIFY_GROUP6_LIST="东东农场领取&东东萌宠领取&汪汪乐园养joy领取&脚本任务更新"
+
 

@@ -78,8 +78,8 @@
     如果通知标题在此变量里面存在(&隔开),则用屏蔽不发送通知.(PS: Ningjia 作者写的功能，继承过来.)	
     例子 :  export NOTIFY_SKIP_LIST="京东CK检测&京东资产变动"
     
-    (2) NOTIFY_GROUP2_LIST NOTIFY_GROUP3_LIST NOTIFY_GROUP4_LIST NOTIFY_GROUP5_LIST
-    如果通知标题在此变量里面存在(&隔开),则用第2/3/4/5套推送变量进行配置.
+    (2) NOTIFY_GROUP2_LIST NOTIFY_GROUP3_LIST NOTIFY_GROUP4_LIST NOTIFY_GROUP5_LIST NOTIFY_GROUP6_LIST
+    如果通知标题在此变量里面存在(&隔开),则用第2/3/4/5/6套推送变量进行配置.
     
     (3) NOTIFY_SHOWNAMETYPE
     export NOTIFY_SHOWNAMETYPE="1"    不做任何变动

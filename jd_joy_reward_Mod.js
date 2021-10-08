@@ -115,7 +115,7 @@ async function joyReward() {
 			}
 		}
 		var llSuccess = false;
-		for (let j = 0; j <= 9; j++) {
+		for (let j = 0; j <= 14; j++) {
 			console.log(`\n正在尝试第` + (j + 1) + `次执行:${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")} \n`);
 
 			if (llSuccess) {

@@ -920,8 +920,10 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 							}
 							if (!$.FoundPin) {
 								//缓存文件中有没有这个账号，调用京东接口获取别名,并更新缓存文件
+								console.log($.UserName+"好像是新账号，尝试获取别名.....");
 								await GetnickName();
 								if (!$.nickName) {
+									console.log("别名获取失败，尝试调用另一个接口获取别名.....");
 									await GetnickName2();
 								}
 								if ($.nickName) {
@@ -933,6 +935,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 									TempCK.push(tempAddCK);
 									//标识，需要更新缓存文件
 									boolneedUpdate = true;
+								} else{
+									console.log($.UserName+"别名获取失败.....");
 								}
 							}
 						}
@@ -1000,21 +1004,16 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 	PushErrorTime = 0;
 	await pushPlusNotifyhxtrip(text, desp); //pushplushxtrip(推送加)
 	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime));
-		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
+		console.log("等待1分钟后重试.....");
+		await $.wait(60000 );
+		await pushPlusNotifyhxtrip(text, desp); 
 	}
 	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime));
-		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
+		console.log("等待1分钟后重试.....");
+		await $.wait(60000);
+		await pushPlusNotifyhxtrip(text, desp); 
 	}
-	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime));
-		await pushPlusNotifyhxtrip(text, desp); //pushplus(推送加)
-	}
-
+	
 	if (PUSH_PLUS_TOKEN) {
 		console.log("PUSH_PLUS TOKEN :" + PUSH_PLUS_TOKEN);
 	}
@@ -1024,21 +1023,16 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 	PushErrorTime = 0;
 	await pushPlusNotify(text, desp); //pushplus(推送加)
 	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime));
+		console.log("等待1分钟后重试.....");
+		await $.wait(60000);
 		await pushPlusNotify(text, desp); //pushplus(推送加)
 	}
 	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime));
+		console.log("等待1分钟后重试.....");
+		await $.wait(60000);
 		await pushPlusNotify(text, desp); //pushplus(推送加)
 	}
-	if (PushErrorTime > 0) {
-		console.log("等待" + (PushErrorTime) + "分钟后重试.....");
-		await $.wait(60000 * (PushErrorTime));
-		await pushPlusNotify(text, desp); //pushplus(推送加)
-	}
-
+	
 	//由于上述两种微信通知需点击进去才能查看到详情，故text(标题内容)携带了账号序号以及昵称信息，方便不点击也可知道是哪个京东哪个活动
 	text = text.match(/.*?(?=\s?-)/g) ? text.match(/.*?(?=\s?-)/g)[0] : text;
 	await Promise.all([

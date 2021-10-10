@@ -49,7 +49,7 @@
     (3) BEANCHANGE_ENABLEMONTH
         每月1号17点后如果执行资产查询，开启京东月资产变动的统计和推送.	
 	    拆分通知和分组通知的变量都可以兼容.	
-	    标题按照分组分别为 京东月资产变动 京东月资产变动#2 京东月资产变动#3 	
+	    标题按照分组分别为 京东月资产变动 京东月资产变动#2 京东月资产变动#3 京东月资产变动#4	
 	    开启 :  export BEANCHANGE_ENABLEMONTH="true"  	
     
     
@@ -96,7 +96,7 @@
     
     (6) NOTIFY_NOREMIND
     对 东东农场领取 东东萌宠领取 京喜工厂领取 汪汪乐园养joy领取 脚本任务更新的通知进行屏蔽,可自行删减.	
-    export NOTIFY_NOREMIND="京喜工厂&汪汪乐园养joy"
+    export NOTIFY_NOREMIND="京喜工厂领取&汪汪乐园养joy领取"
     
     (7) NOTIFY_NOCKFALSE
     屏蔽任务脚本的ck失效通知
@@ -119,7 +119,7 @@
     例子: export NOTIFY_CKTASK="jd_CheckCK.js"
 	
 	(12) PUSH_PLUS_TOKEN_hxtrip 和 PUSH_PLUS_USER_hxtrip
-    增加pushplus.hxtrip.com的推送加接口，貌似更稳定,普通用法和NOTIFY_CUSTOMNOTIFY用法同PUSH_PLUS.
+    增加pushplus.hxtrip.com的推送加接口，貌似更稳定,注意这个和PUSHPLUS不是同一家.
     
     
 # 6. jd_speed_sign_Part1~jd_speed_sign_Part3

@@ -1053,7 +1053,7 @@ function gobotNotify(text, desp, time = 2100) {
 				url: `${GOBOT_URL}?access_token=${GOBOT_TOKEN}&${GOBOT_QQ}`,
 				body: `message=${text}\n${desp}`,
 				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
+					'Content-Type': 'application/json',
 				},
 				timeout,
 			};

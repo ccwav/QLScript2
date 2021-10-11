@@ -2,6 +2,7 @@
 cron "30 21 * * *" jd_bean_change.js, tag:资产变化强化版by-ccwav
  */
 
+
 //详细说明参考 https://github.com/ccwav/QLScript2.
 
 // prettier-ignore
@@ -56,7 +57,7 @@ let i = 0;
 let DisableCash = "false";
 let llShowMonth = false;
 let Today = new Date();
-let RemainMessage = '\n' + "🔪兑换请尽快处理🔪" + '\n';
+let RemainMessage = '\n' ;
 RemainMessage += "⭕提醒:⭕" + '\n';
 RemainMessage += '【极速金币】京东极速版->我的->金币(极速版使用)\n';
 RemainMessage += '【京东赚赚】微信->京东赚赚小程序->底部赚好礼->提现无门槛红包(京东使用)\n';
@@ -67,10 +68,10 @@ RemainMessage += '【东东农场】京东->我的->东东农场,完成是京东
 RemainMessage += '【京喜工厂】京喜->我的->京喜工厂,完成是商品红包,用于购买指定商品(不兑换会过期)\n';
 RemainMessage += '【其他】京喜红包只能在京喜使用,其他同理';
 
-let WP_APP_TOKEN = "";
-
+let WP_APP_TOKEN_ONE = "";
+let TempBaipiao = "";
 if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
-	WP_APP_TOKEN = process.env.WP_APP_TOKEN_ONE;
+	WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
 }
 if ($.isNode() && process.env.BEANCHANGE_PERSENT) {
 	intPerSent = parseInt(process.env.BEANCHANGE_PERSENT);
@@ -166,7 +167,7 @@ if ($.isNode()) {
 			$.allincomeBean = 0; //月收入
 			$.allexpenseBean = 0; //月支出
 			$.joylevel = 0;
-
+			TempBaipiao="";
 			console.log(`******开始查询【京东账号${$.index}】${$.nickName || $.UserName}*********`);
 
 			await TotalBean();
@@ -499,10 +500,7 @@ async function showMsg() {
 	if ($.joylevel || $.jdCash) {
 		ReturnMessage += `【其他信息】`;
 		if ($.joylevel) {
-			ReturnMessage += `汪汪:${$.joylevel}级`;
-			if ($.joylevel >= 30) {
-				allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】汪汪满级可领取宝箱啦 (汪汪乐园)\n`;
-			}
+			ReturnMessage += `汪汪:${$.joylevel}级`;			
 			if ($.jdCash) {
 				ReturnMessage += ",";
 			}
@@ -519,7 +517,7 @@ async function showMsg() {
 		if ($.JdtreeEnergy != 0) {
 			if ($.treeState === 2 || $.treeState === 3) {
 				ReturnMessage += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
-
+				TempBaipiao+= `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
 				if (userIndex2 != -1) {
 					ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
 				}
@@ -542,29 +540,33 @@ async function showMsg() {
 			}
 		} else {
 			if ($.treeState === 0) {
+				TempBaipiao+= `【东东农场】水果领取后未重新种植!\n`;
+				
 				if (userIndex2 != -1) {
-					ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					WarnMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 				if (userIndex3 != -1) {
-					ReceiveMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					WarnMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 				if (userIndex4 != -1) {
-					ReceiveMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					WarnMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 				if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 					allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
+				
 			} else if ($.treeState === 1) {
 				ReturnMessage += `【东东农场】${$.JdFarmProdName}种植中...\n`;
 			} else {
+				TempBaipiao+= `【东东农场】状态异常!\n`;
 				if (userIndex2 != -1) {
-					ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					WarnMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
 				}
 				if (userIndex3 != -1) {
-					ReceiveMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					WarnMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
 				}
 				if (userIndex4 != -1) {
-					ReceiveMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					WarnMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
 				}
 				if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 					allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
@@ -592,6 +594,7 @@ async function showMsg() {
 		if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 			allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.DdFactoryReceive} (东东工厂)\n`;
 		}
+		TempBaipiao+=`【东东工厂】${$.ddFactoryInfo} 可以兑换了!\n`;
 	}
 	if ($.jxFactoryReceive) {
 		if (userIndex2 != -1) {
@@ -606,6 +609,8 @@ async function showMsg() {
 		if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 			allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.jxFactoryReceive} (京喜工厂)\n`;
 		}
+		
+		TempBaipiao+=`【京喜工厂】${$.jxFactoryReceive} 可以兑换了!\n`;
 
 	}
 	const response = await PetRequest('energyCollect');
@@ -616,6 +621,7 @@ async function showMsg() {
 			ReturnMessage += `【东东萌宠】活动未开启!\n`;
 		} else if ($.petInfo.petStatus === 5) {
 			ReturnMessage += `【东东萌宠】${$.petInfo.goodsInfo.goodsName}已可领取!\n`;
+			TempBaipiao+=`【东东萌宠】${$.petInfo.goodsInfo.goodsName}已可领取!\n`;
 			if (userIndex2 != -1) {
 				ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】${$.petInfo.goodsInfo.goodsName}可以兑换了! (东东萌宠)\n`;
 			}
@@ -629,14 +635,15 @@ async function showMsg() {
 				allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.petInfo.goodsInfo.goodsName}可以兑换了! (东东萌宠)\n`;
 			}
 		} else if ($.petInfo.petStatus === 6) {
+			TempBaipiao+= `【东东萌宠】未选择物品! \n`;
 			if (userIndex2 != -1) {
-				ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
+				WarnMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
 			}
 			if (userIndex3 != -1) {
-				ReceiveMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
+				WarnMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
 			}
 			if (userIndex4 != -1) {
-				ReceiveMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
+				WarnMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
 			}
 			if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 				allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】未选择物品! (东东萌宠)\n`;
@@ -646,15 +653,15 @@ async function showMsg() {
 			ReturnMessage += `(${(response.result.medalPercent).toFixed(0)}%,${response.result.medalNum}/${response.result.medalNum+response.result.needCollectMedalNum}块)\n`;
 		} else if (!$.petInfo.goodsInfo) {
 			ReturnMessage += `【东东萌宠】暂未选购新的商品!\n`;
-
+			TempBaipiao+= `【东东萌宠】暂未选购新的商品! \n`;
 			if (userIndex2 != -1) {
-				ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
+				WarnMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
 			}
 			if (userIndex3 != -1) {
-				ReceiveMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
+				WarnMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
 			}
 			if (userIndex4 != -1) {
-				ReceiveMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
+				WarnMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
 			}
 			if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 				allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】暂未选购新的商品! (东东萌宠)\n`;
@@ -681,7 +688,13 @@ async function showMsg() {
 
 	console.log(`${ReturnMessage}`);
 	
-	if ($.isNode() && WP_APP_TOKEN) {
+	if ($.isNode() && WP_APP_TOKEN_ONE) {
+		if(TempBaipiao){
+			TempBaipiao=`\n\n【⏰商品白嫖活动提醒⏰】\n` +TempBaipiao;
+			TempBaipiao += RemainMessage;
+			ReturnMessage+=TempBaipiao;
+		}
+			
 		await notify.sendNotifybyWxPucher(`${$.name}`, `${ReturnMessage}`,`${$.UserName}`);
 	}
 	

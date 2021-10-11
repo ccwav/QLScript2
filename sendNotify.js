@@ -99,6 +99,7 @@ let WP_UIDS = "";
 let WP_URL = "";
 
 let WP_APP_TOKEN_ONE = "";
+let WP_UIDS_ONE = "";
 /**
  * sendNotify 推送通知功能
  * @param text 通知头
@@ -1171,16 +1172,16 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		]);
 }
 
-async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n本通知 By ccwav Mod') {
+async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 By ccwav Mod') {
 
 	try {
 		var Uid = "";
 		var UserRemark = [];
-		WP_APP_TOKEN="";
+		WP_APP_TOKEN_ONE="";
 		if (process.env.WP_APP_TOKEN_ONE) {
-			WP_APP_TOKEN = process.env.WP_APP_TOKEN_ONE;
+			WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
 		}
-		if (WP_APP_TOKEN) {
+		if (WP_APP_TOKEN_ONE) {
 			if (TempCKUid) {
 				for (let j = 0; j < TempCKUid.length; j++) {
 					if (TempCKUid[j].pt_pin == PtPin) {
@@ -1190,20 +1191,18 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n本通知 By 
 			}
 			if (Uid) {
 				console.log("查询到Uid ：" + Uid);
-				WP_UIDS = Uid;
-				WP_TOPICIDS = "";
-				WP_URL = "";
+				WP_UIDS_ONE = Uid;				
 				console.log("正在发送一对一通知,请稍后...");
 				if (strAuthor)
 					desp += '\n\n本通知 By ' + strAuthor;
 				else
 					desp += author;
-				await wxpusherNotify(text, desp);
+				await wxpusherNotifyByOne(text, desp);
 			} else {
 				console.log("未查询到用户的Uid,取消发送...");
 			}
 		} else {
-			console.log("变量WP_APP_TOKEN未配置WxPusher的appToken, 取消发送...");
+			console.log("变量WP_APP_TOKEN_ONE未配置WxPusher的appToken, 取消发送...");
 
 		}
 	} catch (error) {
@@ -1763,6 +1762,59 @@ function pushPlusNotify(text, desp) {
 		}
 	});
 }
+function wxpusherNotifyByOne(text, desp) {
+	return new Promise((resolve) => {
+		if (WP_APP_TOKEN_ONE) {
+			var WPURL="";
+			let uids = [];
+			for (let i of WP_UIDS_ONE.split(";")) {
+				if (i.length != 0)
+					uids.push(i);
+			};
+			let topicIds = [];			
+			const body = {
+				appToken: `${WP_APP_TOKEN_ONE}`,
+				content: `${text}\n\n${desp}`,
+				summary: `${text}`,
+				contentType: 1,
+				topicIds: topicIds,
+				uids: uids,
+				url: `${WPURL}`,
+			};
+			const options = {
+				url: `http://wxpusher.zjiecode.com/api/send/message`,
+				body: JSON.stringify(body),
+				headers: {
+					"Content-Type": "application/json",
+				},
+				timeout,
+			};
+			$.post(options, (err, resp, data) => {
+				try {
+					if (err) {
+						console.log("WxPusher 发送通知调用 API 失败！！\n");
+						console.log(err);
+					} else {
+						data = JSON.parse(data);
+						if (data.code === 1000) {
+							console.log("WxPusher 发送通知消息成功!\n");
+						}
+					}
+				} catch (e) {
+					$.logErr(e, resp);
+				}
+				finally {
+					resolve(data);
+				}
+			});
+		} else {
+			console.log("您未提供 WxPusher 的 appToken, 取消 WxPusher 推送消息通知\n");
+			resolve();
+		}
+	});
+}
+
+
 function wxpusherNotify(text, desp) {
 	return new Promise((resolve) => {
 		if (WP_APP_TOKEN) {

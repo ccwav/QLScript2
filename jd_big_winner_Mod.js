@@ -65,6 +65,10 @@ if ($.isNode() && process.env.BEANCHANGE_USERGP4) {
 	MessageUserGp4 = process.env.BEANCHANGE_USERGP4 ? process.env.BEANCHANGE_USERGP4.split('&') : [];
 	console.log(`检测到设定了分组推送4`);
 }
+let WP_APP_TOKEN_ONE = "";
+if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
+	WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
+}
 
 !(async() => {
 	$.redPacketId = []
@@ -114,6 +118,9 @@ if ($.isNode() && process.env.BEANCHANGE_USERGP4) {
 			console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
 			await main()
 			if (ReturnMessage) {
+				if ($.isNode() && WP_APP_TOKEN_ONE) {
+					await notify.sendNotifybyWxPucher(`${$.name}`, `${ReturnMessage}`,`${$.UserName}`);
+				}
 				ReturnMessage = ReturnMessageTitle + ReturnMessage;
 
 				if (userIndex4 != -1) {

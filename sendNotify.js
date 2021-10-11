@@ -1051,17 +1051,17 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 									await GetnickName2();
 								}
 								if ($.nickName) {
-									console.log("好像是新账号，从接口获取别名" + $.nickName);
-									tempAddCK = {
+									console.log("好像是新账号，从接口获取别名" + $.nickName);									
+								} else {
+									console.log($.UserName + "该账号没有别名.....");
+								}
+								tempAddCK = {
 										"pt_pin": $.UserName,
 										"nickName": $.nickName
 									};
-									TempCK.push(tempAddCK);
-									//标识，需要更新缓存文件
-									boolneedUpdate = true;
-								} else {
-									console.log($.UserName + "别名获取失败.....");
-								}
+								TempCK.push(tempAddCK);
+								//标识，需要更新缓存文件
+								boolneedUpdate = true;
 							}
 						}
 
@@ -1199,7 +1199,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 					desp += author;
 				await wxpusherNotifyByOne(text, desp);
 			} else {
-				console.log("未查询到用户的Uid,取消发送...");
+				console.log("未查询到用户的Uid,取消一对一通知发送...");
 			}
 		} else {
 			console.log("变量WP_APP_TOKEN_ONE未配置WxPusher的appToken, 取消发送...");
@@ -1808,7 +1808,6 @@ function wxpusherNotifyByOne(text, desp) {
 				}
 			});
 		} else {
-			console.log("您未提供 WxPusher 的 appToken, 取消 WxPusher 推送消息通知\n");
 			resolve();
 		}
 	});
@@ -1864,7 +1863,6 @@ function wxpusherNotify(text, desp) {
 				}
 			});
 		} else {
-			console.log("您未提供 WxPusher 的 appToken, 取消 WxPusher 推送消息通知\n");
 			resolve();
 		}
 	});

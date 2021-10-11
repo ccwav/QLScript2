@@ -111,7 +111,7 @@
     
     (10) NOTIFY_CUSTOMNOTIFY
     强大的自定义通知，格式为 脚本名称&推送组别&推送类型 (推送组别总共5组)
-    推送类型: Server酱&pushplus&Bark&TG机器人&钉钉&企业微信机器人&企业微信应用消息&iGotNotify&gobotNotify	
+    推送类型: Server酱&pushplus&pushplushxtrip&Bark&TG机器人&钉钉&企业微信机器人&企业微信应用消息&iGotNotify&gobotNotify&WxPusher
     export NOTIFY_CUSTOMNOTIFY=["京东资产变动&组1&Server酱&Bark&企业微信应用消息","京东白嫖榜&组2&钉钉&pushplus"] 
     
     (11) NOTIFY_CKTASK
@@ -121,6 +121,21 @@
 	(12) PUSH_PLUS_TOKEN_hxtrip 和 PUSH_PLUS_USER_hxtrip
     增加pushplus.hxtrip.com的推送加接口，貌似更稳定,注意这个和PUSHPLUS不是同一家.
     
+	(13) 用 WxPusher 进行一对一推送
+	填写变量 WP_APP_TOKEN_ONE,可在管理台查看: https://wxpusher.zjiecode.com/admin/main/app/appToken
+	手动建立CK_WxPusherUid.json,可以参考CKName_cache.json,只是nickName改成Uid，
+	每个用户的uid可在管理台查看: https://wxpusher.zjiecode.com/admin/main/wxuser/list
+	CK_WxPusherUid.json 内容:
+	[
+	  {
+		"pt_pin": "ccwav",
+		"Uid": "UID_AAAAAAAA"
+	  },
+	  {
+		"pt_pin": "ccwav2",
+		"Uid": "BBBBBBBBBB"
+	  }
+	]
     
 # 6. jd_speed_sign_Part1~jd_speed_sign_Part3
 简单粗暴的极速版的分任务版，将总ck数除以3后平均分配成三个任务同时执行.

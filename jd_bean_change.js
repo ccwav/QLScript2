@@ -67,7 +67,8 @@ RemainMessage += '【东东农场】京东->我的->东东农场,完成是京东
 RemainMessage += '【京喜工厂】京喜->我的->京喜工厂,完成是商品红包,用于购买指定商品(不兑换会过期)\n';
 RemainMessage += '【其他】京喜红包只能在京喜使用,其他同理';
 
-let WP_APP_TOKEN_ONE = "";
+let WP_APP_TOKEN = "";
+
 if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
 	WP_APP_TOKEN = process.env.WP_APP_TOKEN_ONE;
 }

@@ -130,12 +130,6 @@ var merge = {};
 var KEY = '';
 
 
-const Faker = require('./utils/JDSignValidator')
-const zooFaker = require('./utils/JDJRValidator_Pure')
-let fp = '', eid = '', md5
-$nobyda.get = zooFaker.injectToRequest2($nobyda.get.bind($nobyda), 'channelSign')
-$nobyda.post = zooFaker.injectToRequest2($nobyda.post.bind($nobyda), 'channelSign')
-
 async function all(cookie, jrBody) {	
   KEY = cookie;
   merge = {};
@@ -826,49 +820,28 @@ function JDUserSign1(s, key, title, body) {
 }
 
 async function JDUserSign2(s, key, title, tid) {
+  return console.log(`\n${title} >> 可能需要拼图验证, 跳过签到 ⚠️`);
   await new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + 'ztmFUCxcPMNyUq0P' + lkt).toString()
     $nobyda.get({
       url: `https://jdjoy.jd.com/api/turncard/channel/detail?turnTableId=${tid}&invokeKey=ztmFUCxcPMNyUq0P`,
       headers: {
-        Cookie: KEY,
-        'lkt': lkt,
-        'lks': lks
+        Cookie: KEY
       }
-    }, async function(error, response, data) {
-      try {
-        if(data) {
-          data = JSON.parse(data);
-          if (data.success && data.data) {
-            data = data.data
-            if (!data.hasSign) {
-              let ss = await Faker.getBody(`https://prodev.m.jd.com/mall/active/${tid}/index.html`)
-              fp = ss.fp
-              await getEid(ss, title)
-            }
-          }
-        }
-      } catch(eor) {
-        $nobyda.AnError(title, key, eor, response, data)
-      } finally {
-        resolve()
-      }
+    }, function(error, response, data) {
+      resolve()
     })
     if (out) setTimeout(resolve, out + s)
   });
   return new Promise(resolve => {
     setTimeout(() => {
-      let lkt = new Date().getTime()
-      let lks = md5('' + 'ztmFUCxcPMNyUq0P' + lkt).toString()
       const JDUrl = {
         url: 'https://jdjoy.jd.com/api/turncard/channel/sign?invokeKey=ztmFUCxcPMNyUq0P',
         headers: {
-          Cookie: KEY,
-          'lkt': lkt,
-          'lks': lks
+          lkt: '1629984131120',
+          lks: 'd7db92cf40ad5a8d54b9da2b561c5f84',
+          Cookie: KEY
         },
-        body: `turnTableId=${tid}&fp=${fp}&eid=${eid}`
+        body: `turnTableId=${tid}`
       };
       $nobyda.post(JDUrl, function(error, response, data) {
         try {
@@ -1470,39 +1443,6 @@ function TotalSteel() {
     if (out) setTimeout(resolve, out)
   });
 }
-
-function getEid(ss, title) {
-  return new Promise(resolve => {
-    const options = {
-      url: `https://gia.jd.com/fcf.html?a=${ss.a}`,
-      body: `d=${ss.d}`,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-      }
-    }
-    $nobyda.post(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`\n${title} 登录: API查询请求失败 ‼️‼️`)
-          throw new Error(err);
-        } else {
-          if (data.indexOf("*_*") > 0) {
-            data = data.split("*_*", 2);
-            data = JSON.parse(data[1]);
-            eid = data.eid
-          } else {
-            console.log(`京豆api返回数据为空，请检查自身原因`)
-          }
-        }
-      } catch (eor) {
-        $nobyda.AnError(eor, resp);
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-
 
 function TotalBean() {
   merge.TotalBean = {};

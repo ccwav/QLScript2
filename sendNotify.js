@@ -178,7 +178,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		PUSH_PLUS_TOKEN_hxtrip = '';
 		PUSH_PLUS_USER_hxtrip = '';
 		Notify_CKTask = "";
-
+		
 		//变量开关
 		var Use_serverNotify = true;
 		var Use_pushPlusNotify = true;
@@ -195,6 +195,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		if (process.env.NOTIFY_NOCKFALSE) {
 			Notify_NoCKFalse = process.env.NOTIFY_NOCKFALSE;
 		}
+		strAuthor="";
 		if (process.env.NOTIFY_AUTHOR) {
 			strAuthor = process.env.NOTIFY_AUTHOR;
 		}
@@ -1132,11 +1133,6 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		await $.wait(60000);
 		await pushPlusNotifyhxtrip(text, desp);
 	}
-	if (PushErrorTime > 0) {
-		console.log("等待1分钟后重试.....");
-		await $.wait(60000);
-		await pushPlusNotifyhxtrip(text, desp);
-	}
 
 	if (PUSH_PLUS_TOKEN) {
 		console.log("PUSH_PLUS TOKEN :" + PUSH_PLUS_TOKEN);
@@ -1177,6 +1173,10 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 	try {
 		var Uid = "";
 		var UserRemark = [];
+		strAuthor="";
+		if (process.env.NOTIFY_AUTHOR) {
+			strAuthor = process.env.NOTIFY_AUTHOR;
+		}
 		WP_APP_TOKEN_ONE="";
 		if (process.env.WP_APP_TOKEN_ONE) {
 			WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;

@@ -138,26 +138,15 @@ async function joyReward() {
 				let rewardNum = "";
 
 				let giftSaleInfos = 'beanConfigs0';
-				let time = new Date().getHours();
+				let time = new Date($.getExchangeRewardsRes['currentTime']).getHours();
 				if (time >= 0 && time < 8) {
 					giftSaleInfos = 'beanConfigs0';
-					if (time==7 && new Date().getMinutes() == 59) {
-						giftSaleInfos = 'beanConfigs8';
-					}
-
 				}
 				if (time >= 8 && time < 16) {
 					giftSaleInfos = 'beanConfigs8';
-					if (time==15 && new Date().getMinutes() == 59) {
-						giftSaleInfos = 'beanConfigs16';
-					}
-
 				}
 				if (time >= 16 && time < 24) {
 					giftSaleInfos = 'beanConfigs16';
-					if (time==23 && new Date().getMinutes() == 59) {
-						giftSaleInfos = 'beanConfigs0';
-					}
 				}
 
 				if (giftSaleInfos == 'beanConfigs16' && strDisable20 != "false") {

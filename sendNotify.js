@@ -148,6 +148,7 @@ let strCustom = "";
 let strCustomArr = [];
 let strCustomTempArr = [];
 let Notify_CKTask = "";
+let Notify_SkipText = [];
 async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By ccwav Mod') {
 	console.log(`开始发送通知...`);
 	try {
@@ -178,7 +179,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		PUSH_PLUS_TOKEN_hxtrip = '';
 		PUSH_PLUS_USER_hxtrip = '';
 		Notify_CKTask = "";
-		
+		Notify_SkipText = [];
+
 		//变量开关
 		var Use_serverNotify = true;
 		var Use_pushPlusNotify = true;
@@ -195,7 +197,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 		if (process.env.NOTIFY_NOCKFALSE) {
 			Notify_NoCKFalse = process.env.NOTIFY_NOCKFALSE;
 		}
-		strAuthor="";
+		strAuthor = "";
 		if (process.env.NOTIFY_AUTHOR) {
 			strAuthor = process.env.NOTIFY_AUTHOR;
 		}
@@ -209,9 +211,16 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 			Notify_CKTask = process.env.NOTIFY_CKTASK;
 		}
 
-		if (text.indexOf("忘了种植") != -1) {
-			console.log(`东东农场没有种植，不推送`);
-			return;
+		if (process.env.NOTIFY_SKIP_TEXT && desp) {
+			Notify_SkipText = process.env.NOTIFY_SKIP_TEXT.split('&');
+			if (Notify_SkipText.length > 0) {
+				for (var Templ in Notify_SkipText) {					
+					if (desp.indexOf(Notify_SkipText[Templ]) != -1) {
+						console.log("检测内容到内容存在屏蔽推送的关键字(" + Notify_SkipText[Templ] + ")，将跳过推送...");
+						return;
+					}
+				}
+			}
 		}
 
 		if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1 || text == "Ninja 运行通知") {
@@ -265,6 +274,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 				console.log(`${text} 在领取信息黑名单中，已跳过推送`);
 				return;
 			}
+
 		} else {
 			strTitle = text;
 		}
@@ -1052,14 +1062,14 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 									await GetnickName2();
 								}
 								if ($.nickName) {
-									console.log("好像是新账号，从接口获取别名" + $.nickName);									
+									console.log("好像是新账号，从接口获取别名" + $.nickName);
 								} else {
 									console.log($.UserName + "该账号没有别名.....");
 								}
 								tempAddCK = {
-										"pt_pin": $.UserName,
-										"nickName": $.nickName
-									};
+									"pt_pin": $.UserName,
+									"nickName": $.nickName
+								};
 								TempCK.push(tempAddCK);
 								//标识，需要更新缓存文件
 								boolneedUpdate = true;
@@ -1173,17 +1183,17 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 	try {
 		var Uid = "";
 		var UserRemark = [];
-		strAuthor="";
+		strAuthor = "";
 		if (process.env.NOTIFY_AUTHOR) {
 			strAuthor = process.env.NOTIFY_AUTHOR;
 		}
-		WP_APP_TOKEN_ONE="";
+		WP_APP_TOKEN_ONE = "";
 		if (process.env.WP_APP_TOKEN_ONE) {
 			WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
 		}
 		if (WP_APP_TOKEN_ONE) {
 			if (TempCKUid) {
-				for (let j = 0; j < TempCKUid.length; j++) {					
+				for (let j = 0; j < TempCKUid.length; j++) {
 					if (PtPin == decodeURIComponent(TempCKUid[j].pt_pin)) {
 						Uid = TempCKUid[j].Uid;
 					}
@@ -1191,7 +1201,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 			}
 			if (Uid) {
 				console.log("查询到Uid ：" + Uid);
-				WP_UIDS_ONE = Uid;				
+				WP_UIDS_ONE = Uid;
 				console.log("正在发送一对一通知,请稍后...");
 				if (strAuthor)
 					desp += '\n\n本通知 By ' + strAuthor;
@@ -1215,7 +1225,9 @@ function gobotNotify(text, desp, time = 2100) {
 		if (GOBOT_URL) {
 			const options = {
 				url: `${GOBOT_URL}?access_token=${GOBOT_TOKEN}&${GOBOT_QQ}`,
-				json: { message: `${text}\n${desp}` },
+				json: {
+					message: `${text}\n${desp}`
+				},
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -1765,13 +1777,13 @@ function pushPlusNotify(text, desp) {
 function wxpusherNotifyByOne(text, desp) {
 	return new Promise((resolve) => {
 		if (WP_APP_TOKEN_ONE) {
-			var WPURL="";
+			var WPURL = "";
 			let uids = [];
 			for (let i of WP_UIDS_ONE.split(";")) {
 				if (i.length != 0)
 					uids.push(i);
 			};
-			let topicIds = [];			
+			let topicIds = [];
 			const body = {
 				appToken: `${WP_APP_TOKEN_ONE}`,
 				content: `${text}\n\n${desp}`,
@@ -1812,7 +1824,6 @@ function wxpusherNotifyByOne(text, desp) {
 		}
 	});
 }
-
 
 function wxpusherNotify(text, desp) {
 	return new Promise((resolve) => {

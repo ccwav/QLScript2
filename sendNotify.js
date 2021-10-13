@@ -1183,8 +1183,8 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 		}
 		if (WP_APP_TOKEN_ONE) {
 			if (TempCKUid) {
-				for (let j = 0; j < TempCKUid.length; j++) {
-					if (TempCKUid[j].pt_pin == PtPin) {
+				for (let j = 0; j < TempCKUid.length; j++) {					
+					if (PtPin == decodeURIComponent(TempCKUid[j].pt_pin)) {
 						Uid = TempCKUid[j].Uid;
 					}
 				}

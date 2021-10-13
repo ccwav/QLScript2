@@ -226,7 +226,8 @@ async function joyReward() {
 					}
 				} catch (e) {
 					llError = true;
-					console.log('东哥搞事情，不给京豆ID，跳过重新获取...');
+					console.log('东哥搞事情，不给京豆ID，等待300ms后重新获取...');
+					await $.wait(300);
 				}
 				if(llError){
 					continue;
@@ -304,7 +305,7 @@ async function joyReward() {
 			} else {
 				console.log(`${$.name}getExchangeRewards异常,${JSON.stringify($.getExchangeRewardsRes)}`)
 			}
-			await $.wait(200);
+			await $.wait(300);
 		}
 	} catch (e) {
 		$.logErr(e)

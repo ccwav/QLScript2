@@ -151,8 +151,8 @@ async function joyReward() {
 					giftSaleInfos = 'beanConfigs16';
 				}
 
-				if (giftSaleInfos == 'beanConfigs16' && strDisable20 != "false") {
-					console.log("现在是16点时段，执行抢20京豆");
+				if (new Date().getHours()>15 && strDisable20 != "false") {
+					console.log("现在是15点后时段，执行抢20京豆");
 					strDisable20 = "false";
 				}
 				console.log(`debug场次:${giftSaleInfos}\n`)

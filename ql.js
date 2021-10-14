@@ -112,6 +112,16 @@ module.exports.EnableCk = async (eid) => {
   return body;
 };
 
+module.exports.getstatus = async (eid) => {
+  const envs = await this.getEnvs();
+  for (let i = 0; i < envs.length; i++) {	 
+	if(envs[i]._id==eid){
+		 return envs[i].status; 
+	  }
+  }  
+  return 99;
+};
+
 module.exports.delEnv = async (eid) => {
   const token = await getToken();
   const body = await api({

@@ -192,7 +192,7 @@ if ($.isNode() && process.env.CHECKCK_CKNOWARNERROR) {
 
 			} else {
 				const strnowstatus = await getstatus(envs[i]._id);				
-				if (strCk == 99) {
+				if (strnowstatus == 99) {
 					strnowstatus=envs[i].status;
 				}
 				if (!$.isLogin) {

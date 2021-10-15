@@ -14,12 +14,6 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 let jdNotify = false; //是否开启静默运行，默认false关闭(即:奖品兑换成功后会发出通知提示)
 let Today = new Date();
 let strDisable20 = "false";
-if ($.isNode() && process.env.JOY_GET20WHEN16) {
-	strDisable20 = process.env.JOY_GET20WHEN16;
-	if (strDisable20 != "false") {
-		console.log("检测到16点时段才抢20京豆");
-	}
-}
 
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '';
@@ -62,6 +56,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
 				$.index = i + 1;
 			$.isLogin = true;
 			$.nickName = '' || $.UserName;
+
 			await TotalBean();
 			console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}****\n`);
 			if (!$.isLogin) {
@@ -74,6 +69,14 @@ Date.prototype.Format = function (fmt) { //author: meizz
 				}
 				continue
 			}
+			
+			if ($.isNode() && process.env.JOY_GET20WHEN16) {
+				strDisable20 = process.env.JOY_GET20WHEN16;
+				if (strDisable20 != "false") {
+					console.log("设置16点时段才抢20京豆....");
+				}
+			}
+			
 			// console.log(`本地时间与京东服务器时间差(毫秒)：${await get_diff_time()}`);
 			$.validate = '';
 			$.validate = await zooFaker.injectToRequest();

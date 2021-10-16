@@ -118,11 +118,13 @@ if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
 			console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
 			await main()
 			if (ReturnMessage) {
-				ReturnMessage = ReturnMessageTitle + ReturnMessage;
+				
 				
 				if ($.isNode() && WP_APP_TOKEN_ONE) {
-					await notify.sendNotifybyWxPucher(`${$.name}`, `${ReturnMessage}`,`${$.UserName}`);
+					await notify.sendNotifybyWxPucher(`${$.name}`,`【账号名称】${$.nickName || $.UserName}\n`+`${ReturnMessage}`,`${$.UserName}`);
 				}
+				
+				ReturnMessage = ReturnMessageTitle + ReturnMessage;
 				
 				if (userIndex4 != -1) {
 					allMessageGp4 += ReturnMessage;

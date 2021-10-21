@@ -23,6 +23,8 @@
 	
 （4）使用Ninjia要注意Extra.sh中把 cp sendNotify.js /ql/scripts/sendNotify.js 这一句删除，不然每次重启容器sendNotify.js都会被覆盖.
   
+（5）如果用不同的通知类型分组，比如TG作为组1，企业微信作为组2，且之前已经设置过企业微信通知的参数QYWX_AM，请先将QYWX_AM置空（export QYWX_AM=""），再设置组2的企业微信参数QYWX_AM2（export QYWX_AM2="abcdef"）。否则原有的QYWX_AM参数仍在生效中，导致企业微信仍然接受到组1的通知.(来自Windstill的惨痛经历)
+
 # 2. 关于群组
 原通知配置变量加上数字，组成新的通知群组.通知脚本目前支援5组变量.
 

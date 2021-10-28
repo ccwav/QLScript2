@@ -124,17 +124,18 @@
     增加pushplus.hxtrip.com的推送加接口，貌似更稳定,注意这个和PUSHPLUS不是同一家.
     
 	(13) 用 WxPusher 进行一对一推送
+	详细教程有人写了，不知道是幸运还是不幸: https://www.kejiwanjia.com/jiaocheng/27909.html
 	填写变量 WP_APP_TOKEN_ONE,可在管理台查看: https://wxpusher.zjiecode.com/admin/main/app/appToken
 	手动建立CK_WxPusherUid.json,可以参考CKName_cache.json,只是nickName改成Uid，
 	每个用户的uid可在管理台查看: https://wxpusher.zjiecode.com/admin/main/wxuser/list
-	CK_WxPusherUid.json 内容:
+	CK_WxPusherUid.json 内容(pt_pin 如果是汉字需要填写转码后的!):
 	[
 	  {
 		"pt_pin": "ccwav",
 		"Uid": "UID_AAAAAAAA"
 	  },
 	  {
-		"pt_pin": "ccwav2",
+		"pt_pin": "中文名",
 		"Uid": "BBBBBBBBBB"
 	  }
 	]
@@ -151,7 +152,8 @@
 例子 : 有24个ck，则Part1 执行1~8,Part2 执行9~16，Part3 执行17以后剩下的所有ck.
 
 # 7. jd_priceProtect_Mod.js
-京东价格保护通知版,仅仅是保价成功加上了通知，改了执行时间,没有什么技术含量...
+
+京东价格保护一对一通知版,仅仅是保价成功加上了一对一通知，改了执行时间,没有什么技术含量...
 
 # 8. jd_big_winner_Mod.js
 省钱大赢家之翻翻乐分组版本,兼容资产通知查询的分组变量BEANCHANGE_USERGP2 ~ BEANCHANGE_USERGP4

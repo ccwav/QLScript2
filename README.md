@@ -32,7 +32,7 @@
 	
 (PS:例子使用了企业微信的变量QYWX_AM,实际是所有推送变量后加数字都会有效.)
 
-# 3. jd_bean_change.js  
+# 3. jd_bean_change.js (已添加支持一对一推送)
 京东资产变动 + 白嫖榜 + 京东月资产变动,注意事项: 
 
 	如果你遇到TG Bark报错，那是因为报文过长，请使用分段通知功能.
@@ -54,9 +54,18 @@
 	    标题按照分组分别为 京东月资产变动 京东月资产变动#2 京东月资产变动#3 京东月资产变动#4	
 	    开启 :  export BEANCHANGE_ENABLEMONTH="true"  	
     
-    
-  
-# 4. jd_CheckCK.js  
+    (4) BEANCHANGE_ALLNOTIFY
+		设置推送置顶公告，&表示换行，公告会出现在资产通知中(包括一对一).
+		例子 :  export BEANCHANGE_ALLNOTIFY="ccwav 虽然头发块掉光了&可是还是很帅啊...&&不说了，我去哭会...."  
+		显示:
+		
+		【✨✨✨✨公告✨✨✨✨】
+		 ccwav 虽然头发块掉光了
+		 可是还是很帅啊...
+		 
+		 不说了，我去哭会.... 
+		 
+# 4. jd_CheckCK.js (已添加支持一对一推送)
 京东CK检测,不正常的自动禁用，正常的如果是禁用状态则自动启用.配合通知脚本CK触发使用.也可以直接task.
 兼容jd_bean_change的BEANCHANGE_USERGP2 BEANCHANGE_USERGP3 BEANCHANGE_USERGP4变量.
 变量列表:
@@ -151,11 +160,11 @@
 	
 例子 : 有24个ck，则Part1 执行1~8,Part2 执行9~16，Part3 执行17以后剩下的所有ck.
 
-# 7. jd_priceProtect_Mod.js
+# 7. jd_priceProtect_Mod.js  (已添加支持一对一推送)
 
 京东价格保护一对一通知版,仅仅是保价成功加上了一对一通知，改了执行时间,没有什么技术含量...
 
-# 8. jd_big_winner_Mod.js
+# 8. jd_big_winner_Mod.js  (已添加支持一对一推送)
 省钱大赢家之翻翻乐分组版本,兼容资产通知查询的分组变量BEANCHANGE_USERGP2 ~ BEANCHANGE_USERGP4
 
 标题为省钱大赢家之翻翻乐 省钱大赢家之翻翻乐#2 省钱大赢家之翻翻乐#3 省钱大赢家之翻翻乐#4

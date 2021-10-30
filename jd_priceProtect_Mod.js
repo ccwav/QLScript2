@@ -26,7 +26,7 @@ let strmessagebyone="";
 if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
 	WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
 }
-l=
+
 !(async () => {
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});

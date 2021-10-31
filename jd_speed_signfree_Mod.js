@@ -66,7 +66,8 @@ if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
 				strmessagebyone=`【京东账号】${$.nickName || $.UserName}\n`+strmessagebyone;
 				await notify.sendNotifybyWxPucher("京东极速版签到免单",strmessagebyone, `${$.UserName}`);				
 			}
-			strmessage+=`【京东账号】${$.nickName || $.UserName}\n`+strmessagebyone+`\n`;
+			if(strmessagebyone)
+				strmessage+=`【京东账号】${$.nickName || $.UserName}\n`+strmessagebyone+`\n`;
         }
     }
     await notify.sendNotify(`${$.name}`, strmessage);

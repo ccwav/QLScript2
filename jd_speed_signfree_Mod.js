@@ -62,12 +62,14 @@ if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
                     await $.wait(2000)
                 }
             }
+			if(strmessagebyone)
+				strmessage+=`【京东账号】${$.nickName || $.UserName}\n`+strmessagebyone+`\n`;			
+			
 			if (strmessagebyone && $.isNode() && WP_APP_TOKEN_ONE) {
 				strmessagebyone=`【京东账号】${$.nickName || $.UserName}\n`+strmessagebyone;
 				await notify.sendNotifybyWxPucher("京东极速版签到免单",strmessagebyone, `${$.UserName}`);				
 			}
-			if(strmessagebyone)
-				strmessage+=`【京东账号】${$.nickName || $.UserName}\n`+strmessagebyone+`\n`;
+			
         }
     }
     await notify.sendNotify(`${$.name}`, strmessage);

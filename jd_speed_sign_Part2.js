@@ -8,7 +8,7 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 
-
+let llAPIError=false;
 let cookiesArr = [], cookie = '', message;
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
@@ -58,7 +58,7 @@ const JD_API_HOST = 'https://api.m.jd.com/', actCode = 'visa-card-001';
         continue
       }
       await jdGlobal()
-      await $.wait(2*1000)
+      await $.wait(10*1000)
     }
   }
 })()
@@ -77,13 +77,13 @@ async function jdGlobal() {
     await apTaskList()
     await wheelsHome()
 
-    await signInit()
-    await sign()
+    //await signInit()
+    //await sign()
     $.score = 0
     $.total = 0
     await taskList()
     await queryJoy()
-    await signInit()
+    //await signInit()
     await cash()
     await showMsg()
   } catch (e) {
@@ -173,7 +173,7 @@ async function taskList() {
             if (safeGet(data)) {
               data = JSON.parse(data);
               for (let task of data.data) {
-                $.taskName = task.taskInfo.mainTitle
+                $.taskName = task.taskInfo.mainTitle;
                 if (task.taskInfo.status === 0) {
                   if (task.taskType >= 1000) {
                     await doTask(task.taskType)
@@ -191,6 +191,8 @@ async function taskList() {
                 } else {
                   console.log(`${task.taskInfo.mainTitle}已完成`)
                 }
+				if (llAPIError)
+					break;	
               }
             }
           }
@@ -213,6 +215,7 @@ async function doTask(taskId) {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
+		  llAPIError=true;
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -300,6 +303,8 @@ async function queryItem(activeType = 1) {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
+		  $.canStartNewItem = false;
+		  llAPIError=true;
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -336,6 +341,8 @@ async function startItem(activeId, activeType) {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
+		  $.canStartNewItem = false;
+		  llAPIError=true;
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -346,6 +353,7 @@ async function startItem(activeId, activeType) {
                   videoBrowsing = activeType === 1 ? 5 : 10
                 console.log(`【${taskCompletionProgress + 1}/${taskCompletionLimit}】浏览商品任务记录成功，等待${videoBrowsing}秒`)
                 await $.wait(videoBrowsing * 1000)
+				await $.wait(3000);
                 await endItem(data.data.uuid, activeType, activeId, activeType === 3 ? videoBrowsing : "")
               } else {
                 console.log(`${$.taskName}任务已达上限`)

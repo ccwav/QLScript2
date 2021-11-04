@@ -1183,6 +1183,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 	try {
 		var Uid = "";
 		var UserRemark = [];
+		var llShowRemark = "false";
 		strAuthor = "";
 		if (process.env.NOTIFY_AUTHOR) {
 			strAuthor = process.env.NOTIFY_AUTHOR;
@@ -1190,6 +1191,9 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 		WP_APP_TOKEN_ONE = "";
 		if (process.env.WP_APP_TOKEN_ONE) {
 			WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
+		}
+		if (process.env.WP_APP_ONE_TEXTSHOWREMARK) {
+			llShowRemark = process.env.WP_APP_ONE_TEXTSHOWREMARK;
 		}
 		if (WP_APP_TOKEN_ONE) {
 			if (TempCKUid) {
@@ -1209,7 +1213,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 					desp += author;
 				
 				
-					
+				if(llShowRemark=="true"){
 					//开始读取青龙变量列表
 					const envs = await getEnvs();
 					if (envs[0]) {
@@ -1278,7 +1282,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 
 					}
 					
-				
+				}
 				await wxpusherNotifyByOne(text, desp);
 			} else {
 				console.log("未查询到用户的Uid,取消一对一通知发送...");

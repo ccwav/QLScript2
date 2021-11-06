@@ -103,12 +103,12 @@ function get_order_ids(cookie) {
             }, (err, resp, data) => {
                 data = JSON.parse(data)
                 if (data.success == true) {
-                    if (data.data.risk == true) {
+                    /* if (data.data.risk == true) {
                         console.log("风控用户,跳过");
                         $.message += "风控用户,跳过\n"
                         resolve()
                         return
-                    }
+                    } */
                     if (!data.data.signFreeOrderInfoList) {
                         console.log("没有需要签到的商品,请到京东极速版[签到免单]购买商品");
                         $.message += "没有需要签到的商品,请到京东极速版[签到免单]购买商品\n"

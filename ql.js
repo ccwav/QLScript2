@@ -9,7 +9,7 @@ const qlDir = process.env.QL_DIR || '/ql';
 const authFile = path.join(qlDir, 'config/auth.json');
 
 const api = got.extend({
-  prefixUrl: process.env.QL_URL || 'http://localhost:5600',
+  prefixUrl: 'http://localhost:5600',
   retry: { limit: 0 },
 });
 

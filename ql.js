@@ -122,6 +122,16 @@ module.exports.getstatus = async (eid) => {
   return 99;
 };
 
+module.exports.getEnvById = async (eid) => {
+  const envs = await this.getEnvs();
+  for (let i = 0; i < envs.length; i++) {	 
+	if(envs[i]._id==eid){		 
+		 return envs[i].value; 
+	  }
+  }  
+  return "";
+};
+
 module.exports.delEnv = async (eid) => {
   const token = await getToken();
   const body = await api({

@@ -1,6 +1,6 @@
 # QLScript_New
-本仓库不支持qinglong 2.10.2之后的qinglong直接拉库，以后支不支持，难说，不是不想，而是改成这样没法支持,升级了的自己想方法解决.我停留在2.9.9了.
-青龙拉库命令:
+
+2.10.3之前版本青龙拉库命令:
 
 	不包含sendNotify:
 
@@ -10,6 +10,17 @@
 
 	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify|utils"
 
+
+2.10.3之后版本青龙拉库命令:
+
+	不包含sendNotify:
+
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|utils|USER_AGENTS|jdCookie|JS_USER_AGENTS"
+
+	包含sendNotify:
+
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify|utils|USER_AGENTS|jdCookie|JS_USER_AGENTS"
+	
 频道:
 
 	https://t.me/ccwav

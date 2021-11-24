@@ -77,8 +77,10 @@ if ($.isNode()) {
                 let range = $.count.maxTaskCount - $.count.finishCount;
                 await getTaskList(cookie)
                 await $.wait(2000)
+				var CountDoTask =0;
                 for (let k in $.taskList) {
                     if ($.taskList[k].taskId !== null && $.taskList[k].status == 1) {
+						CountDoTask+=0;
                         console.log(`开始尝试活动:` + $.taskList[k].taskName);
                         await saveTaskRecord(cookie, $.taskList[k].taskId, $.taskList[k].businessId, $.taskList[k].taskType);
                         if ($.sendBody) {
@@ -94,6 +96,9 @@ if ($.isNode()) {
                     }
 
                 }
+				if (CountDoTask==0 && $.count.finishCount < $.count.maxTaskCount){
+					console.log("没有能做的活动，明天请早......");
+				}
                
 
             } else {

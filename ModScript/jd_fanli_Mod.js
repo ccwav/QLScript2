@@ -1,13 +1,22 @@
-/*
-cron "10 0 * * *" jd_fanli_Mod.js, tag:京东饭粒
- */
- 
+
 /*
 京东饭粒
-长期活动，结束时间未知！
-活动入口：https://u.jd.com/ytWx4w0
-脚本原作者地址:https://github.com/ickel00/gd_test/blob/main/jd_fanLi.js
-由于原脚本有些逻辑上的问题做了点修复工作 by ccwav.
+已支持IOS双京东账号,Node.js支持N个京东账号
+脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
+============Quantumultx===============
+[task_local]
+#京东饭粒
+40 0,9,17 * * * https://raw.githubusercontent.com/KingRan/JDJB/main/jd_fanli.js, tag=京东饭粒, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jxcfd.png, enabled=true
+
+================Loon==============
+[Script]
+cron "40 0,9,17 * * *" script-path=https://raw.githubusercontent.com/KingRan/JDJB/main/jd_fanli.js,tag=京东饭粒
+
+===============Surge=================
+京东饭粒 = type=cron,cronexp="40 0,9,17 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/KingRan/JDJB/main/jd_fanli.js
+
+============小火箭=========
+京东饭粒 = type=cron,script-path=https://raw.githubusercontent.com/KingRan/JDJB/main/jd_fanli.js, cronexpr="40 0,9,17 * * *", timeout=3600, enable=true
  */
 
 const $ = new Env('京东饭粒');
@@ -69,8 +78,9 @@ if ($.isNode()) {
                 await getTaskList(cookie)
                 await $.wait(2000)
 				var CountDoTask =0;
+				 
                 for (let k in $.taskList) {
-                    if ($.taskList[k].taskId !== null && $.taskList[k].status == 1) {
+                    if ($.taskList[k].taskId !== null && $.taskList[k].statusName != "活动结束" && $.taskList[k].statusName != "明日再来") {
 						CountDoTask+=0;
                         console.log(`开始尝试活动:` + $.taskList[k].taskName);
                         await saveTaskRecord(cookie, $.taskList[k].taskId, $.taskList[k].businessId, $.taskList[k].taskType);
@@ -88,7 +98,7 @@ if ($.isNode()) {
 
                 }
 				if (CountDoTask==0 && $.count.finishCount < $.count.maxTaskCount){
-					console.log("没有能做的活动，明天请早......");
+					console.log("活动已经结束，明天请早.");
 				}
                
 

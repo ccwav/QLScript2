@@ -542,7 +542,7 @@ async function showMsg() {
 	ReturnMessage += `\n`;	
 	
 	if ($.levelName || $.JingXiang){		
-		ReturnMessage += `【当前京豆】${$.beanCount}豆(≈${($.beanCount-$.beanChangeXi / 100).toFixed(2)}元)\n`;		
+		ReturnMessage += `【当前京豆】${$.beanCount}豆(≈${(($.beanCount-$.beanChangeXi)/ 100).toFixed(2)}元)\n`;		
 	} else {
 		ReturnMessage += `【当前京豆】获取失败,接口返回空数据\n`;
 	}
@@ -1220,7 +1220,8 @@ function queryexpirejingdou() {
 							data['expirejingdou'].map(item => {
 								if(item['expireamount']!=0){																	
 									strGuoqi+=`【${timeFormat(item['time'] * 1000)}】过期${item['expireamount']}豆\n`;
-									decExBean+=item['expireamount'];
+									if (decExBean==0)
+										decExBean=item['expireamount'];
 								}
 							})							
 						}

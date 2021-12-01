@@ -1150,10 +1150,9 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                         if (ShowRemarkType == "3") {
                             $.Remark = $.UserName + "(" + $.Remark + ")";
                         }
-                        try {
-                            //加个空格，因为有些通知账号前没有空格很丑-_-!!!
-                            text = text.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), " " + $.Remark);
-                            desp = desp.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), " " + $.Remark);
+                        try {                           
+                            text = text.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
+                            desp = desp.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
                         } catch (err) {
                             console.log("替换出错了");
                             console.log("Debug Name1 :" + $.UserName);

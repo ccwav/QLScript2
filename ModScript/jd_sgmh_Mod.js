@@ -23,7 +23,7 @@ cron "20 8 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd
 闪购盲盒 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_sgmh.js, cronexpr="20 8 * * *", timeout=3600, enable=true
 
  */
-const $ = new Env('闪购盲盒_内部互助');
+const $ = new Env('闪购盲盒互助版');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let appId = '1EFRXxg', homeDataFunPrefix = 'interact_template', collectScoreFunPrefix = 'harmony', message = '';

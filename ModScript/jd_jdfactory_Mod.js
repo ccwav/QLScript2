@@ -30,7 +30,7 @@ cron "10 0,6-23 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/mast
 ============小火箭=========
 东东工厂 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_jdfactory.js, cronexpr="10 0,6-23 * * *", timeout=3600, enable=true
  */
-const $ = new Env('东东工厂_内部互助');
+const $ = new Env('东东工厂互助版');
 
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
@@ -53,6 +53,19 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const inviteCodes = [];
 let myInviteCode;
 $.newShareCode = [];
+
+let NowHour = new Date().getHours();
+let llhelp=true;
+if ($.isNode() && process.env.CC_NOHELPAFTER8) {
+	console.log(NowHour);
+	if (process.env.CC_NOHELPAFTER8=="true"){
+		if (NowHour>8){
+			llhelp=false;
+			console.log(`现在是9点后时段，不启用互助....`);
+		}			
+	}	
+}
+
 !(async () => {  
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
@@ -80,15 +93,17 @@ $.newShareCode = [];
       await jdFactory()
     }
   }
-  console.log(`\n开始账号内互助......`);
-  for (let j = 0; j < cookiesArr.length; j++) {
-    if (cookiesArr[j]) {
-      cookie = cookiesArr[j];
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      $.index = j + 1; 
-	  console.log(`【京东账号${$.index}】${$.nickName || $.UserName}:\n`);
-      await helpFriends();
-    }
+  if(llhelp){
+	  console.log(`\n开始账号内互助......`);
+	  for (let j = 0; j < cookiesArr.length; j++) {
+		if (cookiesArr[j]) {
+		  cookie = cookiesArr[j];
+		  $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+		  $.index = j + 1; 
+		  console.log(`【京东账号${$.index}】${$.nickName || $.UserName}:\n`);
+		  await helpFriends();
+		}
+	  }
   }
 })()
   .catch((e) => {

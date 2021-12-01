@@ -24,7 +24,7 @@ cron "15 6-18/6 * * *" script-path=jd_pet.js,tag=东东萌宠
 东东萌宠 = type=cron,script-path=jd_pet.js, cronexpr="15 6-18/6 * * *", timeout=3600, enable=true
 
  */
-const $ = new Env('东东萌宠_内部互助');
+const $ = new Env('东东萌宠互助版');
 let cookiesArr = [], cookie = '', jdPetShareArr = [], isBox = false, allMessage = '';
 let message = '', subTitle = '', option = {};
 let jdNotify = false; //是否关闭通知，false打开通知推送，true关闭通知推送
@@ -45,6 +45,19 @@ if ($.isNode()) {
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
+
+let NowHour = new Date().getHours();
+let llhelp=true;
+if ($.isNode() && process.env.CC_NOHELPAFTER8) {
+	console.log(NowHour);
+	if (process.env.CC_NOHELPAFTER8=="true"){
+		if (NowHour>8){
+			llhelp=false;
+			console.log(`现在是9点后时段，不启用互助....`);
+		}			
+	}	
+}
+
 console.log(`共${cookiesArr.length}个京东账号\n`);
 
 !(async() => {
@@ -54,36 +67,38 @@ console.log(`共${cookiesArr.length}个京东账号\n`);
         });
         return;
     }
-    console.log('开始收集您的互助码，用于账号内部互助，请稍等...');
-    for (let i = 0; i < cookiesArr.length; i++) {
-        if (cookiesArr[i]) {
-            cookie = cookiesArr[i];
-            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-            $.index = i + 1;
-            $.isLogin = true;
-            $.nickName = '';
-            await TotalBean();
+	if (llhelp){
+		console.log('开始收集您的互助码，用于账号内部互助，请稍等...');
+		for (let i = 0; i < cookiesArr.length; i++) {
+			if (cookiesArr[i]) {
+				cookie = cookiesArr[i];
+				$.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+				$.index = i + 1;
+				$.isLogin = true;
+				$.nickName = '';
+				await TotalBean();
 
-            if (!$.isLogin) {
-                $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
-                    "open-url": "https://bean.m.jd.com/bean/signIndex.action"
-                });
+				if (!$.isLogin) {
+					$.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
+						"open-url": "https://bean.m.jd.com/bean/signIndex.action"
+					});
 
-                if ($.isNode()) {
-                    await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-                }
-                continue;
-            }
-            message = '';
-            subTitle = '';
-            goodsUrl = '';
-            taskInfoKey = [];
-            option = {};
-            await GetShareCode();
-        }
-    }
+					if ($.isNode()) {
+						await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+					}
+					continue;
+				}
+				message = '';
+				subTitle = '';
+				goodsUrl = '';
+				taskInfoKey = [];
+				option = {};
+				await GetShareCode();
+			}
+		}
+		console.log('\n互助码收集完毕，开始执行日常任务...\n');
+	}
 	
-	console.log('\n互助码收集完毕，开始执行日常任务...\n');
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
             cookie = cookiesArr[i];
@@ -170,7 +185,9 @@ async function jdPet() {
             $.taskInfo = $.taskInit.result;
 			
             await petSport(); //遛弯
-            await slaveHelp(); //助力好友
+			if (llhelp){
+				await slaveHelp(); //助力好友
+			}
             await masterHelpInit(); //获取助力的信息
             await doTask(); //做日常任务
             await feedPetsAgain(); //再次投食

@@ -19,7 +19,7 @@ cron "13 0,6,22 * * *" script-path=jd_health.js, tag=东东健康社区
 ============小火箭=========
 东东健康社区 = type=cron,script-path=jd_health.js, cronexpr="13 0,6,22 * * *", timeout=3600, enable=true
  */
-const $ = new Env("东东健康社区_内部互助");
+const $ = new Env("东东健康社区互助版");
 const jdCookieNode = $.isNode() ? require("./jdCookie.js") : "";
 const notify = $.isNode() ? require('./sendNotify') : "";
 let cookiesArr = [], cookie = "", allMessage = "", message;

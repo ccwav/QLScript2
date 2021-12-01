@@ -67,7 +67,7 @@ if ($.isNode() && process.env.CC_NOHELPAFTER8) {
 		});
 		return;
 	}
-	if (llhelp)
+	if (llhelp){
 		console.log(`开始获取助力码....\n`);
 		for (let i = 0; i < cookiesArr.length; i++) {
 			if (cookiesArr[i]) {

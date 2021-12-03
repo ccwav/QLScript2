@@ -60,8 +60,8 @@ let strMessage = "";
     console.log("今日执行任务的账号顺序: \n" + strCk);
 	strMessage="今日执行任务的账号顺序: \n" + strCk;
     if (strNoFoundCk) {
-        console.log("\n没有出现在今日CK队列中的账号: \n" + strNoFoundCk);
-		strMessage+="\n没有出现在今日CK队列中的账号: \n" + strNoFoundCk;
+        console.log("没有出现在今日CK队列中的账号: \n" + strNoFoundCk+"\n");
+		strMessage+="没有出现在今日CK队列中的账号: \n" + strNoFoundCk+"\n";
     }
 
     if ($.isNode()) {

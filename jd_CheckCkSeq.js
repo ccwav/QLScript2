@@ -56,12 +56,13 @@ let strMessage = "";
 
         }
     }
-
-    console.log("今日执行任务的账号顺序: \n" + strCk);	
+	
     if (strNoFoundCk) {
         console.log("没有出现在今日CK队列中的账号: \n" + strNoFoundCk+"\n");
 		strMessage+="没有出现在今日CK队列中的账号: \n" + strNoFoundCk+"\n";
     }
+	
+	console.log("\n今日执行任务的账号顺序: \n" + strCk);	
 	strMessage+="\n今日执行任务的账号顺序: \n" + strCk;
 	
     if ($.isNode()) {

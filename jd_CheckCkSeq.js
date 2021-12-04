@@ -40,7 +40,7 @@ let strMessage = "";
             if (intSeq != -1) {
                 intSeq += 1;
                 arrCkPtPin.push(tempptpin);
-                strCk += intSeq + "." + tempptpin + "\n";
+                strCk += "【"+intSeq + "】" + tempptpin + "\n";
             }
         }
     }
@@ -49,10 +49,11 @@ let strMessage = "";
         var tempptpin = arrEnvPtPin[i];
         var intSeq = inArray(tempptpin, arrCkPtPin);
         if (intSeq == -1) {
-            strNoFoundCk += (i + 1) + "." + tempptpin;
+            strNoFoundCk += "【"+(i + 1) + "】" + tempptpin;
             if (arrEnvStatus[i] == 1) {
                 strNoFoundCk += "(状态已禁用)"
             }
+			 strNoFoundCk +="\n";
 
         }
     }

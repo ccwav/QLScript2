@@ -56,7 +56,7 @@ if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
     }
     if (message !== "") {
         if ($.isNode()) {
-            await notify.sendNotify($.name, message)
+            await notify.sendNotify($.name, "领取地址: \n京东app->东东农场->点水车图标->集勋章得好礼活动，奖励是500京豆\n"+message)
         } else {
             $.msg($.name, '', message)
         }
@@ -108,7 +108,7 @@ async function main() {
 
             if ($.isNode() && WP_APP_TOKEN_ONE) {
                 var strNotifyOneTemp = `您已经集齐所有勋章了，快去领取奖品吧！\n`;
-                strNotifyOneTemp += "领取地址: \n京东app->东东农场->点水车->集勋章得好礼活动";
+                strNotifyOneTemp += "领取地址: \n京东app->东东农场->点水车->集勋章得好礼活动，奖励是500京豆";
                 await notify.sendNotifybyWxPucher(`${$.name}`, strNotifyOneTemp, `${$.UserName}`);
             }
         } else if (mainInfo.result.activityStatus === 4) {

@@ -126,7 +126,6 @@ let ShowRemarkType = "1";
 let Notify_NoCKFalse = "false";
 let Notify_NoLoginSuccess = "false";
 let UseGroupNotify = 1;
-let strAuthor = "";
 const {
     getEnvs
 } = require('./ql');
@@ -208,10 +207,6 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 
         if (process.env.NOTIFY_NOCKFALSE) {
             Notify_NoCKFalse = process.env.NOTIFY_NOCKFALSE;
-        }
-        strAuthor = "";
-        if (process.env.NOTIFY_AUTHOR) {
-            strAuthor = process.env.NOTIFY_AUTHOR;
         }
         if (process.env.NOTIFY_SHOWNAMETYPE) {
             ShowRemarkType = process.env.NOTIFY_SHOWNAMETYPE;
@@ -1233,10 +1228,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
     }
 
     //提供6种通知
-    if (strAuthor)
-        desp += '\n\n本通知 By ' + strAuthor + "\n通知时间: " + GetDateTime(new Date());
-    else
-        desp += author + "\n通知时间: " + GetDateTime(new Date());
+    desp = buildLastDesp(desp, author)
 
     await serverNotify(text, desp); //微信server酱
 
@@ -1295,10 +1287,6 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
         var Uid = "";
         var UserRemark = [];
         var llShowRemark = "false";
-        strAuthor = "";
-        if (process.env.NOTIFY_AUTHOR) {
-            strAuthor = process.env.NOTIFY_AUTHOR;
-        }
 
         if (process.env.WP_APP_ONE_TEXTSHOWREMARK) {
             llShowRemark = process.env.WP_APP_ONE_TEXTSHOWREMARK;
@@ -1315,10 +1303,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                 console.log("查询到Uid ：" + Uid);
                 WP_UIDS_ONE = Uid;
                 console.log("正在发送一对一通知,请稍后...");
-                if (strAuthor)
-                    desp += '\n\n本通知 By ' + strAuthor;
-                else
-                    desp += author;
+                desp = buildLastDesp(desp, author)
 
                 if (llShowRemark == "true") {
                     //开始读取青龙变量列表
@@ -1729,6 +1714,18 @@ function qywxBotNotify(text, desp) {
             resolve();
         }
     });
+}
+
+function buildLastDesp(desp, author='') {
+    author = process.env.NOTIFY_AUTHOR || author;
+    if (process.env.NOTIFY_AUTHOR_BLANK || !author) {
+        return desp.trim();
+    } else {
+        if (!author.match(/本通知 By/)) {
+            author = `\n\n本通知 By ${author}`
+        }
+        return desp.trim() + author + "\n通知时间: " + GetDateTime(new Date());
+    }
 }
 
 function ChangeUserId(desp) {

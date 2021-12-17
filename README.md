@@ -174,6 +174,10 @@
     如果此变量(&隔开)的关键字在通知内容里面存在,则屏蔽不发送通知.
     例子 :  export NOTIFY_SKIP_TEXT="忘了种植&异常"
     
+	(15) NOTIFY_AUTHOR_BLANK (tcbaby提交)
+    控制不显示推送通知的底部信息
+    例子 :  export NOTIFY_AUTHOR_BLANK="随便填只要非空即可"
+	
 # 6. jd_speed_sign_Part1~jd_speed_sign_Part3
 简单粗暴的极速版的分任务版，将总ck数除以3后平均分配成三个任务同时执行.
 

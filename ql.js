@@ -132,6 +132,17 @@ module.exports.getEnvById = async (eid) => {
   return "";
 };
 
+module.exports.getEnvByPtPin = async (Ptpin) => {
+  const envs = await this.getEnvs();
+  for (let i = 0; i < envs.length; i++) {	
+	var tempptpin = decodeURIComponent(envs[i].value.match(/pt_pin=([^; ]+)(?=;?)/) && envs[i].value.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+	if(tempptpin==Ptpin){		 
+		 return envs[i]; 
+	  }
+  }  
+  return "";
+};
+
 module.exports.delEnv = async (eid) => {
   const token = await getToken();
   const body = await api({

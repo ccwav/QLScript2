@@ -160,8 +160,7 @@
 	详细教程有人写了，不知道是幸运还是不幸: https://www.kejiwanjia.com/jiaocheng/27909.html
 	填写变量 WP_APP_TOKEN_ONE,可在管理台查看: https://wxpusher.zjiecode.com/admin/main/app/appToken
 	手动建立CK_WxPusherUid.json,可以参考CKName_cache.json,只是nickName改成Uid，
-	每个用户的uid可在管理台查看: https://wxpusher.zjiecode.com/admin/main/wxuser/list
-	另外: export WP_APP_ONE_TEXTSHOWREMARK="true"，启用一对一推送标题显示备注信息，默认不启用.
+	每个用户的uid可在管理台查看: https://wxpusher.zjiecode.com/admin/main/wxuser/list	
 	CK_WxPusherUid.json 内容(pt_pin 如果是汉字需要填写转码后的!):
 	[
 	  {

@@ -240,7 +240,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 
             if (strPtPin) {
                 var temptest = await getEnvByPtPin(strdecPtPin);
-                if (temptest) {                    
+                if (temptest) {
                     if (temptest.status == 0) {
                         isLogin = true;
                         await isLoginByX1a0He(temptest.value);
@@ -302,8 +302,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                             }
 
                             if (DisableCkBody.code == 200) {
-								console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
-								
+                                console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
+
                                 strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,自动禁用成功!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
                                 if (strAllNotify)
                                     strNotifyOneTemp += `\n` + strAllNotify;
@@ -311,9 +311,9 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                                 if (WP_APP_TOKEN_ONE) {
                                     await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
                                 }
-                                
+
                             } else {
-								console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
+                                console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
                                 strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
                                 if (strAllNotify)
                                     strNotifyOneTemp += `\n` + strAllNotify;
@@ -322,10 +322,10 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                                     await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
                                 }
                             }
-                        }else{
-							console.log(`该CK已经检测没有有效，跳过通知...`);
-							llHaderror = true;
-						}
+                        } else {
+                            console.log(`该CK已经检测没有有效，跳过通知...`);
+                            llHaderror = true;
+                        }
                     } else {
                         console.log(`该CK已经禁用不需要处理`);
                         llHaderror = true;
@@ -1375,11 +1375,6 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
     try {
         var Uid = "";
         var UserRemark = [];
-        var llShowRemark = "false";
-
-        if (process.env.WP_APP_ONE_TEXTSHOWREMARK) {
-            llShowRemark = process.env.WP_APP_ONE_TEXTSHOWREMARK;
-        }
         if (WP_APP_TOKEN_ONE) {
             if (TempCKUid) {
                 for (let j = 0; j < TempCKUid.length; j++) {
@@ -1394,77 +1389,75 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                 console.log("正在发送一对一通知,请稍后...");
                 desp = buildLastDesp(desp, author);
 
-                if (llShowRemark == "true") {
-                    //开始读取青龙变量列表
-                    const envs = await getEnvs();
-                    if (envs[0]) {
-                        for (let i = 0; i < envs.length; i++) {
-                            cookie = envs[i].value;
-                            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-                            if (PtPin != $.UserName)
-                                continue;
-                            $.nickName = "";
-                            $.Remark = envs[i].remarks || '';
-                            $.FoundnickName = "";
-                            $.FoundPin = "";
-                            //判断有没有Remark，没有搞个屁，有的继续
-                            if ($.Remark) {
-                                console.log("sendNotifybyWxPucher正在处理账号Remark.....");
-                                //先查找缓存文件中有没有这个账号，有的话直接读取别名
-                                if (envs[i].status == 0) {
-                                    if (TempCK) {
-                                        for (let j = 0; j < TempCK.length; j++) {
-                                            if (TempCK[j].pt_pin == $.UserName) {
-                                                $.FoundPin = TempCK[j].pt_pin;
-                                                $.nickName = TempCK[j].nickName;
-                                            }
+                //开始读取青龙变量列表
+                const envs = await getEnvs();
+                if (envs[0]) {
+                    for (let i = 0; i < envs.length; i++) {
+                        cookie = envs[i].value;
+                        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+                        if (PtPin != $.UserName)
+                            continue;
+                        $.nickName = "";
+                        $.Remark = envs[i].remarks || '';
+                        $.FoundnickName = "";
+                        $.FoundPin = "";
+                        //判断有没有Remark，没有搞个屁，有的继续
+                        if ($.Remark) {
+                            console.log("sendNotifybyWxPucher正在处理账号Remark.....");
+                            //先查找缓存文件中有没有这个账号，有的话直接读取别名
+                            if (envs[i].status == 0) {
+                                if (TempCK) {
+                                    for (let j = 0; j < TempCK.length; j++) {
+                                        if (TempCK[j].pt_pin == $.UserName) {
+                                            $.FoundPin = TempCK[j].pt_pin;
+                                            $.nickName = TempCK[j].nickName;
                                         }
                                     }
-                                    if (!$.FoundPin) {
-                                        //缓存文件中有没有这个账号，调用京东接口获取别名,并更新缓存文件
-                                        console.log($.UserName + "好像是新账号，尝试获取别名.....");
-                                        await GetnickName();
-                                        if (!$.nickName) {
-                                            console.log("别名获取失败，尝试调用另一个接口获取别名.....");
-                                            await GetnickName2();
-                                        }
-                                        if ($.nickName) {
-                                            console.log("好像是新账号，从接口获取别名" + $.nickName);
-                                        } else {
-                                            console.log($.UserName + "该账号没有别名.....");
-                                        }
-                                        tempAddCK = {
-                                            "pt_pin": $.UserName,
-                                            "nickName": $.nickName
-                                        };
-                                        TempCK.push(tempAddCK);
-                                        //标识，需要更新缓存文件
-                                        boolneedUpdate = true;
+                                }
+                                if (!$.FoundPin) {
+                                    //缓存文件中有没有这个账号，调用京东接口获取别名,并更新缓存文件
+                                    console.log($.UserName + "好像是新账号，尝试获取别名.....");
+                                    await GetnickName();
+                                    if (!$.nickName) {
+                                        console.log("别名获取失败，尝试调用另一个接口获取别名.....");
+                                        await GetnickName2();
                                     }
+                                    if ($.nickName) {
+                                        console.log("好像是新账号，从接口获取别名" + $.nickName);
+                                    } else {
+                                        console.log($.UserName + "该账号没有别名.....");
+                                    }
+                                    tempAddCK = {
+                                        "pt_pin": $.UserName,
+                                        "nickName": $.nickName
+                                    };
+                                    TempCK.push(tempAddCK);
+                                    //标识，需要更新缓存文件
+                                    boolneedUpdate = true;
                                 }
-
-                                $.nickName = $.nickName || $.UserName;
-                                //这是为了处理ninjia的remark格式
-                                $.Remark = $.Remark.replace("remark=", "");
-                                $.Remark = $.Remark.replace(";", "");
-                                //开始替换内容中的名字
-                                if (ShowRemarkType == "2") {
-                                    $.Remark = $.nickName + "(" + $.Remark + ")";
-                                }
-                                if (ShowRemarkType == "3") {
-                                    $.Remark = $.UserName + "(" + $.Remark + ")";
-                                }
-                                text = text + " (" + $.Remark + ")";
-                                //console.log($.nickName+$.Remark);
-                                console.log("处理完成，开始发送通知...");
-
                             }
-                            break;
-                        }
 
+                            $.nickName = $.nickName || $.UserName;
+                            //这是为了处理ninjia的remark格式
+                            $.Remark = $.Remark.replace("remark=", "");
+                            $.Remark = $.Remark.replace(";", "");
+                            //开始替换内容中的名字
+                            if (ShowRemarkType == "2") {
+                                $.Remark = $.nickName + "(" + $.Remark + ")";
+                            }
+                            if (ShowRemarkType == "3") {
+                                $.Remark = $.UserName + "(" + $.Remark + ")";
+                            }
+                            text = text + " (" + $.Remark + ")";
+                            //console.log($.nickName+$.Remark);
+                            console.log("处理完成，开始发送通知...");
+
+                        }
+                        break;
                     }
 
                 }
+
                 desp = desp.replace(/[\n\r]/g, '<br>');
                 await wxpusherNotifyByOne(text, desp);
             } else {

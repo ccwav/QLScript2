@@ -83,8 +83,12 @@
 		当设定BEANCHANGE_CheckJxBeans="true" 将启用喜豆查询功能.
 		
 # 4. jd_CheckCK.js (已添加支持一对一推送)
+(最新的通知脚本已经集成自动禁用失效CK，如不需要自动启用CK功能可以直接禁用此脚本.)
+
 京东CK检测,不正常的自动禁用，正常的如果是禁用状态则自动启用.配合通知脚本CK触发使用.也可以直接task.
+
 兼容jd_bean_change的BEANCHANGE_USERGP2 BEANCHANGE_USERGP3 BEANCHANGE_USERGP4变量.
+
 变量列表:
 	
 	显示正常CK:  export CHECKCK_SHOWSUCCESSCK="true"
@@ -101,7 +105,7 @@
 	
   
 # 5. sendNotify.js
-发送通知脚本Pro.
+发送通知脚本Pro.集成自动禁用失效CK功能，通过捕获任务脚本发送ck失效实现，精准操作，支持一对一推送，通知标题还是以前的"京东CK检测",兼容jd_CheckCK.js的分组设定和CHECKCK_ALLNOTIFY设定.
 
 变量列表:
 

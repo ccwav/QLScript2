@@ -251,9 +251,9 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                             var MessageUserGp3 = "";
                             var MessageUserGp4 = "";
 							
-							var userIndex2 = "";
-                            var userIndex3 = "";
-                            var userIndex4 = "";
+							var userIndex2 = -1;
+                            var userIndex3 = -1;
+                            var userIndex4 = -1;
 							
                             var strNotifyOneTemp = "";
                             if ($.isNode() && process.env.BEANCHANGE_USERGP2) {
@@ -345,7 +345,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                 return;
         }
 
-        if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1 || text == "Ninja 运行通知") {
+        if (text.indexOf("京东CK检测") != -1 || text == "Ninja 运行通知") {
 
             if (Notify_CKTask) {
                 console.log("触发CK脚本，开始执行....");

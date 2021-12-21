@@ -250,6 +250,11 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                             var MessageUserGp2 = "";
                             var MessageUserGp3 = "";
                             var MessageUserGp4 = "";
+							
+							var userIndex2 = "";
+                            var userIndex3 = "";
+                            var userIndex4 = "";
+							
                             var strNotifyOneTemp = "";
                             if ($.isNode() && process.env.BEANCHANGE_USERGP2) {
                                 MessageUserGp2 = process.env.BEANCHANGE_USERGP2 ? process.env.BEANCHANGE_USERGP2.split('&') : [];

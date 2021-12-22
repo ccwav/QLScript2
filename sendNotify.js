@@ -231,7 +231,18 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                 }
             }
         }
+		
+		if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1 || text == "Ninja 运行通知") {
 
+            if (Notify_CKTask) {
+                console.log("触发CK脚本，开始执行....");
+                Notify_CKTask = "task " + Notify_CKTask + " now";
+                await exec(Notify_CKTask, function (error, stdout, stderr) {
+                    console.log(error, stdout, stderr)
+                });
+            }
+        }
+		
         if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1) {
             console.log(`捕获CK过期通知，开始尝试处理...`);
             var strPtPin = await GetPtPin(text);
@@ -343,18 +354,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
             }
             if (llHaderror)
                 return;
-        }
-
-        if (text.indexOf("京东CK检测") != -1 || text == "Ninja 运行通知") {
-
-            if (Notify_CKTask) {
-                console.log("触发CK脚本，开始执行....");
-                Notify_CKTask = "task " + Notify_CKTask + " now";
-                await exec(Notify_CKTask, function (error, stdout, stderr) {
-                    console.log(error, stdout, stderr)
-                });
-            }
-        }
+        }        
 
         //检查黑名单屏蔽通知
         const notifySkipList = process.env.NOTIFY_SKIP_LIST ? process.env.NOTIFY_SKIP_LIST.split('&') : [];

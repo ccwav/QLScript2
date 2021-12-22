@@ -248,7 +248,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
             var strPtPin = await GetPtPin(text);
             var strdecPtPin = decodeURIComponent(strPtPin);
             var llHaderror = false;
-
+			var strtext=text;
             if (strPtPin) {
                 var temptest = await getEnvByPtPin(strdecPtPin);
                 if (temptest) {
@@ -257,6 +257,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                         await isLoginByX1a0He(temptest.value);
                         if (!isLogin) {
                             const DisableCkBody = await DisableCk(temptest._id);
+							strPtPin=temptest.value;
+							strPtPin=(strPtPin.match(/pt_pin=([^; ]+)(?=;?)/) && strPtPin.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
                             var strAllNotify = "";
                             var MessageUserGp2 = "";
                             var MessageUserGp3 = "";
@@ -280,14 +282,14 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                             }
 
                             if (MessageUserGp4) {
-                                userIndex4 = MessageUserGp4.findIndex((item) => item === $.UserName);
+                                userIndex4 = MessageUserGp4.findIndex((item) => item === strPtPin);
 
                             }
                             if (MessageUserGp2) {
-                                userIndex2 = MessageUserGp2.findIndex((item) => item === $.UserName);
+                                userIndex2 = MessageUserGp2.findIndex((item) => item === strPtPin);
                             }
                             if (MessageUserGp3) {
-                                userIndex3 = MessageUserGp3.findIndex((item) => item === $.UserName);
+                                userIndex3 = MessageUserGp3.findIndex((item) => item === strPtPin);
                             }
 
                             if (userIndex2 != -1) {
@@ -321,6 +323,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                                 console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
 
                                 strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,自动禁用成功!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
+								strNotifyOneTemp+="\n任务标题："+strtext;
                                 if (strAllNotify)
                                     strNotifyOneTemp += `\n` + strAllNotify;
                                 desp = strNotifyOneTemp;
@@ -331,6 +334,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                             } else {
                                 console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
                                 strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
+								strNotifyOneTemp+="\n任务标题："+strtext;
                                 if (strAllNotify)
                                     strNotifyOneTemp += `\n` + strAllNotify;
                                 desp = strNotifyOneTemp;

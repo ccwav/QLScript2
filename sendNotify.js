@@ -1277,7 +1277,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                             text = text.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
 
                             if (text == "京东资产变动" || text == "京东资产变动#2" || text == "京东资产变动#3" || text == "京东资产变动#4") {
-                                var Tempinfo = getQLinfo(cookie, envs[i].created, envs[i].timestamp);
+                                var Tempinfo = getQLinfo(cookie, envs[i].created, envs[i].timestamp, envs[i].remarks);
                                 if (Tempinfo) {
                                     $.Remark += Tempinfo;
                                 }
@@ -1379,6 +1379,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
         ]);
 }
 
+
 function getuuid(strRemark, PtPin) {
     var strTempuuid = "";
     if (strRemark) {
@@ -1386,10 +1387,23 @@ function getuuid(strRemark, PtPin) {
         if (Tempindex != -1) {
             console.log("检测到NVJDC的一对一格式,瑞思拜~!");
             var TempRemarkList = strRemark.split("@@");
-            strTempuuid = TempRemarkList[1];
+            for (let j = 1; j < TempRemarkList.length; j++) {
+                if (TempRemarkList[j]) {
+                    if (TempRemarkList[j].length > 4) {
+                        if (TempRemarkList[j].substring(0, 4) == "UID_") {
+                            strTempuuid = TempRemarkList[j];
+                            break;
+                        }
+                    }
+                }
+            }
+			if(!strTempuuid){
+				console.log("检索资料失败...");
+			}
         }
     }
     if (!strTempuuid && TempCKUid) {
+        console.log("正在从CK_WxPusherUid文件中检索资料...");
         for (let j = 0; j < TempCKUid.length; j++) {
             if (PtPin == TempCKUid[j].pt_pin) {
                 strTempuuid = TempCKUid[j].Uid;
@@ -1400,18 +1414,33 @@ function getuuid(strRemark, PtPin) {
     return strTempuuid;
 }
 
-function getQLinfo(strCK, intcreated, strTimestamp) {
+function getQLinfo(strCK, intcreated, strTimestamp, strRemark) {
     var strCheckCK = strCK.match(/pt_key=([^; ]+)(?=;?)/) && strCK.match(/pt_key=([^; ]+)(?=;?)/)[1];
     var strReturn = "";
     if (strCheckCK.substring(0, 4) == "AAJh") {
         var DateCreated = new Date(intcreated);
         var DateTimestamp = new Date(strTimestamp);
         var DateToday = new Date();
-
+        if (strRemark) {
+            var Tempindex = strRemark.indexOf("@@");
+            if (Tempindex != -1) {
+                console.log("检测到NVJDC的备注格式,尝试获取登录时间,瑞思拜~!");
+                var TempRemarkList = strRemark.split("@@");
+                for (let j = 1; j < TempRemarkList.length; j++) {
+                    if (TempRemarkList[j]) {
+                        if (TempRemarkList[j].length == 13) {
+                            DateTimestamp = new Date(parseInt(TempRemarkList[j]));
+							console.log("获取登录时间成功:"+GetDateTime(DateTimestamp));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         //过期时间
         var UseDay = Math.ceil((DateToday.getTime() - DateCreated.getTime()) / 86400000);
         var LogoutDay = 30 - Math.ceil((DateToday.getTime() - DateTimestamp.getTime()) / 86400000);
-        if (LogoutDay < 1 ) {
+        if (LogoutDay < 1) {
             strReturn = "\n【登录信息】已服务" + UseDay + "天(登录状态即将到期，请重新登录)"
         } else {
             strReturn = "\n【登录信息】已服务" + UseDay + "天(有效期约剩" + LogoutDay + "天)"
@@ -1486,7 +1515,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                             //额外处理1，nickName包含星号
                             $.nickName = $.nickName.replace(new RegExp(`[*]`, 'gm'), "[*]");
 
-                            var Tempinfo = getQLinfo(cookie, tempEnv.created, tempEnv.timestamp);
+                            var Tempinfo = getQLinfo(cookie, tempEnv.created, tempEnv.timestamp, tempEnv.remarks);
                             if (Tempinfo) {
                                 Tempinfo = $.nickName + Tempinfo;
                                 desp = desp.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), Tempinfo);

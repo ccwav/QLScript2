@@ -166,8 +166,9 @@ let isLogin = false;
 if (process.env.NOTIFY_SHOWNAMETYPE) {
     ShowRemarkType = process.env.NOTIFY_SHOWNAMETYPE;
 }
-async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By ccwav Mod') {
+async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By ccwav Mod',strsummary="") {
     console.log(`开始发送通知...`);
+	
     try {
         //Reset 变量
         UseGroupNotify = 1;
@@ -1382,7 +1383,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
             tgBotNotify(text, desp), //telegram 机器人
             ddBotNotify(text, desp), //钉钉机器人
             qywxBotNotify(text, desp), //企业微信机器人
-            qywxamNotify(text, desp), //企业微信应用消息推送
+            qywxamNotify(text, desp,strsummary), //企业微信应用消息推送
             iGotNotify(text, desp, params), //iGot
             gobotNotify(text, desp), //go-cqhttp
             gotifyNotify(text, desp), //gotify
@@ -1395,7 +1396,7 @@ function getuuid(strRemark, PtPin) {
     if (strRemark) {
         var Tempindex = strRemark.indexOf("@@");
         if (Tempindex != -1) {
-            console.log("检测到NVJDC的一对一格式,瑞思拜~!");
+            console.log(PtPin+": 检测到NVJDC的一对一格式,瑞思拜~!");
             var TempRemarkList = strRemark.split("@@");
             for (let j = 1; j < TempRemarkList.length; j++) {
                 if (TempRemarkList[j]) {
@@ -1415,7 +1416,7 @@ function getuuid(strRemark, PtPin) {
     if (!strTempuuid && TempCKUid) {
         console.log("正在从CK_WxPusherUid文件中检索资料...");
         for (let j = 0; j < TempCKUid.length; j++) {
-            if (PtPin == TempCKUid[j].pt_pin) {
+            if (PtPin == decodeURIComponent(TempCKUid[j].pt_pin)) {
                 strTempuuid = TempCKUid[j].Uid;
                 break;
             }
@@ -1426,6 +1427,7 @@ function getuuid(strRemark, PtPin) {
 
 function getQLinfo(strCK, intcreated, strTimestamp, strRemark) {
     var strCheckCK = strCK.match(/pt_key=([^; ]+)(?=;?)/) && strCK.match(/pt_key=([^; ]+)(?=;?)/)[1];
+	var strPtPin = decodeURIComponent(strCK.match(/pt_pin=([^; ]+)(?=;?)/) && strCK.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
     var strReturn = "";
     if (strCheckCK.substring(0, 4) == "AAJh") {
         var DateCreated = new Date(intcreated);
@@ -1434,13 +1436,13 @@ function getQLinfo(strCK, intcreated, strTimestamp, strRemark) {
         if (strRemark) {
             var Tempindex = strRemark.indexOf("@@");
             if (Tempindex != -1) {
-                console.log("检测到NVJDC的备注格式,尝试获取登录时间,瑞思拜~!");
+                console.log(strPtPin+": 检测到NVJDC的备注格式,尝试获取登录时间,瑞思拜~!");
                 var TempRemarkList = strRemark.split("@@");
                 for (let j = 1; j < TempRemarkList.length; j++) {
                     if (TempRemarkList[j]) {
                         if (TempRemarkList[j].length == 13) {
                             DateTimestamp = new Date(parseInt(TempRemarkList[j]));
-                            console.log("获取登录时间成功:" + GetDateTime(DateTimestamp));
+                            console.log(strPtPin+": 获取登录时间成功:" + GetDateTime(DateTimestamp));
                             break;
                         }
                     }
@@ -1994,7 +1996,7 @@ function ChangeUserId(desp) {
     }
 }
 
-function qywxamNotify(text, desp) {
+function qywxamNotify(text, desp, strsummary="") {
     return new Promise((resolve) => {
         if (QYWX_AM) {
             const QYWX_AM_AY = QYWX_AM.split(',');
@@ -2012,6 +2014,9 @@ function qywxamNotify(text, desp) {
             $.post(options_accesstoken, (err, resp, data) => {
                 html = desp.replace(/\n/g, '<br/>');
                 html = `<font size="3">${html}</font>`;
+                if (strsummary=="") {
+                    strsummary = desp;
+                }
                 var json = JSON.parse(data);
                 accesstoken = json.access_token;
                 let options;
@@ -2022,7 +2027,7 @@ function qywxamNotify(text, desp) {
                         msgtype: 'textcard',
                         textcard: {
                             title: `${text}`,
-                            description: `${desp}`,
+                            description: `${strsummary}`,
                             url: 'https://github.com/whyour/qinglong',
                             btntxt: '更多',
                         },
@@ -2048,7 +2053,7 @@ function qywxamNotify(text, desp) {
                                     author: `智能助手`,
                                     content_source_url: ``,
                                     content: `${html}`,
-                                    digest: `${desp}`,
+                                    digest: `${strsummary}`,
                                 }, ],
                         },
                     };
@@ -2254,7 +2259,7 @@ function wxpusherNotifyByOne(text, desp, strsummary = "") {
             }
 
             if (strsummary.length > 96) {
-                strsummary = strsummary.substring(0, 95);
+                strsummary = strsummary.substring(0, 95)+"...";
             }
             let uids = [];
             for (let i of WP_UIDS_ONE.split(";")) {
@@ -2262,8 +2267,40 @@ function wxpusherNotifyByOne(text, desp, strsummary = "") {
                     uids.push(i);
             };
             let topicIds = [];
-            desp = `<font size="4"><strong>${text}</strong></font>\n\n<font size="3">${desp}</font>`;
+
+            //desp = `<font size="3">${desp}</font>`;
             desp = desp.replace(/[\n\r]/g, '<br>'); // 默认为html, 不支持plaintext
+            desp = `<section style="width: 24rem; max-width: 100%;border:none;border-style:none;margin:2.5rem auto;" id="shifu_imi_57"
+    donone="shifuMouseDownPayStyle(&#39;shifu_imi_57&#39;)">
+    <section
+        style="margin: 0px auto;text-align: left;border: 2px solid #212122;padding: 10px 0px;box-sizing:border-box; width: 100%; display:inline-block;"
+        class="ipaiban-bc">
+        <section style="margin-top: 1rem; float: left; margin-left: 1rem; margin-left: 1rem; font-size: 1.3rem; font-weight: bold;">
+            <p style="margin: 0; color: black">
+                ${text}
+            </p>
+        </section>
+        <section style="display: block;width: 0;height: 0;clear: both;"></section>
+        <section
+            style="margin-top:20px; display: inline-block; border-bottom: 1px solid #212122; padding: 4px 20px; box-sizing:border-box;"
+            class="ipaiban-bbc">
+            <section
+                style="width:25px; height:25px; border-radius:50%; background-color:#212122;display:inline-block;line-height: 25px"
+                class="ipaiban-bg">
+                <p style="text-align:center;font-weight:1000;margin:0">
+                    <span style="color: #ffffff;font-size:20px;">📢</span>
+                </p>
+            </section>
+            <section style="display:inline-block;padding-left:10px;vertical-align: top;box-sizing:border-box;">
+            </section>
+        </section>
+        <section style="margin-top:0rem;padding: 0.8rem;box-sizing:border-box;">
+            <p style=" line-height: 1.6rem; font-size: 1.1rem; ">
+                ${desp} 
+			</p>            
+        </section>
+    </section>
+</section>`;
 
             const body = {
                 appToken: `${WP_APP_TOKEN_ONE}`,

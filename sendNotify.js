@@ -209,7 +209,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
         var Use_gobotNotify = true;
         var Use_pushPlushxtripNotify = true;
         var Use_WxPusher = true;
-
+        var strtext = text;
+        var strdesp = desp;
         if (process.env.NOTIFY_NOCKFALSE) {
             Notify_NoCKFalse = process.env.NOTIFY_NOCKFALSE;
         }
@@ -231,8 +232,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                 }
             }
         }
-		
-		if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1 || text == "Ninja 运行通知") {
+
+        if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1 || text == "Ninja 运行通知") {
 
             if (Notify_CKTask) {
                 console.log("触发CK脚本，开始执行....");
@@ -242,123 +243,129 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                 });
             }
         }
-		
-        if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1) {
-            console.log(`捕获CK过期通知，开始尝试处理...`);
-            var strPtPin = await GetPtPin(text);
-            var strdecPtPin = decodeURIComponent(strPtPin);
-            var llHaderror = false;
-			var strtext=text;
-            if (strPtPin) {
-                var temptest = await getEnvByPtPin(strdecPtPin);
-                if (temptest) {
-                    if (temptest.status == 0) {
-                        isLogin = true;
-                        await isLoginByX1a0He(temptest.value);
-                        if (!isLogin) {
-                            const DisableCkBody = await DisableCk(temptest._id);
-							strPtPin=temptest.value;
-							strPtPin=(strPtPin.match(/pt_pin=([^; ]+)(?=;?)/) && strPtPin.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-                            var strAllNotify = "";
-                            var MessageUserGp2 = "";
-                            var MessageUserGp3 = "";
-                            var MessageUserGp4 = "";
+        if (process.env.NOTIFY_AUTOCHECKCK == "true") {
+            if (text.indexOf("cookie已失效") != -1 || desp.indexOf("重新登录获取") != -1) {
+                console.log(`捕获CK过期通知，开始尝试处理...`);
+                var strPtPin = await GetPtPin(text);
+                var strdecPtPin = decodeURIComponent(strPtPin);
+                var llHaderror = false;
 
-                            var userIndex2 = -1;
-                            var userIndex3 = -1;
-                            var userIndex4 = -1;
+                if (strPtPin) {
+                    var temptest = await getEnvByPtPin(strdecPtPin);
+                    if (temptest) {
+                        if (temptest.status == 0) {
+                            isLogin = true;
+                            await isLoginByX1a0He(temptest.value);
+                            if (!isLogin) {
+                                const DisableCkBody = await DisableCk(temptest._id);
+                                strPtPin = temptest.value;
+                                strPtPin = (strPtPin.match(/pt_pin=([^; ]+)(?=;?)/) && strPtPin.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+                                var strAllNotify = "";
+                                var MessageUserGp2 = "";
+                                var MessageUserGp3 = "";
+                                var MessageUserGp4 = "";
 
-                            var strNotifyOneTemp = "";
-                            if ($.isNode() && process.env.BEANCHANGE_USERGP2) {
-                                MessageUserGp2 = process.env.BEANCHANGE_USERGP2 ? process.env.BEANCHANGE_USERGP2.split('&') : [];
-                            }
+                                var userIndex2 = -1;
+                                var userIndex3 = -1;
+                                var userIndex4 = -1;
 
-                            if ($.isNode() && process.env.BEANCHANGE_USERGP3) {
-                                MessageUserGp3 = process.env.BEANCHANGE_USERGP3 ? process.env.BEANCHANGE_USERGP3.split('&') : [];
-                            }
+                                var strNotifyOneTemp = "";
+                                if ($.isNode() && process.env.BEANCHANGE_USERGP2) {
+                                    MessageUserGp2 = process.env.BEANCHANGE_USERGP2 ? process.env.BEANCHANGE_USERGP2.split('&') : [];
+                                }
 
-                            if ($.isNode() && process.env.BEANCHANGE_USERGP4) {
-                                MessageUserGp4 = process.env.BEANCHANGE_USERGP4 ? process.env.BEANCHANGE_USERGP4.split('&') : [];
-                            }
+                                if ($.isNode() && process.env.BEANCHANGE_USERGP3) {
+                                    MessageUserGp3 = process.env.BEANCHANGE_USERGP3 ? process.env.BEANCHANGE_USERGP3.split('&') : [];
+                                }
 
-                            if (MessageUserGp4) {
-                                userIndex4 = MessageUserGp4.findIndex((item) => item === strPtPin);
+                                if ($.isNode() && process.env.BEANCHANGE_USERGP4) {
+                                    MessageUserGp4 = process.env.BEANCHANGE_USERGP4 ? process.env.BEANCHANGE_USERGP4.split('&') : [];
+                                }
 
-                            }
-                            if (MessageUserGp2) {
-                                userIndex2 = MessageUserGp2.findIndex((item) => item === strPtPin);
-                            }
-                            if (MessageUserGp3) {
-                                userIndex3 = MessageUserGp3.findIndex((item) => item === strPtPin);
-                            }
+                                if (MessageUserGp4) {
+                                    userIndex4 = MessageUserGp4.findIndex((item) => item === strPtPin);
 
-                            if (userIndex2 != -1) {
-                                console.log(`该账号属于分组2`);
-                                text = "京东CK检测#2";
-                            }
-                            if (userIndex3 != -1) {
-                                console.log(`该账号属于分组3`);
-                                text = "京东CK检测#3";
-                            }
-                            if (userIndex4 != -1) {
-                                console.log(`该账号属于分组4`);
-                                text = "京东CK检测#4";
-                            }
-                            if (userIndex4 == -1 && userIndex2 == -1 && userIndex3 == -1) {
-                                text = "京东CK检测";
-                            }
-                            if (process.env.CHECKCK_ALLNOTIFY) {
-                                var strTempNotify = process.env.CHECKCK_ALLNOTIFY ? process.env.CHECKCK_ALLNOTIFY.split('&') : [];
-                                if (strTempNotify.length > 0) {
-                                    for (var TempNotifyl in strTempNotify) {
-                                        strAllNotify += strTempNotify[TempNotifyl] + '\n';
+                                }
+                                if (MessageUserGp2) {
+                                    userIndex2 = MessageUserGp2.findIndex((item) => item === strPtPin);
+                                }
+                                if (MessageUserGp3) {
+                                    userIndex3 = MessageUserGp3.findIndex((item) => item === strPtPin);
+                                }
+
+                                if (userIndex2 != -1) {
+                                    console.log(`该账号属于分组2`);
+                                    text = "京东CK检测#2";
+                                }
+                                if (userIndex3 != -1) {
+                                    console.log(`该账号属于分组3`);
+                                    text = "京东CK检测#3";
+                                }
+                                if (userIndex4 != -1) {
+                                    console.log(`该账号属于分组4`);
+                                    text = "京东CK检测#4";
+                                }
+                                if (userIndex4 == -1 && userIndex2 == -1 && userIndex3 == -1) {
+                                    text = "京东CK检测";
+                                }
+                                if (process.env.CHECKCK_ALLNOTIFY) {
+                                    var strTempNotify = process.env.CHECKCK_ALLNOTIFY ? process.env.CHECKCK_ALLNOTIFY.split('&') : [];
+                                    if (strTempNotify.length > 0) {
+                                        for (var TempNotifyl in strTempNotify) {
+                                            strAllNotify += strTempNotify[TempNotifyl] + '\n';
+                                        }
+                                    }
+                                    console.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
+                                    strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
+                                    console.log(strAllNotify);
+                                }
+
+                                if (DisableCkBody.code == 200) {
+                                    console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
+
+                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,自动禁用成功!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
+                                    strNotifyOneTemp += "\n任务标题：" + strtext;
+                                    if (strAllNotify)
+                                        strNotifyOneTemp += `\n` + strAllNotify;
+                                    desp = strNotifyOneTemp;
+                                    if (WP_APP_TOKEN_ONE) {
+                                        await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
+                                    }
+
+                                } else {
+                                    console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
+                                    strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
+                                    strNotifyOneTemp += "\n任务标题：" + strtext;
+                                    if (strAllNotify)
+                                        strNotifyOneTemp += `\n` + strAllNotify;
+                                    desp = strNotifyOneTemp;
+                                    if (WP_APP_TOKEN_ONE) {
+                                        await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
                                     }
                                 }
-                                console.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
-                                strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
-                                console.log(strAllNotify);
-                            }
-
-                            if (DisableCkBody.code == 200) {
-                                console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
-
-                                strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,自动禁用成功!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
-								strNotifyOneTemp+="\n任务标题："+strtext;
-                                if (strAllNotify)
-                                    strNotifyOneTemp += `\n` + strAllNotify;
-                                desp = strNotifyOneTemp;
-                                if (WP_APP_TOKEN_ONE) {
-                                    await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
-                                }
-
                             } else {
-                                console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
-                                strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
-								strNotifyOneTemp+="\n任务标题："+strtext;
-                                if (strAllNotify)
-                                    strNotifyOneTemp += `\n` + strAllNotify;
-                                desp = strNotifyOneTemp;
-                                if (WP_APP_TOKEN_ONE) {
-                                    await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
-                                }
+                                console.log(`该CK已经检测没有有效，跳过通知...`);
+                                llHaderror = true;
                             }
                         } else {
-                            console.log(`该CK已经检测没有有效，跳过通知...`);
+                            console.log(`该CK已经禁用不需要处理`);
                             llHaderror = true;
                         }
-                    } else {
-                        console.log(`该CK已经禁用不需要处理`);
-                        llHaderror = true;
+
                     }
 
+                } else {
+                    console.log(`CK过期通知处理失败...`);
                 }
-
-            } else {
-                console.log(`CK过期通知处理失败...`);
+                if (llHaderror)
+                    return;
             }
-            if (llHaderror)
+        }
+        if (strtext.indexOf("cookie已失效") != -1 || strdesp.indexOf("重新登录获取") != -1 || strtext == "Ninja 运行通知") {
+            if (Notify_NoCKFalse == "true" && text != "Ninja 运行通知") {
                 return;
-        }        
+            }
+        }
 
         //检查黑名单屏蔽通知
         const notifySkipList = process.env.NOTIFY_SKIP_LIST ? process.env.NOTIFY_SKIP_LIST.split('&') : [];
@@ -1383,7 +1390,6 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
         ]);
 }
 
-
 function getuuid(strRemark, PtPin) {
     var strTempuuid = "";
     if (strRemark) {
@@ -1401,9 +1407,9 @@ function getuuid(strRemark, PtPin) {
                     }
                 }
             }
-			if(!strTempuuid){
-				console.log("检索资料失败...");
-			}
+            if (!strTempuuid) {
+                console.log("检索资料失败...");
+            }
         }
     }
     if (!strTempuuid && TempCKUid) {
@@ -1434,7 +1440,7 @@ function getQLinfo(strCK, intcreated, strTimestamp, strRemark) {
                     if (TempRemarkList[j]) {
                         if (TempRemarkList[j].length == 13) {
                             DateTimestamp = new Date(parseInt(TempRemarkList[j]));
-							console.log("获取登录时间成功:"+GetDateTime(DateTimestamp));
+                            console.log("获取登录时间成功:" + GetDateTime(DateTimestamp));
                             break;
                         }
                     }
@@ -1544,7 +1550,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                     }
                     console.log("处理完成，开始发送通知...");
                     desp = buildLastDesp(desp, author);
-                    await wxpusherNotifyByOne(text, desp,strsummary);
+                    await wxpusherNotifyByOne(text, desp, strsummary);
                 } else {
                     console.log("未查询到用户的Uid,取消一对一通知发送...");
                 }

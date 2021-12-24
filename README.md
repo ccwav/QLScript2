@@ -105,7 +105,11 @@
 	
   
 # 5. sendNotify.js
-发送通知脚本Pro.集成自动禁用失效CK功能，通过捕获任务脚本发送ck失效实现，精准操作，支持一对一推送，通知标题还是以前的"京东CK检测",兼容jd_CheckCK.js的分组设定和CHECKCK_ALLNOTIFY设定.
+发送通知脚本Pro.
+
+集成自动禁用失效CK功能，当NOTIFY_AUTOCHECKCK=“true”时开启,默认关闭,原理是通过捕获任务脚本发送ck失效实现，
+
+精准操作，支持一对一推送，通知标题还是以前的"京东CK检测",兼容jd_CheckCK.js的分组设定和CHECKCK_ALLNOTIFY设定.
 
 变量列表:
 
@@ -159,7 +163,7 @@
 	(13) 用 WxPusher 进行一对一推送
 	详细教程有人写了，不知道是幸运还是不幸: https://www.kejiwanjia.com/jiaocheng/27909.html
 	填写变量 WP_APP_TOKEN_ONE,可在管理台查看: https://wxpusher.zjiecode.com/admin/main/app/appToken
-	手动建立CK_WxPusherUid.json,可以参考CKName_cache.json,只是nickName改成Uid，
+	手动建立CK_WxPusherUid.json，放通知脚本同级文件夹,可以参考CKName_cache.json,只是nickName改成Uid，
 	每个用户的uid可在管理台查看: https://wxpusher.zjiecode.com/admin/main/wxuser/list	
 	CK_WxPusherUid.json 内容(pt_pin 如果是汉字需要填写转码后的!):
 	[

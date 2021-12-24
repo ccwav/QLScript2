@@ -218,6 +218,13 @@
 变量列表:
 	export CC_NOHELPAFTER8="true"   控制早上9点后时段跳过不必要的互助
 
+# 11. jd_UpdateUIDtoRemark.js WxPusherUid迁移工具
+	WxPusherUid迁移工具是给使用nvjdc的用户准备的，没有使用nvjdc的请不要使用。
+	
+	适配nvjdc的备注格式为 :  备注@@账号更新时间数值@@Uid ,脚本会按照这个格式自动更新，其中账号更新时间数值用户使用 nvjdc登录更新ck的时候会自动更新，
+	
+	非nvjdc用户如果不小心使用了迁移工具，请还原env.db或手动更改备注格式为  备注@@Uid
+
 # 分组应用总结实例:
 
     ##CK失效时执行脚本

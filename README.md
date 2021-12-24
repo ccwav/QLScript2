@@ -161,6 +161,9 @@
     增加pushplus.hxtrip.com的推送加接口，貌似更稳定,注意这个和PUSHPLUS不是同一家.
     
 	(13) 用 WxPusher 进行一对一推送
+	新方案;
+	填写变量 WP_APP_TOKEN_ONE,按照备注内容@@WxPusherUid的格式修改备注,例子 萌新cc@@UID_AASDADASDQWEQWDADASDADASDASDSA
+	旧方案:
 	详细教程有人写了，不知道是幸运还是不幸: https://www.kejiwanjia.com/jiaocheng/27909.html
 	填写变量 WP_APP_TOKEN_ONE,可在管理台查看: https://wxpusher.zjiecode.com/admin/main/app/appToken
 	手动建立CK_WxPusherUid.json，放通知脚本同级文件夹,可以参考CKName_cache.json,只是nickName改成Uid，

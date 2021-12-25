@@ -80,6 +80,11 @@ async function jdGlobal() {
     await queryJoy()
     // await signInit()
     await cash()
+	var date = new Date();
+	if(new Date(date.getFullYear(), date.getMonth()+1, 0).getDate() == date.getDate()){
+		console.log('月底了,自动领下单红包奖励')
+		await orderReward()
+	}	
     await showMsg()
   } catch (e) {
     $.logErr(e)
@@ -151,6 +156,68 @@ async function sign() {
       })
   })
 }
+
+async function orderReward(type) {
+  let t = +new Date()
+  var headers = {
+    'Host': 'api.m.jd.com',
+    'accept': 'application/json, text/plain, */*',
+    'content-type': 'application/x-www-form-urlencoded',
+    'origin': 'https://palace.m.jd.com',
+    'accept-language': 'zh-cn',
+    'user-agent': $.isNode() ? (process.env.JS_USER_AGENT ? process.env.JS_USER_AGENT : (require('./JS_USER_AGENTS').USER_AGENT)) : ($.getdata('JSUA') ? $.getdata('JSUA') : "'jdltapp;iPad;3.1.0;14.4;network/wifi;Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+    'referer': 'https://palace.m.jd.com/?lng=110.917107&lat=22.2706&sid=abefac3cfbcb550b542e4c064dbcabfw&un_area=19_1684_1687_6233',
+    'Cookie': cookie
+  };
+  if (type) {
+    var dataString = `functionId=OrderRewardService&body={"method":"receiveReward","data":{"orderQty":${type}}}&_t=${t}&appid=market-task-h5&eid=`;
+  } else {
+    var dataString = `functionId=OrderRewardService&body={"method":"queryRewards","data":{}}&_t=${t}&appid=market-task-h5&eid=`;
+  }
+  var options = {
+    url: `https://api.m.jd.com/`,
+    headers: headers,
+    body: dataString
+  };
+  $.post(options, async (err, resp, data) => {
+    try {
+      if (err) {
+        console.log(`${JSON.stringify(err)}`)
+        console.log(`orderReward API请求失败，请检查网路重试`)
+      } else {
+        if (safeGet(data)) {
+          data = JSON.parse(data);
+          if (data.code === 0 && data.isSuccess) {
+            if (data.data.details) {
+              $.details = data.data.details
+              for (let item of $.details) {
+                if (item.status === 2) {
+                  console.log(`\n检测到【下单领红包】有奖励可领取，开始领取奖励`)
+                  await orderReward(item.orderQty);
+                  await $.wait(2000)
+                } else if (item.status === 1) {
+                  console.log(`\n【下单领红包】暂无奖励可领取，再下${data.data.needOrderQty}单可领取${data.data.rewardAmount}元`)
+                  break
+                }
+              }
+            } else {
+              if (data.code === 0) {
+                console.log(`奖励领取结果，获得${data.data.rewardAmount}元`)
+              } else {
+                console.log(`奖励领取结果：获得${JSON.stringify(data)}`)
+              }
+            }
+          } else {
+            console.log(`\n其他情况：${JSON.stringify(data)}`)
+          }
+        }
+      }
+    } catch (e) {
+      $.logErr(e, resp)
+    }
+  })
+}
+
 
 async function taskList() {
   return new Promise(resolve => {

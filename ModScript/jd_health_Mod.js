@@ -35,7 +35,7 @@ function oc(fn, defaultVal) { //optioanl chaining
 	}
 }
 function nc(val1, val2) { //nullish coalescing
-	return val1 ? val1 : val2
+	return val1 != undefined ? val1 : val2
 }
 if ($.isNode()) {
 	Object.keys(jdCookieNode).forEach((item) => {
@@ -219,7 +219,7 @@ function getTaskDetail(taskId = '') {
 								await $.wait(1000 * (oc(() => data.data.result.taskVos[0].waitDuration) || 3));
 							await doTask(oc(() => data.data.result.taskVos[0].shoppingActivityVos[0].taskToken), 22, 0); //完成任务
 						} else {
-							for (let vo of nc(oc(() => data.data.result.taskVos.filter(vo => vo.taskType !== 19 && vo.taskType !== 25)), [])) {
+							for (let vo of nc(oc(() => data.data.result.taskVos.filter(vo => ![19,25,15,21].includes(vo.taskType))) , [])) {
 								console.log(`${vo.taskName}任务，完成次数：${vo.times}/${vo.maxTimes}`)
 								for (let i = vo.times; i < vo.maxTimes; i++) {
 									console.log(`去完成${vo.taskName}任务`)
@@ -322,63 +322,55 @@ function exchange(commodityType, commodityId) {
 }
 
 function doTask(taskToken, taskId, actionType = 0) {
-	return new Promise(resolve => {
-		const options = taskUrl('jdhealth_collectScore', {
-			taskToken,
-			taskId,
-			actionType
-		})
-			$.get(options,
-				(err, resp, data) => {
-				try {
-					if (safeGet(data)) {
-						data = $.toObj(data);
-						if ([0, 1].includes(data?.data?.bizCode ?? -1)) {
-							$.canDo = true;
-							if (data?.data?.result?.score) {
-								console.log(`任务完成成功，获得：${data?.data?.result?.score ?? '未知'}能量`);
-							} else {
-								console.log(`任务领取结果：${data?.data?.bizMsg ?? JSON.stringify(data)}`);
-							}
-						} else {
-							console.log(`任务完成失败：${data?.data?.bizMsg ?? JSON.stringify(data)}`);
-						}
-					}
-				} catch (e) {
-					console.log(e)
-				}
-				finally {
-					resolve(data)
-				}
-			})
-	})
+  return new Promise(resolve => {
+    const options = taskUrl('jdhealth_collectScore', {taskToken, taskId, actionType})
+    $.get(options,
+      (err, resp, data) => {
+        try {
+          if (safeGet(data)) {
+            data = $.toObj(data)
+            if ([0, 1].includes(nc(oc(() => data.data.bizCode) , -1))) {
+              $.canDo = true
+              if (oc(() => data.data.result.score))
+                console.log(`任务完成成功，获得：${nc(oc(() => data.data.result.score) , '未知')}能量`)
+              else
+                console.log(`任务领取结果：${nc(oc(() => data.data.bizMsg) , JSON.stringify(data))}`)
+            } else {
+              console.log(`任务完成失败：${nc(oc(() => data.data.bizMsg) , JSON.stringify(data))}`)
+            }
+          }
+        } catch (e) {
+          console.log(e)
+        } finally {
+          resolve(data)
+        }
+      })
+  })
 }
 
 function collectScore() {
-	return new Promise(resolve => {
-		$.get(taskUrl('jdhealth_collectProduceScore', {}),
-			(err, resp, data) => {
-			try {
-				if (safeGet(data)) {
-					data = $.toObj(data);
-					if (data?.data?.bizCode === 0) {
-						if (data?.data?.result?.produceScore) {
-							console.log(`任务完成成功，获得：${data?.data?.result?.produceScore ?? '未知'}能量`);
-						} else {
-							console.log(`任务领取结果：${data?.data?.bizMsg ?? JSON.stringify(data)}`);
-						}
-					} else {
-						console.log(`任务完成失败：${data?.data?.bizMsg ?? JSON.stringify(data)}`);
-					}
-				}
-			} catch (e) {
-				console.log(e)
-			}
-			finally {
-				resolve()
-			}
-		})
-	})
+  return new Promise(resolve => {
+    $.get(taskUrl('jdhealth_collectProduceScore', {}),
+      (err, resp, data) => {
+        try {
+          if (safeGet(data)) {
+            data = $.toObj(data)
+            if (oc(() => data.data.bizCode) === 0) {
+              if (oc(() => data.data.result.produceScore))
+                console.log(`任务完成成功，获得：${nc(oc(() => data.data.result.produceScore) , '未知')}能量`)
+              else
+                console.log(`任务领取结果：${nc(oc(() => data.data.bizMsg) , JSON.stringify(data))}`)
+            } else {
+              console.log(`任务完成失败：${nc(oc(() => data.data.bizMsg) , JSON.stringify(data))}`)
+            }
+          }
+        } catch (e) {
+          console.log(e)
+        } finally {
+          resolve()
+        }
+      })
+  })
 }
 
 function taskUrl(function_id, body = {}) {

@@ -47,6 +47,8 @@
 京东资产变动 + 白嫖榜 + 京东月资产变动,注意事项: 
 
 	如果你遇到TG Bark报错，那是因为报文过长，请使用分段通知功能.
+	
+	CKName_cache.json 跟 CK_WxPusherUid.json 现在写死路径到ql/scripts
 
 变量列表:
 
@@ -66,9 +68,13 @@
 	    开启 :  export BEANCHANGE_ENABLEMONTH="true"  	
     
     (4) BEANCHANGE_ALLNOTIFY
-		设置推送置顶公告，&表示换行，公告会出现在资产通知中(包括一对一).
-		例子 :  export BEANCHANGE_ALLNOTIFY="ccwav 虽然头发块掉光了&可是还是很帅啊...&&不说了，我去哭会...."  
-		显示:
+		设置推送置顶公告，公告会出现在资产通知中(包括一对一),支持html语法.
+		例子 :  export BEANCHANGE_ALLNOTIFY='ccwav 虽然头发块掉光了
+		可是还是很帅啊...
+		
+		不说了，我去哭会....'  
+		
+		显示效果:
 		
 		【✨✨✨✨公告✨✨✨✨】
 		 ccwav 虽然头发块掉光了
@@ -100,7 +106,7 @@
 	分组通知的通知标题为 脚本名+"#"+分组数值
 	主要用于搭配通知脚本的分组通知使用.
   
-	2021-11-14增加CHECKCK_ALLNOTIFY设置温馨提示，&表示换行，推送时在内容末尾添加显示
+	增加CHECKCK_ALLNOTIFY设置温馨提示，推送时在内容末尾添加显示
 	一对一推送只有推送账户失效时才会添加.用法参考BEANCHANGE_ALLNOTIFY.
 	
   

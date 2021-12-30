@@ -14,7 +14,7 @@ const querystring = require('querystring');
 const exec = require('child_process').exec;
 const $ = new Env();
 const timeout = 15000; //超时时间(单位毫秒)
-console.log("加载sendNotify，当前版本: 20211228");
+console.log("加载sendNotify，当前版本: 20211230");
 // =======================================go-cqhttp通知设置区域===========================================
 //gobot_url 填写请求地址http://127.0.0.1/send_private_msg
 //gobot_token 填写在go-cqhttp文件设置的访问密钥
@@ -310,13 +310,13 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                                     text = "京东CK检测";
                                 }
                                 if (process.env.CHECKCK_ALLNOTIFY) {
-                                    var strTempNotify = process.env.CHECKCK_ALLNOTIFY ? process.env.CHECKCK_ALLNOTIFY.split('&') : [];
-                                    if (strTempNotify.length > 0) {
+                                   strAllNotify = process.env.CHECKCK_ALLNOTIFY;
+                                    /* if (strTempNotify.length > 0) {
                                         for (var TempNotifyl in strTempNotify) {
                                             strAllNotify += strTempNotify[TempNotifyl] + '\n';
                                         }
                                     }
-                                    console.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
+                                    co */nsole.log(`检测到设定了温馨提示,将在推送信息中置顶显示...`);
                                     strAllNotify = `\n【✨✨✨✨温馨提示✨✨✨✨】\n` + strAllNotify;
                                     console.log(strAllNotify);
                                 }
@@ -1230,6 +1230,17 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
             //开始读取青龙变量列表
             const envs = await getEnvs();
             if (envs[0]) {
+                var strTempdesp = [];
+                var strAllNotify = "";
+                if (text == "京东资产变动" || text == "京东资产变动#2" || text == "京东资产变动#3" || text == "京东资产变动#4") {
+                    strTempdesp = desp.split('🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏');
+                    if (strTempdesp.length == 2) {
+                        strAllNotify = strTempdesp[0];
+                        desp = strTempdesp[1];
+                    }
+
+                }
+
                 for (let i = 0; i < envs.length; i++) {
                     cookie = envs[i].value;
                     $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
@@ -1285,15 +1296,14 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                         try {
                             //额外处理1，nickName包含星号
                             $.nickName = $.nickName.replace(new RegExp(`[*]`, 'gm'), "[*]");
-
                             text = text.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
-
                             if (text == "京东资产变动" || text == "京东资产变动#2" || text == "京东资产变动#3" || text == "京东资产变动#4") {
                                 var Tempinfo = getQLinfo(cookie, envs[i].created, envs[i].timestamp, envs[i].remarks);
                                 if (Tempinfo) {
                                     $.Remark += Tempinfo;
                                 }
                             }
+
                             desp = desp.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
                             strsummary = strsummary.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
                             //额外处理2，nickName不包含星号，但是确实是手机号
@@ -1303,7 +1313,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                                 //console.log("额外处理2:"+tempname);
                                 text = text.replace(new RegExp(tempname, 'gm'), $.Remark);
                                 desp = desp.replace(new RegExp(tempname, 'gm'), $.Remark);
-								strsummary = strsummary.replace(new RegExp(tempname, 'gm'), $.Remark);
+                                strsummary = strsummary.replace(new RegExp(tempname, 'gm'), $.Remark);
                             }
 
                         } catch (err) {
@@ -1321,6 +1331,9 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 
             }
             console.log("处理完成，开始发送通知...");
+            if (strAllNotify) {
+                desp = strAllNotify+"\n" + desp;
+            }
         }
     } catch (error) {
         console.error(error);
@@ -1486,6 +1499,17 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
     try {
         var Uid = "";
         var UserRemark = "";
+        var strTempdesp = [];
+        var strAllNotify = "";
+        if (text == "京东资产变动") {
+            strTempdesp = desp.split('🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏🎏');
+            if (strTempdesp.length == 2) {
+                strAllNotify = strTempdesp[0];
+                desp = strTempdesp[1];
+            }
+
+        }
+
         if (WP_APP_TOKEN_ONE) {
             var tempEnv = await getEnvByPtPin(PtPin);
             if (tempEnv) {
@@ -1553,6 +1577,9 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                     }
                     console.log("处理完成，开始发送通知...");
                     desp = buildLastDesp(desp, author);
+					if (strAllNotify) {
+						desp = strAllNotify+"\n" + desp;
+					}
                     await wxpusherNotifyByOne(text, desp, strsummary);
                 } else {
                     console.log("未查询到用户的Uid,取消一对一通知发送...");

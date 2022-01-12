@@ -84,9 +84,10 @@
 	
 	(5) BEANCHANGE_ExJxBeans
 		当设定BEANCHANGE_ExJxBeans="true"且时间在17点之后，会自动将临期京豆兑换成喜豆续命.
-	
-	(6) BEANCHANGE_CheckJxBeans
-		当设定BEANCHANGE_CheckJxBeans="true" 将启用喜豆查询功能.
+
+	(6) BEANCHANGE_DISABLELIST
+		关闭查询列表中的项目,自行删减.(攻略显示就是之前的提醒)
+		export BEANCHANGE_DISABLELIST="汪汪乐园&京东赚赚&京东秒杀&东东农场&极速金币&京喜牧场&京喜工厂&京东工厂&领现金&喜豆查询&金融养猪&东东萌宠&活动攻略"
 		
 # 4. jd_CheckCK.js (已添加支持一对一推送)
 (最新的通知脚本已经集成自动禁用失效CK，如不需要自动启用CK功能可以直接禁用此脚本.)

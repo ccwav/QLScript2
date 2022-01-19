@@ -174,7 +174,22 @@ if (process.env.NOTIFY_SHOWNAMETYPE) {
 }
 async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By ccwav Mod', strsummary = "") {
     console.log(`开始发送通知...`);
-
+    let no_notify = process.env.no_notify
+    if (no_notify) {
+        no_notify = process.env.no_notify.split('&')
+        if (module.parent.filename) {
+            const script_name = module.parent.filename.split('/').slice(-1)[0]
+            if (no_notify.some(key_word => {
+                const flag = script_name.includes(key_word)
+                if (flag) {
+                    console.log(`${script_name}含有关键字${key_word},不推送`)
+                }
+                return flag
+            })) {
+                return
+            }
+        }
+    }
     try {
         //Reset 变量
         UseGroupNotify = 1;

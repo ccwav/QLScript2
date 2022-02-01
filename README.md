@@ -1,27 +1,12 @@
 # QLScript_New
 
-本库的一对一通知和Ark(原Nvjdc)登录产生的备注格式互相兼容，且只有使用Ark(原Nvjdc)登录的才会在资产查询中显示预计过期时间.
+本库的一对一通知和Ark(原Nvjdc)登录产生的备注格式互相兼容.
 
-2.10.3之前版本青龙拉库命令:
+本库只提供资产查询和通知脚本修改,不再提供其他任何额外脚本.
 
-	不包含sendNotify:
-
-	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|utils"
-
-	包含sendNotify:
-
-	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify|utils"
-
-
-2.10.3之后版本青龙拉库命令:
-
-	不包含sendNotify:
-
-	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|utils|USER_AGENTS|jdCookie|JS_USER_AGENTS"
-
-	包含sendNotify:
-
-	ql repo https://github.com/ccwav/QLScript2.git "jd_" "NoUsed" "ql|sendNotify|utils|USER_AGENTS|jdCookie|JS_USER_AGENTS"
+青龙拉库命令:
+	
+	ql repo https://github.com/ccwav/QLScript2.git "jd_" "" "ql|sendNotify"
 	
 频道:
 
@@ -197,37 +182,7 @@
     控制不显示推送通知的底部信息
     例子 :  export NOTIFY_AUTHOR_BLANK="随便填只要非空即可"
 	
-# 6. jd_speed_sign_Part1~jd_speed_sign_Part3
-简单粗暴的极速版的分任务版，将总ck数除以3后平均分配成三个任务同时执行.
-
-如果使用请务必禁用其他库的jd_speed_sign脚本.感谢jd_speed_sign原作者。
-	
-例子 : 有24个ck，则Part1 执行1~8,Part2 执行9~16，Part3 执行17以后剩下的所有ck.
-
-# 7. jd_priceProtect_Mod.js  (已添加支持一对一推送)
-
-京东价格保护一对一通知版,仅仅是保价成功加上了一对一通知，改了执行时间,没有什么技术含量...
-
-# 8. jd_big_winner_Mod.js  (已添加支持一对一推送)
-省钱大赢家之翻翻乐分组版本,兼容资产通知查询的分组变量BEANCHANGE_USERGP2 ~ BEANCHANGE_USERGP4
-
-标题为省钱大赢家之翻翻乐 省钱大赢家之翻翻乐#2 省钱大赢家之翻翻乐#3 省钱大赢家之翻翻乐#4
-
-# 9. jd_joy_reward_Mod.js
-宠汪汪积分兑换有就换版
-
-变量列表:
-
-    export JOY_GET20WHEN16="true"  
-    控制16点才触发20京豆兑换.
-	
-# 10. 互助版脚本
-互助版没有助力池，全部账号内互助，另外,东东农场跟东东萌宠要跑第二次任务才能看到正确的助力结果，请知悉(能改，但是懒，不想动它的顺序逻辑).
-
-变量列表:
-	export CC_NOHELPAFTER8="true"   控制早上9点后时段跳过不必要的互助
-
-# 11. jd_UpdateUIDtoRemark.js WxPusherUid迁移工具
+# 6. jd_UpdateUIDtoRemark.js WxPusherUid迁移工具
 	WxPusherUid迁移工具是给使用nvjdc的用户准备的，没有使用nvjdc的请不要使用。
 	
 	适配nvjdc的备注格式为 :  备注@@账号更新时间数值@@Uid ,脚本会按照这个格式自动更新，其中账号更新时间数值用户使用 nvjdc登录更新ck的时候会自动更新，

@@ -78,6 +78,7 @@ if (WP_APP_TOKEN_ONE) {
     console.log(`检测到未配置Wxpusher的Token，禁用一对一推送...`);
 let lnrun=0;
 let llgetshare=false;
+let NoNeedCodes = [];
 !(async () => {
 
   await requireConfig();
@@ -782,6 +783,19 @@ async function masterHelpShare() {
   if(llhelp){
 	  console.log('开始助力好友')
 	  for (let code of newShareCodes) {
+		if(NoNeedCodes){
+			var llnoneed=false;
+			for (let NoNeedCode of NoNeedCodes) {
+				if (code==NoNeedCode){
+					llnoneed=true;
+					break;
+				}
+			}
+			if(llnoneed){
+				console.log(`${code}助力已满，跳过...`);
+				continue;
+			}
+		}        
 		console.log(`${$.UserName}开始助力: ${code}`);
 		if (!code) continue;
 		if (!$.farmInfo.farmUserPro) {
@@ -805,6 +819,7 @@ async function masterHelpShare() {
 		  } else if ($.helpResult.helpResult.code === '9') {
 			console.log(`【助力好友结果】: 之前给【${$.helpResult.helpResult.masterUserInfo.nickName}】助力过了`);
 		  } else if ($.helpResult.helpResult.code === '10') {
+			NoNeedCodes.push(code);
 			console.log(`【助力好友结果】: 好友【${$.helpResult.helpResult.masterUserInfo.nickName}】已满五人助力`);
 		  } else {
 			console.log(`助力其他情况：${JSON.stringify($.helpResult.helpResult)}`);

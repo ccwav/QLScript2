@@ -362,18 +362,12 @@ if(DisableIndex!=-1){
 			//东东农场
 			if (EnableJdFruit) {
 			    llgeterror = false;
-			    await getjdfruit();
-				
+			    await getjdfruit();				
 			    if (llgeterror) {
 					console.log(`东东农场API查询失败,等待10秒后再次尝试...`)
 					await $.wait(10 * 1000);					
 			        await getjdfruit();
-			    }
-				if (llgeterror) {
-					console.log(`东东农场API查询失败,等待30秒后再次尝试...`)
-					await $.wait(30 * 1000);					
-			        await getjdfruit();
-			    }
+			    }				
 				if (llgeterror) {
 					console.log(`东东农场API查询失败,有空重启路由器换个IP吧.`)
 				}

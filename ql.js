@@ -6,7 +6,7 @@ const { readFile } = require('fs/promises');
 const path = require('path');
 
 const qlDir = '/ql';
-const authFile = path.join(qlDir, 'config/auth.json');
+const authFile = path.join(qlDir, 'data/config/auth.json');
 
 const api = got.extend({
   prefixUrl: 'http://127.0.0.1:5600',

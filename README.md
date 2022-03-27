@@ -2,6 +2,8 @@
 
 本库的一对一通知和Ark(原Nvjdc)登录产生的备注格式互相兼容，且只有使用Ark(原Nvjdc)登录的才会在资产查询中显示预计过期时间.
 
+如果遇到什么问题先看看,可能有收获:	https://www.kejiwanjia.com/jiaocheng/61708.html
+
 2.10.3之前版本青龙拉库命令:
 
 	不包含sendNotify:

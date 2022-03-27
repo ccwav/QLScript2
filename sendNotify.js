@@ -141,6 +141,7 @@ if(isnewql){
 }else{
 	strCKFile = '/ql/scripts/CKName_cache.json';
 	strUidFile = '/ql/scripts/CK_WxPusherUid.json';
+}
 	
 
 let Fileexists = fs.existsSync(strCKFile);

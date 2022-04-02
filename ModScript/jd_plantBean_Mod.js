@@ -47,7 +47,6 @@ $.newShareCode = [];
 let NowHour = new Date().getHours();
 let llhelp=true;
 if ($.isNode() && process.env.CC_NOHELPAFTER8) {
-	console.log(NowHour);
 	if (process.env.CC_NOHELPAFTER8=="true"){
 		if (NowHour>8){
 			llhelp=false;
@@ -63,28 +62,35 @@ if ($.isNode() && process.env.CC_NOHELPAFTER8) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
     return;
   }
+   
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
-      cookie = cookiesArr[i];
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      $.index = i + 1;
-      $.isLogin = true;
-      $.nickName = '';
-      await TotalBean();
-      console.log(`\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
-      if (!$.isLogin) {
-        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
+        cookie = cookiesArr[i];
+        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+            $.index = i + 1;
+        $.isLogin = true;
+        $.nickName = '';
+        await TotalBean();
+        console.log(`\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
+        if (!$.isLogin) {
+            $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
+                "open-url": "https://bean.m.jd.com/bean/signIndex.action"
+            });
 
-        if ($.isNode()) {
-          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+            if ($.isNode()) {
+                await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+            }
+            continue
         }
-        continue
-      }
-      message = '';
-      subTitle = '';
-      option = {};
-      await jdPlantBean();
-      await showMsg();
+        message = '';
+        subTitle = '';
+        option = {};
+        await jdPlantBean();
+        await showMsg();
+        if ($.isNode() && llerror) {
+            await notify.sendNotify(`${$.name}`, `京东账号${$.index} ${$.nickName || $.UserName}\n任务执行异常，请检查执行日志 ‼️‼️`);
+        }
+
     }
   }
   if(llhelp){
@@ -110,34 +116,9 @@ if ($.isNode() && process.env.CC_NOHELPAFTER8) {
 async function jdPlantBean() {
   try {
     console.log(`获取任务及基本信息`)
-    await plantBeanIndex();
-    if ($.plantBeanIndexResult.errorCode === 'PB101') {
-        console.log(`\n活动太火爆了，还是去买买买吧！\n`)
-        return
-    }
-    if ($.plantBeanIndexResult.errorCode) {
-        console.log(`获取任务及基本信息出错，10秒后重试\n`)
-        await $.wait(10000);
-        await plantBeanIndex();
-        if ($.plantBeanIndexResult.errorCode === 'PB101') {
-            console.log(`\n活动太火爆了，还是去买买买吧！\n`)
-            return
-        }
-    }
-	if ($.plantBeanIndexResult.errorCode) {
-        console.log(`获取任务及基本信息出错，30秒后重试\n`)
-        await $.wait(30000);
-        await plantBeanIndex();
-        if ($.plantBeanIndexResult.errorCode === 'PB101') {
-            console.log(`\n活动太火爆了，还是去买买买吧！\n`)
-            return
-        }
-    }
-	if ($.plantBeanIndexResult.errorCode) {
-		console.log(`获取任务及基本信息失败，活动异常，换个时间再试试吧....`)
-		console.log("错误代码;"+$.plantBeanIndexResult.errorCode)
-		return
-	}
+    await plantBeanIndex(); 
+    if(llerror)
+		return;
     for (let i = 0; i < $.plantBeanIndexResult.data.roundList.length; i++) {
       if ($.plantBeanIndexResult.data.roundList[i].roundState === "2") {
         num = i
@@ -208,21 +189,24 @@ async function doGetReward() {
   message += `【本期成长值】${roundList[num].growth}\n`;
 }
 async function doCultureBean() {
-  await plantBeanIndex();
-  if ($.plantBeanIndexResult && $.plantBeanIndexResult.code === '0') {
-    const plantBeanRound = $.plantBeanIndexResult.data.roundList[num]
-    if (plantBeanRound.roundState === '2') {
-      //收取营养液
-      if (plantBeanRound.bubbleInfos && plantBeanRound.bubbleInfos.length) console.log(`开始收取营养液`)
-      for (let bubbleInfo of plantBeanRound.bubbleInfos) {
-        console.log(`收取-${bubbleInfo.name}-的营养液`)
-        await cultureBean(plantBeanRound.roundId, bubbleInfo.nutrientsType)
-        console.log(`收取营养液结果:${JSON.stringify($.cultureBeanRes)}`)
-      }
+    await plantBeanIndex();
+	if(llerror)
+		return;
+    if ($.plantBeanIndexResult && $.plantBeanIndexResult.code === '0') {
+        const plantBeanRound = $.plantBeanIndexResult.data.roundList[num];
+        if (plantBeanRound.roundState === '2') {
+            //收取营养液
+            if (plantBeanRound.bubbleInfos && plantBeanRound.bubbleInfos.length)
+                console.log(`开始收取营养液`)
+                for (let bubbleInfo of plantBeanRound.bubbleInfos) {
+                    console.log(`收取-${bubbleInfo.name}-的营养液`)
+                    await cultureBean(plantBeanRound.roundId, bubbleInfo.nutrientsType)
+                    console.log(`收取营养液结果:${JSON.stringify($.cultureBeanRes)}`)
+                }
+        }
+    } else {
+        console.log(`plantBeanIndexResult:${JSON.stringify($.plantBeanIndexResult)}`)
     }
-  } else {
-    console.log(`plantBeanIndexResult:${JSON.stringify($.plantBeanIndexResult)}`)
-  }
 }
 async function stealFriendWater() {
   await stealFriendList();
@@ -436,7 +420,9 @@ async function doTask() {
 }
 function showTaskProcess() {
   return new Promise(async resolve => {
-    await plantBeanIndex();
+    await plantBeanIndex();	
+	if(llerror)
+		return;
     $.taskList = $.plantBeanIndexResult.data.taskList;
     if ($.taskList && $.taskList.length > 0) {
       console.log("     任务   进度");
@@ -592,7 +578,39 @@ async function helpShare(plantUuid) {
   console.log(`助力结果的code:${$.helpResult && $.helpResult.code}`);
 }
 async function plantBeanIndex() {
-  $.plantBeanIndexResult = await request('plantBeanIndex');//plantBeanIndexBody
+	llerror=false;
+    $.plantBeanIndexResult = await request('plantBeanIndex'); //plantBeanIndexBody
+    if ($.plantBeanIndexResult.errorCode === 'PB101') {
+        console.log(`\n活动太火爆了，还是去买买买吧！\n`)
+		llerror=true;
+        return
+    }
+    if ($.plantBeanIndexResult.errorCode) {
+        console.log(`获取任务及基本信息出错，10秒后重试\n`)
+        await $.wait(10000);
+        $.plantBeanIndexResult = await request('plantBeanIndex'); 
+        if ($.plantBeanIndexResult.errorCode === 'PB101') {
+            console.log(`\n活动太火爆了，还是去买买买吧！\n`)
+			llerror=true;
+            return
+        }
+    }
+    if ($.plantBeanIndexResult.errorCode) {
+        console.log(`获取任务及基本信息出错，30秒后重试\n`)
+        await $.wait(30000);
+        $.plantBeanIndexResult = await request('plantBeanIndex'); 
+        if ($.plantBeanIndexResult.errorCode === 'PB101') {
+            console.log(`\n活动太火爆了，还是去买买买吧！\n`)
+			llerror=true;
+            return
+        }
+    }
+    if ($.plantBeanIndexResult.errorCode) {
+        console.log(`获取任务及基本信息失败，活动异常，换个时间再试试吧....`)
+        console.log("错误代码;" + $.plantBeanIndexResult.errorCode)
+		llerror=true;
+        return
+    }
 }
 //格式化助力码
 function shareCodesFormat() {

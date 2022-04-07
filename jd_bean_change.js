@@ -1662,7 +1662,10 @@ function getCoupon() {
 							if (useable[i].platFormInfo) 
 								$.platFormInfo = useable[i].platFormInfo;
 							
-							$.message += `【全品类券】满${useable[i].quota}减${useable[i].discount}元`;
+							var decquota=parseFloat(useable[i].quota).toFixed(2);
+							var decdisc= parseFloat(useable[i].discount).toFixed(2);
+							
+							$.message += `【全品类券】满${decquota}减${decdisc}元`;
 							
 							if (useable[i].endTime < $.todayEndTime) {
 								$.message += `(今日过期,${$.platFormInfo})\n`;

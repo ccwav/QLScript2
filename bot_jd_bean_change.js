@@ -1099,6 +1099,7 @@ function getCoupon() {
                 $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23, 59, 59, 999)).getTime();
                 $.tomorrowEndTime = new Date(new Date(new Date().getTime() + 24 * 60 * 60 * 1000).setHours(23, 59, 59, 999)).getTime();
 				$.platFormInfo="";
+				//console.log(useable);
                 for (let i = 0; i < useable.length; i++) {
 					//console.log(useable[i]);
                     if (useable[i].limitStr.indexOf('全品类') > -1) {
@@ -1108,8 +1109,10 @@ function getCoupon() {
                             $.couponName = useable[i].limitStr;
 							if (useable[i].platFormInfo) 
 								$.platFormInfo = useable[i].platFormInfo;
+							var decquota=parseFloat(useable[i].quota).toFixed(2);
+							var decdisc= parseFloat(useable[i].discount).toFixed(2);
 							
-							$.message += `【全品类券】满${useable[i].quota.toFixed(2)}减${useable[i].discount.toFixed(2)}元`;
+							$.message += `【全品类券】满${decquota}减${decdisc}元`;
 							
 							if (useable[i].endTime < $.todayEndTime) {
 								$.message += `(今日过期,${$.platFormInfo})\n`;

@@ -292,7 +292,7 @@ async function showMsg() {
 	ReturnMessageTitle="";
 	ReturnMessage = "";
 	var strsummary="";
-	ReturnMessageTitle = `【账号🆔】${$.nickName || $.UserName}\n`;
+	ReturnMessageTitle = `【您的账号🆔${(intcheckckseq+1)}收支情况】\n`;
 
 	if ($.levelName || $.JingXiang){
 		ReturnMessage += `【账号信息】`;

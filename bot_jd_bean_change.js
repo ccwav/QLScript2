@@ -161,15 +161,9 @@ DisableIndex=strDisableList.findIndex((item) => item === "领现金");
 if(DisableIndex!=-1){
 	console.log("检测到设定关闭领现金查询");
 	EnableCash=false;	
-}	
-
-//金融养猪
-let EnablePigPet=true;
-DisableIndex=strDisableList.findIndex((item) => item === "金融养猪");
-if(DisableIndex!=-1){
-	console.log("检测到设定关闭金融养猪查询");
-	EnablePigPet=false;	
 }
+
+
 //东东萌宠
 let EnableJDPet=true;
 DisableIndex=strDisableList.findIndex((item) => item === "东东萌宠");
@@ -279,8 +273,7 @@ if(DisableIndex!=-1){
 		         getJxFactory(), //京喜工厂
 		         getDdFactoryInfo(), // 京东工厂
 		         jdCash(), //领现金
-		         GetJxBeaninfo(), //喜豆查询
-		         GetPigPetInfo() //金融养猪
+		         GetJxBeaninfo() //喜豆查询		         
 		     ])
 
         await showMsg();        
@@ -538,8 +531,7 @@ async function bean() {
 	yesterdayArr = [],
 	todayArr = [];
 	do {
-		let response = await getJingBeanBalanceDetail(page);
-		await $.wait(2000);
+		let response = await getJingBeanBalanceDetail(page);		
 		// console.log(`第${page}页: ${JSON.stringify(response)}`);
 		if (response && response.code === "0") {
 			page++;
@@ -1980,6 +1972,7 @@ Date.prototype.Format = function (fmt) {
 }
 
 function decrypt(time, stk, type, url) {
+	$.appId = 10028;
 	stk = stk || (url ? getJxmcUrlData(url, '_stk') : '')
 		if (stk) {
 			const timestamp = new Date(time).Format("yyyyMMddhhmmssSSS");
@@ -2116,60 +2109,6 @@ function timeFormat(time) {
 }
 
 
-function GetPigPetInfo() {
-	if (!EnablePigPet)
-		return;
-    return new Promise(async resolve => {
-        const body = {
-            "shareId": "",
-            "source": 2,
-            "channelLV": "juheye",
-            "riskDeviceParam": "{}",
-        }
-        $.post(taskPetPigUrl('pigPetLogin', body), async(err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`GetPigPetInfo API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        if (data.resultData.resultData.wished && data.resultData.resultData.wishAward) {
-							$.PigPet=`${data.resultData.resultData.wishAward.name}`                           
-                        }
-                    } else {
-                        console.log(`GetPigPetInfo: 京东服务器返回空数据`)
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            }
-            finally {
-                resolve();
-            }
-        })
-    })
-}
-
-function taskPetPigUrl(function_id, body) {
-  return {
-    url: `https://ms.jr.jd.com/gw/generic/uc/h5/m/${function_id}?_=${Date.now()}`,
-    body: `reqData=${encodeURIComponent(JSON.stringify(body))}`,
-    headers: {
-      'Accept': `*/*`,
-      'Origin': `https://u.jr.jd.com`,
-      'Accept-Encoding': `gzip, deflate, br`,
-      'Cookie': cookie,
-      'Content-Type': `application/x-www-form-urlencoded;charset=UTF-8`,
-      'Host': `ms.jr.jd.com`,
-      'Connection': `keep-alive`,
-      'User-Agent': UA,
-      'Referer': `https://u.jr.jd.com/`,
-      'Accept-Language': `zh-cn`
-    },
-    timeout: 10000
-  }
-}
 function IsNumber(value) {
     intPerSent = parseInt(value);
     if (!intPerSent)

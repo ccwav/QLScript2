@@ -101,7 +101,7 @@ async function showMsg() {
   
   for (let key of myMap.keys()) {
     /* allMessage += key + ' ---> ' +myMap.get(key)+'京豆\n' */
-	allMessage += "(" +(myMap.get(key)+"京豆)").padEnd(8)+': '+key+'\n'
+	allMessage += "【" +myMap.get(key)+"豆"+"】 "+key+'\n'
   }
 }
 function IsNumber(value) {

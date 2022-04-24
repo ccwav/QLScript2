@@ -99,9 +99,12 @@ console.log("当前查询的CK序号是:"+(intcheckckseq+1));
 async function showMsg() {
   if ($.errorMsg) return
   
-  for (let key of myMap.keys()) {
+  var arrayObj=Array.from(myMap);
+  arrayObj.sort(function(a,b){return a[1]-b[1]})
+  
+  for (var [key, value] of arrayObj) {
     /* allMessage += key + ' ---> ' +myMap.get(key)+'京豆\n' */
-	allMessage += "【" +myMap.get(key)+"豆"+"】 "+key+'\n'
+	allMessage += "【" +value+"豆"+"】 "+key+'\n'
   }
 }
 function IsNumber(value) {

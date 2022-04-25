@@ -8,7 +8,7 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 //IOS等用户直接用NobyDa的jd cookie
-let cookiesArr = [], cookie = '', message = '', linkId = 'yMVR-_QKRd2Mq27xguJG-w', fflLinkId = 'YhCkrVusBVa_O2K-7xE6hA';
+let cookiesArr = [], cookie = '', message = '', linkId = 'WMDf1PTHmh8MYBpD97sieQ', fflLinkId = 'WMDf1PTHmh8MYBpD97sieQ';
 const money = $.isNode() ? (process.env.BIGWINNER_MONEY ? process.env.BIGWINNER_MONEY * 1 : 0.3) : ($.getdata("BIGWINNER_MONEY") ? $.getdata("BIGWINNER_MONEY") * 1 : 0.3)
 	const JD_API_HOST = 'https://api.m.jd.com/api';
 if ($.isNode()) {
@@ -51,6 +51,8 @@ let allMessage = '';
 let ReturnMessage = "";
 let ReturnMessageTitle = "";
 
+
+
 if ($.isNode() && process.env.BEANCHANGE_USERGP2) {
 	MessageUserGp2 = process.env.BEANCHANGE_USERGP2 ? process.env.BEANCHANGE_USERGP2.split('&') : [];
 	console.log(`检测到设定了分组推送2`);
@@ -65,6 +67,15 @@ if ($.isNode() && process.env.BEANCHANGE_USERGP4) {
 	MessageUserGp4 = process.env.BEANCHANGE_USERGP4 ? process.env.BEANCHANGE_USERGP4.split('&') : [];
 	console.log(`检测到设定了分组推送4`);
 }
+
+let strNoRunPin = "";
+let NoRunIndex3=-1;
+if ($.isNode() && process.env.BIGNORUNPIN) {
+	strNoRunPin = process.env.BIGNORUNPIN ? process.env.BIGNORUNPIN.split('&') : [];
+	console.log(`检测到账号跳过的设定`);
+}
+
+
 let WP_APP_TOKEN_ONE = "";
 if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
 	WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
@@ -86,7 +97,21 @@ if ($.isNode() && process.env.WP_APP_TOKEN_ONE) {
 			$.index = i + 1;
 			$.isLogin = true;
 			$.nickName = '';
-
+			
+			if (strNoRunPin) {
+				NoRunIndex3 = strNoRunPin.findIndex((item) => item === $.pt_pin);
+				if (NoRunIndex3 != -1) {	
+					console.log(`账号跳过:`+$.UserName);		
+					continue;
+				}
+				NoRunIndex3 = strNoRunPin.findIndex((item) => item === $.UserName);
+				if (NoRunIndex3 != -1) {	
+					console.log(`账号跳过:`+$.UserName);		
+					continue;
+				}
+			}
+			
+			
 			if (MessageUserGp4) {
 				userIndex4 = MessageUserGp4.findIndex((item) => item === $.pt_pin);
 			}
@@ -189,10 +214,10 @@ async function main() {
 			console.log(`开始进行翻翻乐拿红包\n`)
 			await gambleOpenReward(); //打开红包
 			if ($.canOpenRed) {
-				while (!$.canApCashWithDraw && $.changeReward) {
+				 while (!$.canApCashWithDraw && $.changeReward) {
 					await openRedReward();
 					await $.wait(1000);
-				}
+				} 
 				if ($.canApCashWithDraw) {
 					//提现
 					await openRedReward('gambleObtainReward', $.rewardData.rewardType);
@@ -282,6 +307,7 @@ function gambleOpenReward() {
 				} else {
 					if (data) {
 						data = JSON.parse(data);
+						$.rewardData = data.data;
 						if (data['code'] === 0) {
 							console.log(`翻翻乐打开红包 成功，获得：${data.data.rewardValue}元红包\n`);
 						} else {
@@ -422,7 +448,8 @@ function apCashWithDraw(id, poolBaseId, prizeGroupId, prizeBaseId, prizeType) {
 								ReturnMessage += `提现至微信钱包成功🎉\n\n`;
 							} else {
 								console.log(`翻翻乐提现 失败，详情：${JSON.stringify(data)}\n`);
-								ReturnMessage += `提现至微信钱包失败\n详情：${JSON.stringify(data)}\n\n`;
+								ReturnMessage += `提现至微信钱包失败\n详情：${JSON.stringify(data)}\n`;
+								ReturnMessage +="温馨提示: 如果是没有绑定，请至微信搜索京东小程序登录即可.\n"
 							}
 						} else {
 							console.log(`翻翻乐提现 失败：${JSON.stringify(data)}\n`);

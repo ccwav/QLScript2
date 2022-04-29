@@ -288,7 +288,7 @@ function getSignfromPanda(functionId, body) {
     }
     return new Promise((resolve) => {
         let url = {
-            url: "https://api.jds.codes/jd/sign",
+            url: "https://api.zhezhe.cf/jd/sign",
             body: JSON.stringify(data),
 		    followRedirect: false,
 		    headers: {

@@ -35,7 +35,7 @@ pin3@&@不清空👉该pin不清空
 防止没指定的账号购物车全清空
 
 */
-let jdSignUrl = 'https://api.jds.codes/jd/sign'
+let jdSignUrl = 'https://api.zhezhe.cf/jd/sign'
 let jdPandaToken = ''
 let cleancartRun = 'false'
 let cleancartProducts = ''

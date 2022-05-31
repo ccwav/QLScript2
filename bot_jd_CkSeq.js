@@ -88,10 +88,10 @@ if (UidFileexists) {
 
         }
     }
-	console.log("😀今日正常的账号:\n" + strCk);
+	console.log("😀今日正常的账号("+cookiesArr.length+"个):\n" + strCk);
 	console.log("分割行");	
     if (strNoFoundCk) {
-        console.log("\n😒没有出现在CK队列中的账号:\n" + strNoFoundCk);
+        console.log("\n😒没有出现在CK队列中的账号("+(arrEnvPtPin.length-cookiesArr.length)+"个):\n" + strNoFoundCk);
     }
     return;
 })()

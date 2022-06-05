@@ -36,7 +36,6 @@ pin3@&@不清空👉该pin不清空
 
 */
 let jdSignUrl = 'https://api.zhezhe.cf/jd/sign'
-let jdPandaToken = ''
 let cleancartRun = 'false'
 let cleancartProducts = ''
 let lnrequesttimes=0
@@ -57,16 +56,10 @@ if ($.isNode()) {
 
 message = ''
 
-jdPandaToken = $.isNode() ? (process.env.PandaToken ? process.env.PandaToken : `${jdPandaToken}`) : ($.getdata('PandaToken') ? $.getdata('PandaToken') : `${jdPandaToken}`);
-
 cleancartRun = $.isNode() ? (process.env.gua_cleancart_Run ? process.env.gua_cleancart_Run : `${cleancartRun}`) : ($.getdata('gua_cleancart_Run') ? $.getdata('gua_cleancart_Run') : `${cleancartRun}`);
 
 cleancartProducts = $.isNode() ? (process.env.gua_cleancart_products ? process.env.gua_cleancart_products : `${cleancartProducts}`) : ($.getdata('gua_cleancart_products') ? $.getdata('gua_cleancart_products') : `${cleancartProducts}`);
 
-if (!jdPandaToken) {
-    console.log('请填写Panda获取的Token,变量是PandaToken');
-	return;
-}
 let productsArr = []
 let cleancartProductsAll = []
 for (let i of cleancartProducts && cleancartProducts.split('|-|')) {
@@ -294,8 +287,7 @@ function jdSign(fn, body) {
             headers: {
                 'Accept': '*/*',
                 "accept-encoding": "gzip, deflate, br",
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + jdPandaToken
+                'Content-Type': 'application/json'
             },
             timeout: 30000
         }

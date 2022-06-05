@@ -46,12 +46,6 @@ if ($.isNode()) {
 }
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 let allMessage = '';
-let jdPandaToken = '';
-jdPandaToken = $.isNode() ? (process.env.PandaToken ? process.env.PandaToken : `${jdPandaToken}`) : ($.getdata('PandaToken') ? $.getdata('PandaToken') : `${jdPandaToken}`);
-if (!jdPandaToken) {
-    console.log('请填写Panda获取的Token,变量是PandaToken');
-	return;
-}
 
 !(async () => {
   if (!cookiesArr[0]) {
@@ -128,7 +122,7 @@ async function appindex(info=false) {
               }
               $.signMoney = data.data.result.totalMoney;
               // console.log(`您的助力码为${data.data.result.invitedCode}`)
-              console.log(`\n【京东账号${$.index}（${$.UserName}）的好友互助码】${data.data.result.invitedCode}\n`);
+              //console.log(`\n【京东账号${$.index}（${$.UserName}）的好友互助码】${data.data.result.invitedCode}\n`);
               let helpInfo = {
                 'inviteCode': data.data.result.invitedCode,
                 'shareDate': data.data.result.shareDate
@@ -294,8 +288,7 @@ function getSignfromPanda(functionId, body) {
 		    headers: {
 		        'Accept': '*/*',
 		        "accept-encoding": "gzip, deflate, br",
-		        'Content-Type': 'application/json',
-				'Authorization': 'Bearer ' + jdPandaToken
+		        'Content-Type': 'application/json'
 		    },
 		    timeout: 30000
         }

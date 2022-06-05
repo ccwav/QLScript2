@@ -66,9 +66,10 @@ if ($.isNode() && process.env.CC_NOHELPAFTER8) {
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
         cookie = cookiesArr[i];
-        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-            $.index = i + 1;
+        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+        $.index = i + 1;
         $.isLogin = true;
+		llerror=false
         $.nickName = '';
         await TotalBean();
         console.log(`\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
@@ -94,6 +95,7 @@ if ($.isNode() && process.env.CC_NOHELPAFTER8) {
     }
   }
   if(llhelp){
+	  console.log(`开始账号内互助`);
 	  for (let j = 0; j < cookiesArr.length; j++) {
 		if (cookiesArr[j]) {
 		  cookie = cookiesArr[j];
@@ -434,9 +436,7 @@ function showTaskProcess() {
   })
 }
 //助力好友
-async function doHelp() {
-
-  console.log(`开始账号内互助`);
+async function doHelp() {  
   $.newShareCode = [...(jdPlantBeanShareArr || [])]
   
   for (let plantUuid of $.newShareCode) {
@@ -447,7 +447,8 @@ async function doHelp() {
       continue
     }
     await helpShare(plantUuid);
-    if ($.helpResult && $.helpResult.code === '0') {
+	console.log("========HELP=======");	
+    if ($.helpResult && $.helpResult.code === '0' && !$.helpResult.errorCode) {
       // console.log(`助力好友结果: ${JSON.stringify($.helpResult.data.helpShareRes)}`);
       if ($.helpResult.data.helpShareRes) {
         if ($.helpResult.data.helpShareRes.state === '1') {
@@ -768,7 +769,7 @@ function request(function_id, body = {}) {
   })
 }
 function taskUrl(function_id, body) {
-  body["version"] = "9.2.4.0";
+  body["version"] = "9.2.4.1";
   body["monitor_source"] = "plant_app_plant_index";
   body["monitor_refer"] = "";
   return {

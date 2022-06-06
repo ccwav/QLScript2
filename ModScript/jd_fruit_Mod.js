@@ -1115,7 +1115,6 @@ async function duck() {
 }
 async function GetCollect() {
     try {
-		console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】`);
         var llfound = false;
         var strShareCode = "";
         if (TempShareCache) {
@@ -1144,7 +1143,7 @@ async function GetCollect() {
         }
 
         if (strShareCode) {
-            console.log(`\n`+strShareCode);
+	    console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】`+strShareCode);
             newShareCodes.push(strShareCode)
         } else {
             console.log(`\n数据异常`);

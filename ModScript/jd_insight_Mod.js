@@ -1,7 +1,7 @@
-/**
-京洞察问卷通知
-cron 35 9,15,20 * * * jd_insight.js
-*/
+/*
+cron "35 9,15,20 * * *" jd_insight.js, tag:京洞察问卷通知
+ */
+ 
 const $ = new Env('京洞察问卷通知');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;

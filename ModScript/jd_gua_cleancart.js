@@ -1,12 +1,11 @@
 /*
-清空购物车_Panda接口专用版
-更新时间：2021-10-27
+清空购物车
+更新时间：2022-08-12
 因其他脚本会加入商品到购物车，故此脚本用来清空购物车
 包括预售
 需要算法支持
 默认：不执行 如需要请添加环境变量
 gua_cleancart_Run="true"
-PandaToken="" # PanDaToken
 
 ——————————————
 1.@&@ 前面加数字 指定账号pin
@@ -35,11 +34,10 @@ pin3@&@不清空👉该pin不清空
 防止没指定的账号购物车全清空
 
 */
-let jdSignUrl = 'https://api.zhezhe.cf/jd/sign'
+let jdSignUrl = 'https://api.nolanstore.top/sign'
 let cleancartRun = 'false'
 let cleancartProducts = ''
-let lnrequesttimes=0
-const $ = new Env('清空购物车_Panda');
+const $ = new Env('清空购物车');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
 //IOS等用户直接用NobyDa的jd cookie
@@ -74,6 +72,7 @@ for (let i in productsArr) {
     cleancartProductsAll[arr[0]] = arr[1].split(',')
   }
 }
+
 !(async () => {
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
@@ -93,12 +92,13 @@ for (let i in productsArr) {
     return
   }
   $.out = false
+  console.log('\n==此脚本使用的签名接口来自Nolan提供的公益服务,大伙记得给他点赞==');
   for (let i = 0; i < cookiesArr.length; i++) {
     cookie = cookiesArr[i];
     if (cookie) {
       $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
       $.index = i + 1;
-      console.log(`\n\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+      console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
       if(cleancartProductsAll[$.UserName]){
         $.cleancartProductsArr = cleancartProductsAll[$.UserName]
       }else if(cleancartProductsAll["*"]){
@@ -238,8 +238,7 @@ function jdApi(functionId,body) {
         if (err) {
           console.log(`${$.toStr(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          // console.log(data)
+        } else {          
           let res = $.toObj(data,data);
           if(typeof res == 'object'){
             if(res.mainTitle) console.log(res.mainTitle)
@@ -292,17 +291,15 @@ function jdSign(fn, body) {
             timeout: 30000
         }
         $.post(url, async(err, resp, data) => {
-            try {
+            try {				
                 data = JSON.parse(data);
-                if (data && data.code == 200) {
-                    lnrequesttimes = data.request_times;
-                    console.log("连接Panda服务成功，当前Token使用次数为" + lnrequesttimes);
-                    if (data.data.sign)
-                        sign = data.data.sign || '';
+                if (data && data.body) {                    
+                    if (data.body)
+                        sign = data.body || '';
                     if (sign != '')
                         resolve(sign);
                     else
-                        console.log("签名获取失败,可能Token使用次数上限或被封.");
+                        console.log("签名获取失败.");
                 } else {
                     console.log("签名获取失败.");
                 }

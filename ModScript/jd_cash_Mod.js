@@ -2,7 +2,7 @@
 签到领现金，每日2毛～5毛
 可互助，助力码每日不变，只变日期
 活动入口：京东APP搜索领现金进入
-更新时间：2021-06-07
+更新时间：2022-08-13
 已支持IOS双京东账号,Node.js支持N个京东账号
 脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
 ============Quantumultx===============
@@ -25,7 +25,8 @@ cron "2 0-23/4 * * *" script-path=jd_cash.js,tag=签到领现金
 他的交流群：https://t.me/jdPLA2
 
  */
-const $ = new Env('签到领现金_Panda');
+const $ = new Env('签到领现金');
+let jdSignUrl = 'https://api.nolanstore.top/sign'
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -53,7 +54,7 @@ let allMessage = '';
     return;
   }
  // await requireConfig()
-  
+  console.log('\n==此脚本使用的签名接口来自Nolan提供的公益服务,大伙记得给他点赞==');
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -221,7 +222,7 @@ function index() {
 async function appdoTask(type,taskInfo) {
   let functionId = 'cash_doTask'
   let body = {"type":type,"taskInfo":taskInfo}
-  let sign = await getSignfromPanda(functionId, body)  
+  let sign = await getSignfromNolan(functionId, body)  
 
   return new Promise((resolve) => {
     $.post(apptaskUrl(functionId, sign), (err, resp, data) => {
@@ -274,7 +275,7 @@ function doTask(type,taskInfo) {
     })
   })
 }
-function getSignfromPanda(functionId, body) {	
+function getSignfromNolan(functionId, body) {	
     var strsign = '';
 	let data = {
       "fn":functionId,
@@ -282,7 +283,7 @@ function getSignfromPanda(functionId, body) {
     }
     return new Promise((resolve) => {
         let url = {
-            url: "https://api.zhezhe.cf/jd/sign",
+            url: jdSignUrl,
             body: JSON.stringify(data),
 		    followRedirect: false,
 		    headers: {
@@ -294,21 +295,17 @@ function getSignfromPanda(functionId, body) {
         }
         $.post(url, async(err, resp, data) => {
             try {				
-                data = JSON.parse(data);				
-				
-				if (data && data.code == 200) {
-                    lnrequesttimes = data.request_times;
-                    console.log("连接Panda服务成功，当前Token使用次数为" + lnrequesttimes);
-                    if (data.data.sign)
-                        strsign = data.data.sign || '';
+                data = JSON.parse(data);
+                if (data && data.body) {                    
+                    if (data.body)
+                        strsign = data.body || '';
                     if (strsign != '')
                         resolve(strsign);
                     else
-                        console.log("签名获取失败,可能Token使用次数上限或被封.");
+                        console.log("签名获取失败.");
                 } else {
                     console.log("签名获取失败.");
-                }
-				
+                }				
             }catch (e) {
                 $.logErr(e, resp);
             }finally {

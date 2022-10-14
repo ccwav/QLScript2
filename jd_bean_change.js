@@ -20,6 +20,7 @@ if ($.isNode() && process.env.BEANCHANGE_BEANDETAILMODE){
 }
 
 const fs = require('fs');
+let matchtitle="昨日";
 let yesterday="";
 let TodayDate="";
 let startDate="";
@@ -48,6 +49,7 @@ if(!Fileexists){
 	yesterday=TodayDate;
 	strBeanCache=strNewBeanCache;
 	Fileexists = fs.existsSync(strBeanCache);
+	matchtitle="今日";
 }
 if (Fileexists) {
     console.log("检测到资产变动缓存文件"+yesterday+".json，载入...");
@@ -397,7 +399,8 @@ if(DisableIndex!=-1){
 			$.jxFactoryInfo = '';
 			$.jxFactoryReceive = '';
 			$.jdCash = 0;
-			$.isPlusVip = 0;
+			$.isPlusVip = false;
+			$.isRealNameAuth = false;
 			$.JingXiang = "";
 			$.allincomeBean = 0; //月收入
 			$.allexpenseBean = 0; //月支出
@@ -420,6 +423,7 @@ if(DisableIndex!=-1){
 			$.PlustotalScore=0;
 			$.CheckTime="";
 			$.beanCache=0;
+			
 			TempBaipiao = "";
 			strGuoqi="";
 			console.log(`******开始查询【京东账号${$.index}】${$.nickName || $.UserName}*********`);
@@ -476,7 +480,7 @@ if(DisableIndex!=-1){
 			if (TodayCache) {
 			    for (let j = 0; j < TodayCache.length; j++) {
 			        if (TodayCache[j].pt_pin == $.UserName) {
-			            TodayCache[j].CheckTime = TodayDate + " " + timeString;
+			            TodayCache[j].CheckTime = timeString;
 			            TodayCache[j].BeanNum = $.beanCount;
 			            llfound = true;
 			            break;
@@ -487,7 +491,7 @@ if(DisableIndex!=-1){
 
 			    var tempAddCache = {
 			        "pt_pin": $.UserName,
-			        "CheckTime": TodayDate + " " + timeString,
+			        "CheckTime": timeString,
 			        "BeanNum": $.beanCount
 			    };
 			    TodayCache.push(tempAddCache);
@@ -731,58 +735,38 @@ async function showMsg() {
 	
 	if (userIndex2 != -1) {
 		IndexGp2 += 1;
-		ReturnMessageTitle = `【账号${IndexGp2}🆔】${$.nickName || $.UserName}\n`;
+		ReturnMessageTitle = `【账号${IndexGp2}🆔】${$.nickName || $.UserName}`;
 	}
 	if (userIndex3 != -1) {
 		IndexGp3 += 1;
-		ReturnMessageTitle = `【账号${IndexGp3}🆔】${$.nickName || $.UserName}\n`;
+		ReturnMessageTitle = `【账号${IndexGp3}🆔】${$.nickName || $.UserName}`;
 	}
 	if (userIndex4 != -1) {
 		IndexGp4 += 1;
-		ReturnMessageTitle = `【账号${IndexGp4}🆔】${$.nickName || $.UserName}\n`;
+		ReturnMessageTitle = `【账号${IndexGp4}🆔】${$.nickName || $.UserName}`;
 	}
 	if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 		IndexAll += 1;
-		ReturnMessageTitle = `【账号${IndexAll}🆔】${$.nickName || $.UserName}\n`;
+		ReturnMessageTitle = `【账号${IndexAll}🆔】${$.nickName || $.UserName}`;
 	}
-
-	if ($.levelName || $.JingXiang){
-		ReturnMessage += `【账号信息】`;
-		if ($.levelName) {
-			if ($.levelName.length > 2)
-				$.levelName = $.levelName.substring(0, 2);
-
-			if ($.levelName == "注册")
-				$.levelName = `😊普通`;
-
-			if ($.levelName == "钻石")
-				$.levelName = `💎钻石`;
-
-			if ($.levelName == "金牌")
-				$.levelName = `🥇金牌`;
-
-			if ($.levelName == "银牌")
-				$.levelName = `🥈银牌`;
-
-			if ($.levelName == "铜牌")
-				$.levelName = `🥉铜牌`;
-
-			if ($.isPlusVip == 1){
-				ReturnMessage += `${$.levelName}Plus`;
-				if($.PlustotalScore)
-					ReturnMessage+=`(${$.PlustotalScore}分)`
-			}
-			else
-				ReturnMessage += `${$.levelName}会员`;
-		}
-
-		if ($.JingXiang){
-			if ($.levelName) {
-				ReturnMessage +=",";
-			}
-			ReturnMessage += `${$.JingXiang}`;
-		}
-		ReturnMessage +=`\n`;
+	
+		
+	if ($.JingXiang) {
+		if ($.isRealNameAuth)
+			ReturnMessageTitle += `(已实名)\n`;
+		else
+			ReturnMessageTitle += `(未实名)\n`;
+	    ReturnMessage += `【账号信息】`;
+	    if ($.isPlusVip) {
+	        ReturnMessage += `Plus会员`;
+	        if ($.PlustotalScore)
+	            ReturnMessage += `(${$.PlustotalScore}分)`
+	    } else {
+	        ReturnMessage += `普通会员`;
+	    }  
+	    ReturnMessage += `,京享值${$.JingXiang}\n`;	    
+	}else{
+		ReturnMessageTitle+= `\n`;
 	}
 	if (llShowMonth) {
 		ReturnMessageMonth = ReturnMessage;
@@ -826,8 +810,8 @@ async function showMsg() {
 	        ReturnMessage += `\n`;
 	    } else {	
 			if (TempBeanCache){
-				ReturnMessage += `【京豆变动】 ${$.beanCount-$.beanCache}豆(与${$.CheckTime}比较)`;			
-				strsummary += `【京豆变动】 ${$.beanCount-$.beanCache}豆(与${$.CheckTime}比较)`;
+				ReturnMessage += `【京豆变动】${$.beanCount-$.beanCache}豆(与${matchtitle}${$.CheckTime}比较)`;			
+				strsummary += `【京豆变动】${$.beanCount-$.beanCache}豆(与${matchtitle}${$.CheckTime}比较)`;
 				ReturnMessage += `\n`;
 				strsummary += `\n`;
 			}	
@@ -1141,8 +1125,14 @@ async function showMsg() {
 
 	if ($.isNode() && WP_APP_TOKEN_ONE) {
 		var strTitle="京东资产变动";
-		ReturnMessage=`【账号名称】${$.nickName || $.UserName}\n`+ReturnMessage;
-		
+		if($.JingXiang){
+			if ($.isRealNameAuth)
+				ReturnMessage=`【账号名称】${$.nickName || $.UserName}(已实名)\n`+ReturnMessage;				
+			else
+				ReturnMessage=`【账号名称】${$.nickName || $.UserName}(未实名)\n`+ReturnMessage;				
+		}else{
+			ReturnMessage=`【账号名称】${$.nickName || $.UserName}\n`+ReturnMessage;
+		}
 		if (TempBaipiao) {
 			strsummary=strSubNotify+TempBaipiao +strsummary;			
 			TempBaipiao = `【⏰商品白嫖活动提醒⏰】\n` + TempBaipiao;
@@ -1490,7 +1480,9 @@ function TotalBean() {
                         if (data['retcode'] === 0) {
                             $.nickName = (data['base'] && data['base'].nickname) || $.UserName;
 							$.isPlusVip=data['isPlusVip'];
-							$.beanCount=(data['base'] && data['base'].jdNum) || 0 ;							
+							$.isRealNameAuth=data['isRealNameAuth'];
+							$.beanCount=(data['base'] && data['base'].jdNum) || 0 ;		
+							$.JingXiang = (data['base'] && data['base'].jvalue) || 0 ;						
                         } else {
                             $.nickName = $.UserName
                         }
@@ -3035,7 +3027,7 @@ function GetDateTime(date) {
 }
 
 async function queryScores() {
-	if ($.isPlusVip != 1)
+	if (!$.isPlusVip)
 		return
     let res = ''
     let url = {

@@ -270,7 +270,7 @@ if(DisableIndex!=-1){
         TempBaipiao = "";
         strGuoqi = "";
 		await TotalBean()
-		return
+		
         if (!$.isLogin) {
             await isLoginByX1a0He();
         }

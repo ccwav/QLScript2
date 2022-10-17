@@ -2037,8 +2037,10 @@ function jdfruitRequest(function_id, body = {}, timeout = 1000) {
 					} else {
 						if (safeGet(data)) {							
 							data = JSON.parse(data);
-							if (data.code=="400")
-								console.log('东东农场: '+data.message)
+							if (data.code=="400"){
+								console.log('东东农场: '+data.message);
+								llgeterror = true;
+							}
 							else
 								$.JDwaterEveryDayT = data.totalWaterTaskInit.totalWaterTaskTimes;
 						}
@@ -2063,7 +2065,10 @@ async function getjdfruitinfo() {
             "channel": 1,
             "babelChannel": "120"
         });
-
+		
+		if (llgeterror)
+			return
+		
         await getjdfruit();
         if (llgeterror) {
             console.log(`东东农场API查询失败,等待10秒后再次尝试...`)

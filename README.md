@@ -1,6 +1,10 @@
 # QLScript_New
 
-本库的一对一通知和Ark(原Nvjdc)登录产生的备注格式互相兼容，且只有使用Ark(原Nvjdc)登录的才会在资产查询中显示预计过期时间.
+本库的一对一通知和Nolan的Mark、Ark(原Nvjdc)登录产生的备注格式互相兼容，且只有使用Ark(原Nvjdc)登录的才会在资产查询中显示预计过期时间.
+
+另外资产查询增加缓存Mode，配置BEANCHANGE_BEANDETAILMODE=1，则获取昨天最后一次资产查询结果比较京豆变更，避免频繁调用详细查询接口导致的403问题
+
+PS:如果需要准确信息，请使用diybot的bd cb等指令查询
 
 如果遇到什么问题先看看,可能有收获:	https://www.kejiwanjia.com/jiaocheng/61708.html
 

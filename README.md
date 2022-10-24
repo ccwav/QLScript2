@@ -93,9 +93,9 @@
 		关闭查询列表中的项目,自行删减.(攻略显示就是之前的提醒)
 		export BEANCHANGE_DISABLELIST="汪汪乐园&汪汪赛跑&京东赚赚&京东秒杀&东东农场&极速金币&京喜牧场&京喜工厂&京东工厂&领现金&喜豆查询&金融养猪&东东萌宠&活动攻略&过期京豆&查优惠券"
 
-	(7) BEANCHANGE_BEANDETAILMODE
-		配置BEANCHANGE_BEANDETAILMODE=1，则启用缓存Mode,将使用获取的昨天最后一次资产查询结果比较京豆变更，避免频繁调用详细查询接口导致的403问题，
-		配置BEANCHANGE_BEANDETAILMODE=0，则不启用缓存，实时获取，但是现在跑不了几个号就403了，会显示0京豆.PS:如果需要准确信息，请使用diybot的bd cb等指令查询单个账号.
+	(7) BEANCHANGE_BEANDETAILMODE(默认启用)
+		配置BEANCHANGE_BEANDETAILMODE=1，则启用缓存Mode,将使用获取的昨天最后一次资产查询结果比较京豆变更，避免频繁调用详细查询接口导致的403问题，如果需要准确信息，请使用diybot的bd cb等指令查询单个账号.
+		配置BEANCHANGE_BEANDETAILMODE=0，则不启用缓存，实时获取，但是现在跑不了几个号就403了，会显示0京豆.
 
 # 4. jd_CheckCK.js (已添加支持一对一推送)
 (最新的通知脚本已经集成自动禁用失效CK，如不需要自动启用CK功能可以直接禁用此脚本.)

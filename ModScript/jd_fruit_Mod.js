@@ -87,6 +87,8 @@ let NoNeedCodes = [];
     return;
   }
   if (llhelp) {
+      // 直接获取全部ShareCode
+      GetAllShareCode()
       console.log('开始收集您的互助码，用于账号内部互助，请稍等...');
       for (let i = 0; i < cookiesArr.length; i++) {
           if (cookiesArr[i]) {
@@ -1145,12 +1147,22 @@ async function GetCollect() {
 
         if (strShareCode) {
             console.log(`\n`+strShareCode);
-            newShareCodes.push(strShareCode)
+            if (!newShareCodes.includes(strShareCode)) {
+                newShareCodes.push(strShareCode)
+            }
         } else {
             console.log(`\n数据异常`);
         }
     } catch (e) {
         $.logErr(e);
+    }
+}
+function GetAllShareCode() {
+    if (TempShareCache) {
+        for (let j = 0; j < TempShareCache.length; j++) {
+            strShareCode = TempShareCache[j].ShareCode;
+            newShareCodes.push(strShareCode)
+        }
     }
 }
 // ========================API调用接口========================

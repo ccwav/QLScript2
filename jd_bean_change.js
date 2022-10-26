@@ -771,6 +771,33 @@ if(DisableIndex!=-1){
 		await $.wait(10 * 1000);
 	}
 
+    // hermanwu 分组合并推送
+    if (Object.keys(WP_UID_PINS).length > 0) {
+        console.log('按Uid分组合并推送：')
+        // console.log(JSON.stringify(WP_UID_PINS))
+        for (const key in WP_UID_PINS) {
+            if (Object.hasOwnProperty.call(WP_UID_PINS, key)) {
+                const pins = WP_UID_PINS[key];
+                let pt_pin = '';
+                let allMsg = {
+                    title: '',
+                    msg: '',
+                    author: '\n\n本通知 By Herman Wu',
+                    summary: ''
+                };
+                for (let index = 0; index < pins.length; index++) {
+                    const pin = pins[index];
+                    allMsg.title = pin.title;
+                    allMsg.msg += pin.msg + '\n\n\n\n';
+                    allMsg.summary += pin.summary + '\n\n\n\n';
+                    pt_pin = pin.pt_pin;
+                }
+                console.log('合并后：', JSON.stringify(allMsg))
+                await notify.sendNotifybyWxPucher(allMsg.title, `${allMsg.msg}`, `${pt_pin}`,`${allMsg.author}`,allMsg.summary);
+            }
+        }
+    }
+
 })()
 .catch((e) => {
 	$.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -1207,11 +1234,64 @@ async function showMsg() {
 		if(strAllNotify)
 			ReturnMessage=strAllNotify+`\n`+ReturnMessage;
 		
-		await notify.sendNotifybyWxPucher(strTitle, `${ReturnMessage}`, `${$.UserName}`,'\n\n本通知 By ccwav Mod',strsummary);
+        // hermanwu 分组合并推送
+        if (WP_APP_COMBINE_NOTIFY) {
+            // 同Uid合并推送
+            const uid = getuuid("", $.UserName)
+            console.log('查找uid： ', $.UserName, uid)
+            if(!WP_UID_PINS[uid]) {
+                WP_UID_PINS[uid] = []
+            }
+            WP_UID_PINS[uid].push({
+                pt_pin: $.UserName,
+                title: strTitle,
+                msg: ReturnMessage,
+                author: '\n\n本通知 By Herman Wu',
+                summary: strsummary
+            })
+        } else {
+            
+            await notify.sendNotifybyWxPucher(strTitle, `${ReturnMessage}`, `${$.UserName}`,'\n\n本通知 By ccwav Mod',strsummary);
+        }
 	}
 
 	//$.msg($.name, '', ReturnMessage , {"open-url": "https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean"});
 }
+// hermanwu
+function getuuid(strRemark, PtPin) {
+    var strTempuuid = "";
+    if (strRemark) {
+        var Tempindex = strRemark.indexOf("@@");
+        if (Tempindex != -1) {
+            console.log(PtPin + ": 检测到NVJDC的一对一格式,瑞思拜~!");
+            var TempRemarkList = strRemark.split("@@");
+            for (let j = 1; j < TempRemarkList.length; j++) {
+                if (TempRemarkList[j]) {
+                    if (TempRemarkList[j].length > 4) {
+                        if (TempRemarkList[j].substring(0, 4) == "UID_") {
+                            strTempuuid = TempRemarkList[j];
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!strTempuuid) {
+                console.log("检索资料失败...");
+            }
+        }
+    }
+    if (!strTempuuid && TempCKUid) {
+        console.log("正在从CK_WxPusherUid文件中检索资料...");
+        for (let j = 0; j < TempCKUid.length; j++) {
+            if (PtPin == decodeURIComponent(TempCKUid[j].pt_pin)) {
+                strTempuuid = TempCKUid[j].Uid;
+                break;
+            }
+        }
+    }
+    return strTempuuid;
+}
+
 async function bean() {
 	
 	if (EnableCheckBean && checkbeanDetailMode==0) {	

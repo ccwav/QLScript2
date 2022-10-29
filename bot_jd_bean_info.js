@@ -36,7 +36,7 @@ if ($.isNode() && process.env.BOTShowTopNum) {
 }
 let lnShowJinQiNum = 3;
 if ($.isNode() && process.env.BOTShowJinQiNum) {
-	lnShowJinQiNum = parseInt(process.env.BOTShowTopNum);	
+	lnShowJinQiNum = parseInt(process.env.BOTShowJinQiNum);	
 }
 
 for (i = 0; i < cookiesArr.length; i++) {

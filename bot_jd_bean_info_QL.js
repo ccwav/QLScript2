@@ -36,7 +36,7 @@ if ($.isNode() && process.env.BOTShowTopNum) {
 	lnShowTop = parseInt(process.env.BOTShowTopNum);	
 }
 
-let lnShowJinQiNum = 5;
+let lnShowJinQiNum = 3;
 if ($.isNode() && process.env.BOTShowJinQiNum) {
 	lnShowJinQiNum = parseInt(process.env.BOTShowTopNum);	
 }
@@ -125,7 +125,7 @@ async function showMsg() {
     /* allMessage += key + ' ---> ' +myMap.get(key)+'京豆\n' */
 	if(lnShowTop && lnShowTop>value)
 		continue;
-	allMessage += "【" +value+"豆"+"】 "+key+'\n'
+	allMessage += "    【" +value+"豆"+"】 "+key+'\n'
 	}
 	if(JinQibean)
 	  allMessage += "\n\n【近期豆子】"+JinQibean;
@@ -159,9 +159,8 @@ async function bean() {
         for (let item of detailList) {
 			if (lnShowJinQiNum-1>-1){
 				lnShowJinQiNum--;
-				strtemp=item.eventMassage;	  
-				strtemp=strtemp.replace("参加[","").replace("]-奖励","").replace("]店铺活动-奖励","");
-				JinQibean+="\n"+"【" +item.amount+"豆"+"】 "+item.date.split(" ")[1]+" "+strtemp+" "
+				strtemp=adjuststring(item.eventMassage);				
+				JinQibean+="\n"+"    【" +item.amount+"豆"+"】"+showtime(new Date(item.date))+" "+strtemp
 			}
           const date = item.date.replace(/-/g, '/') + "+08:00";
           if (new Date(date).getTime() >= tm1 && (!item['eventMassage'].includes("退还") && !item['eventMassage'].includes("物流") && !item['eventMassage'].includes('扣赠'))) {
@@ -189,27 +188,34 @@ async function bean() {
   for (let item of todayArr) {
     if (Number(item.amount) > 0) {
       $.todayIncomeBean += Number(item.amount);
-	  strtemp=item.eventMassage;	  
-	  strtemp=strtemp.replace("参加[","").replace("]-奖励","").replace("]店铺活动-奖励","");
-	  strtemp=strtemp.replace("京东自营旗舰店","(自营)").replace("京东自营官方旗舰店","(自营官方)");
-	  strtemp=strtemp.replace("（","(").replace("）",")");
-	  strtemp=strtemp.replace("官方旗舰店","(官方)");
-	  strtemp=strtemp.replace("旗舰店","(旗舰)").replace("专营店","(专营)").replace("专卖店","(专卖)");	  
+	  strtemp=adjuststring(item.eventMassage);	  
       myMap.set(strtemp,0)
     }
   }
   for (let item of todayArr) {
     if (Number(item.amount) > 0) {
-	  strtemp=item.eventMassage;
-	  strtemp=strtemp.replace("参加[","").replace("]-奖励","").replace("]店铺活动-奖励","");
-	  strtemp=strtemp.replace("京东自营旗舰店","(自营)").replace("京东自营官方旗舰店","(自营官方)");
-	  strtemp=strtemp.replace("（","(").replace("）",")");
-	  strtemp=strtemp.replace("官方旗舰店","(官方)");
-	  strtemp=strtemp.replace("旗舰店","(旗舰)").replace("专营店","(专营)").replace("专卖店","(专卖)");	  
+	  strtemp=adjuststring(item.eventMassage);
       myMap.set(strtemp,parseInt(myMap.get(strtemp))+parseInt(item.amount))
     }
   }
 }
+function showtime(date) {
+
+	var timeString = "";
+	
+	if ((date.getHours()) < 10)
+		timeString += "0" + date.getHours() + ":";
+	else
+		timeString += date.getHours() + ":";
+
+	if ((date.getMinutes()) < 10)
+		timeString += "0" + date.getMinutes() ;
+	else
+		timeString += date.getMinutes() ;
+
+	return timeString;
+}
+
 function TotalBean() {
   return new Promise(async resolve => {
     const options = {
@@ -343,6 +349,21 @@ function jsonParse(str) {
       return [];
     }
   }
+}
+
+function adjuststring(streventMassage) {
+    var strtemp = streventMassage;
+    strtemp = strtemp.replace("参加[", "").replace("]-奖励", "").replace("]店铺活动-奖励", "");
+    strtemp = strtemp.replace("京东自营旗舰店", "(自营)").replace("京东自营官方旗舰店", "(自营官方)");
+    strtemp = strtemp.replace("（", "(").replace("）", ")");
+    strtemp = strtemp.replace("官方旗舰店", "(官方)");
+    strtemp = strtemp.replace("旗舰店", "(旗舰)").replace("专营店", "(专营)").replace("专卖店", "(专卖)");
+	strtemp = strtemp.replace("回答京东", "").replace("获取的奖励", "");
+	strtemp = strtemp.replace("评价官:", "");
+	strtemp = strtemp.replace("商品号:", "");
+	strtemp = strtemp.replace(")奖励京豆", "");
+	strtemp = strtemp.replace(")评价官补发奖励京豆", "");
+    return strtemp
 }
 
 function getRemark(strRemark) {

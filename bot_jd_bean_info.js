@@ -149,7 +149,7 @@ async function bean() {
 			if (lnShowJinQiNum-1>-1){
 				lnShowJinQiNum--;
 				strtemp=adjuststring(item.eventMassage);				
-				JinQibean+="\n"+"    【" +item.amount+"豆"+"】"+showtime(new Date(item.date))+" "+strtemp
+				JinQibean+="\n"+"    "+showtime(new Date(item.date))+" "+"【" +item.amount+"豆"+"】"+strtemp
 			}
 			
           const date = item.date.replace(/-/g, '/') + "+08:00";
@@ -350,8 +350,11 @@ function adjuststring(streventMassage) {
 	strtemp = strtemp.replace("回答京东", "").replace("获取的奖励", "");
 	strtemp = strtemp.replace("评价官:", "");
 	strtemp = strtemp.replace("商品号:", "");
+	strtemp = strtemp.replace("订单号:", "");
 	strtemp = strtemp.replace(")奖励京豆", "");
 	strtemp = strtemp.replace(")评价官补发奖励京豆", "");
+	strtemp = strtemp.replace("PLUS会员使用京东支付银行卡", "PLUS京东支付");
+	
     return strtemp
 }
 

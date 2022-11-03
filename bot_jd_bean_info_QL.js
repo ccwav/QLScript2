@@ -12,6 +12,7 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let allMessage = '';
 let myMap = new Map();
 let allBean = 0;
+let JinQibean="";
 const {getEnvByPtPin} = require('./ql');
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '';
@@ -35,6 +36,10 @@ if ($.isNode() && process.env.BOTShowTopNum) {
 	lnShowTop = parseInt(process.env.BOTShowTopNum);	
 }
 
+let lnShowJinQiNum = 3;
+if ($.isNode() && process.env.BOTShowJinQiNum) {
+	lnShowJinQiNum = parseInt(process.env.BOTShowJinQiNum);	
+}
 
 for (i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
@@ -120,8 +125,11 @@ async function showMsg() {
     /* allMessage += key + ' ---> ' +myMap.get(key)+'京豆\n' */
 	if(lnShowTop && lnShowTop>value)
 		continue;
-	allMessage += "【" +value+"豆"+"】 "+key+'\n'
-  }
+	allMessage += "    【" +value+"豆"+"】 "+key+'\n'
+	}
+	if(JinQibean)
+	  allMessage += "\n\n【近期豆子】"+JinQibean;
+  
 }
 function IsNumber(value) {
     intPerSent = parseInt(value);
@@ -140,14 +148,20 @@ async function bean() {
   // 今天0:0:0时间戳
   const tm1 = parseInt((Date.now() + 28800000) / 86400000) * 86400000 - 28800000;
   let page = 1, t = 0, todayArr = [];
+  var strtemp="";
   do {
     let response = await getJingBeanBalanceDetail(page);
     // console.log(`第${page}页: ${JSON.stringify(response)}`);
     if (response && response.code === "0") {
       page++;
-      let detailList = response.detailList;
+      let detailList = response.jingDetailList;
       if (detailList && detailList.length > 0) {
         for (let item of detailList) {
+			if (lnShowJinQiNum-1>-1){
+				lnShowJinQiNum--;
+				strtemp=adjuststring(item.eventMassage);				
+				JinQibean+="\n"+"    "+showtime(new Date(item.date))+" "+"【" +item.amount+"豆"+"】"+strtemp
+			}
           const date = item.date.replace(/-/g, '/') + "+08:00";
           if (new Date(date).getTime() >= tm1 && (!item['eventMassage'].includes("退还") && !item['eventMassage'].includes("物流") && !item['eventMassage'].includes('扣赠'))) {
             todayArr.push(item);
@@ -170,31 +184,38 @@ async function bean() {
       t = 1;
     }
   } while (t === 0);
-  var strtemp="";
+  
   for (let item of todayArr) {
     if (Number(item.amount) > 0) {
       $.todayIncomeBean += Number(item.amount);
-	  strtemp=item.eventMassage;	  
-	  strtemp=strtemp.replace("参加[","").replace("]-奖励","").replace("]店铺活动-奖励","");
-	  strtemp=strtemp.replace("京东自营旗舰店","(自营)").replace("京东自营官方旗舰店","(自营官方)");
-	  strtemp=strtemp.replace("（","(").replace("）",")");
-	  strtemp=strtemp.replace("官方旗舰店","(官方)");
-	  strtemp=strtemp.replace("旗舰店","(旗舰)").replace("专营店","(专营)").replace("专卖店","(专卖)");	  
+	  strtemp=adjuststring(item.eventMassage);	  
       myMap.set(strtemp,0)
     }
   }
   for (let item of todayArr) {
     if (Number(item.amount) > 0) {
-	  strtemp=item.eventMassage;
-	  strtemp=strtemp.replace("参加[","").replace("]-奖励","").replace("]店铺活动-奖励","");
-	  strtemp=strtemp.replace("京东自营旗舰店","(自营)").replace("京东自营官方旗舰店","(自营官方)");
-	  strtemp=strtemp.replace("（","(").replace("）",")");
-	  strtemp=strtemp.replace("官方旗舰店","(官方)");
-	  strtemp=strtemp.replace("旗舰店","(旗舰)").replace("专营店","(专营)").replace("专卖店","(专卖)");	  
+	  strtemp=adjuststring(item.eventMassage);
       myMap.set(strtemp,parseInt(myMap.get(strtemp))+parseInt(item.amount))
     }
   }
 }
+function showtime(date) {
+
+	var timeString = "";
+	
+	if ((date.getHours()) < 10)
+		timeString += "0" + date.getHours() + ":";
+	else
+		timeString += date.getHours() + ":";
+
+	if ((date.getMinutes()) < 10)
+		timeString += "0" + date.getMinutes() ;
+	else
+		timeString += date.getMinutes() ;
+
+	return timeString;
+}
+
 function TotalBean() {
   return new Promise(async resolve => {
     const options = {
@@ -242,11 +263,10 @@ function TotalBean() {
 function getJingBeanBalanceDetail(page) {
   return new Promise(async resolve => {
     const options = {
-      "url": `https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail`,
+      "url": `https://bean.m.jd.com/beanDetail/detail.json?page=${page}`,
       "body": `body=${escape(JSON.stringify({"pageSize": "20", "page": page.toString()}))}&appid=ld`,
       "headers": {
-        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-        'Host': 'api.m.jd.com',
+        'User-Agent': "Mozilla/5.0 (Linux; Android 12; SM-G9880) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Mobile Safari/537.36 EdgA/106.0.1370.47",       
         'Content-Type': 'application/x-www-form-urlencoded',
         'Cookie': cookie,
       }
@@ -329,6 +349,24 @@ function jsonParse(str) {
       return [];
     }
   }
+}
+
+function adjuststring(streventMassage) {
+    var strtemp = streventMassage;
+    strtemp = strtemp.replace("参加[", "").replace("]-奖励", "").replace("]店铺活动-奖励", "");
+    strtemp = strtemp.replace("京东自营旗舰店", "(自营)").replace("京东自营官方旗舰店", "(自营官方)");
+    strtemp = strtemp.replace("（", "(").replace("）", ")");
+    strtemp = strtemp.replace("官方旗舰店", "(官方)");
+    strtemp = strtemp.replace("旗舰店", "(旗舰)").replace("专营店", "(专营)").replace("专卖店", "(专卖)");
+	strtemp = strtemp.replace("回答京东", "").replace("获取的奖励", "");
+	strtemp = strtemp.replace("评价官:", "");
+	strtemp = strtemp.replace("商品号:", "");
+	strtemp = strtemp.replace("订单号:", "");
+	strtemp = strtemp.replace(")奖励京豆", "");
+	strtemp = strtemp.replace(")评价官补发奖励京豆", "");
+	strtemp = strtemp.replace("PLUS会员使用京东支付银行卡", "PLUS京东支付");
+	
+    return strtemp
 }
 
 function getRemark(strRemark) {

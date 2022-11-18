@@ -21,6 +21,41 @@ if ($.isNode() && process.env.BEANCHANGE_BEANDETAILMODE){
 }
 
 const fs = require('fs');
+
+// hermanwu 加载一对一推送
+let isnewql = fs.existsSync('/ql/data/config/auth.json');
+let strCKFile="";
+let strUidFile ="";
+if(isnewql){
+    strCKFile = '/ql/data/scripts/CKName_cache.json';
+    strUidFile = '/ql/data/scripts/CK_WxPusherUid.json';
+}else{
+    strCKFile = '/ql/scripts/CKName_cache.json';
+    strUidFile = '/ql/scripts/CK_WxPusherUid.json';
+}
+
+let Fileexists2 = fs.existsSync(strCKFile);
+let TempCK = [];
+if (Fileexists2) {
+    console.log("检测到别名缓存文件CKName_cache.json，载入...");
+    TempCK = fs.readFileSync(strCKFile, 'utf-8');
+    if (TempCK) {
+        TempCK = TempCK.toString();
+        TempCK = JSON.parse(TempCK);
+    }
+}
+
+let UidFileexists = fs.existsSync(strUidFile);
+let TempCKUid = [];
+if (UidFileexists) {
+    console.log("检测到一对一Uid文件WxPusherUid.json，载入...");
+    TempCKUid = fs.readFileSync(strUidFile, 'utf-8');
+    if (TempCKUid) {
+        TempCKUid = TempCKUid.toString();
+        TempCKUid = JSON.parse(TempCKUid);
+    }
+}
+
 let matchtitle="昨日";
 let yesterday="";
 let TodayDate="";
@@ -133,6 +168,9 @@ RemainMessage += '【京东金融】京东金融app->我的->养猪猪,完成是
 RemainMessage += '【其他】京喜红包只能在京喜使用,其他同理';
 
 let WP_APP_TOKEN_ONE = "";
+let WP_APP_NOT_NOTIFY_PINS = [];
+let WP_APP_COMBINE_NOTIFY = false;
+let WP_UID_PINS = {};
 
 let TempBaipiao = "";
 let llgeterror=false;
@@ -143,6 +181,13 @@ if ($.isNode()) {
 	if (process.env.WP_APP_TOKEN_ONE) {		
 		WP_APP_TOKEN_ONE = process.env.WP_APP_TOKEN_ONE;
 	}
+    // hermanwu加载配置
+    if (process.env.WP_APP_NOT_NOTIFY_PINS) {
+        WP_APP_NOT_NOTIFY_PINS = process.env.WP_APP_NOT_NOTIFY_PINS.split("&");
+    }
+    if (process.env.WP_APP_COMBINE_NOTIFY) {
+        WP_APP_COMBINE_NOTIFY = process.env.WP_APP_COMBINE_NOTIFY;
+    }
 	/* if(process.env.BEANCHANGE_ExJxBeans=="true"){
 		if (time >= 17){ 
 			console.log(`检测到设定了临期京豆转换喜豆...`);
@@ -152,11 +197,15 @@ if ($.isNode()) {
 		}
 	} */
 }
-if(WP_APP_TOKEN_ONE)
-	console.log(`检测到已配置Wxpusher的Token，启用一对一推送...`);
-else
-	console.log(`检测到未配置Wxpusher的Token，禁用一对一推送...`);
-		
+if(WP_APP_TOKEN_ONE) {
+    console.log(`检测到已配置Wxpusher的Token，启用一对一推送...`);
+    if(!WP_APP_COMBINE_NOTIFY) {
+        // hermanwu提示可以开启合并推送
+        console.log(`设置WP_APP_COMBINE_NOTIFY="true"，开启同uid合并推送`);
+    }
+} else{
+    console.log(`检测到未配置Wxpusher的Token，禁用一对一推送...`);
+}
 if ($.isNode() && process.env.BEANCHANGE_PERSENT) {
 	intPerSent = parseInt(process.env.BEANCHANGE_PERSENT);
 	console.log(`检测到设定了分段通知:` + intPerSent);
@@ -424,6 +473,12 @@ if(DisableIndex!=-1){
 			$.PlustotalScore=0;
 			$.CheckTime="";
 			$.beanCache=0;
+
+            // hermanwu 跳过配置ck
+            if (WP_APP_NOT_NOTIFY_PINS.indexOf($.pt_pin) != -1) {
+                console.log("已在WP_APP_NOT_NOTIFY_PINS中配置【"+$.pt_pin+"】，跳过不执行\n");
+                continue;
+            }
 			
 			TempBaipiao = "";
 			strGuoqi="";
@@ -715,6 +770,33 @@ if(DisableIndex!=-1){
 		})
 		await $.wait(10 * 1000);
 	}
+
+    // hermanwu 分组合并推送
+    if (Object.keys(WP_UID_PINS).length > 0) {
+        console.log('按Uid分组合并推送：')
+        // console.log(JSON.stringify(WP_UID_PINS))
+        for (const key in WP_UID_PINS) {
+            if (Object.hasOwnProperty.call(WP_UID_PINS, key)) {
+                const pins = WP_UID_PINS[key];
+                let pt_pin = '';
+                let allMsg = {
+                    title: '',
+                    msg: '',
+                    author: '\n\n本通知 By Herman Wu',
+                    summary: ''
+                };
+                for (let index = 0; index < pins.length; index++) {
+                    const pin = pins[index];
+                    allMsg.title = pin.title;
+                    allMsg.msg += pin.msg + '\n\n\n\n';
+                    allMsg.summary += pin.summary + '\n\n\n\n';
+                    pt_pin = pin.pt_pin;
+                }
+                console.log('合并后：', JSON.stringify(allMsg))
+                await notify.sendNotifybyWxPucher(allMsg.title, `${allMsg.msg}`, `${pt_pin}`,`${allMsg.author}`,allMsg.summary);
+            }
+        }
+    }
 
 })()
 .catch((e) => {
@@ -1152,11 +1234,64 @@ async function showMsg() {
 		if(strAllNotify)
 			ReturnMessage=strAllNotify+`\n`+ReturnMessage;
 		
-		await notify.sendNotifybyWxPucher(strTitle, `${ReturnMessage}`, `${$.UserName}`,'\n\n本通知 By ccwav Mod',strsummary);
+        // hermanwu 分组合并推送
+        if (WP_APP_COMBINE_NOTIFY) {
+            // 同Uid合并推送
+            const uid = getuuid("", $.UserName)
+            console.log('查找uid： ', $.UserName, uid)
+            if(!WP_UID_PINS[uid]) {
+                WP_UID_PINS[uid] = []
+            }
+            WP_UID_PINS[uid].push({
+                pt_pin: $.UserName,
+                title: strTitle,
+                msg: ReturnMessage,
+                author: '\n\n本通知 By Herman Wu',
+                summary: strsummary
+            })
+        } else {
+            
+            await notify.sendNotifybyWxPucher(strTitle, `${ReturnMessage}`, `${$.UserName}`,'\n\n本通知 By ccwav Mod',strsummary);
+        }
 	}
 
 	//$.msg($.name, '', ReturnMessage , {"open-url": "https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean"});
 }
+// hermanwu
+function getuuid(strRemark, PtPin) {
+    var strTempuuid = "";
+    if (strRemark) {
+        var Tempindex = strRemark.indexOf("@@");
+        if (Tempindex != -1) {
+            console.log(PtPin + ": 检测到NVJDC的一对一格式,瑞思拜~!");
+            var TempRemarkList = strRemark.split("@@");
+            for (let j = 1; j < TempRemarkList.length; j++) {
+                if (TempRemarkList[j]) {
+                    if (TempRemarkList[j].length > 4) {
+                        if (TempRemarkList[j].substring(0, 4) == "UID_") {
+                            strTempuuid = TempRemarkList[j];
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!strTempuuid) {
+                console.log("检索资料失败...");
+            }
+        }
+    }
+    if (!strTempuuid && TempCKUid) {
+        console.log("正在从CK_WxPusherUid文件中检索资料...");
+        for (let j = 0; j < TempCKUid.length; j++) {
+            if (PtPin == decodeURIComponent(TempCKUid[j].pt_pin)) {
+                strTempuuid = TempCKUid[j].Uid;
+                break;
+            }
+        }
+    }
+    return strTempuuid;
+}
+
 async function bean() {
 	
 	if (EnableCheckBean && checkbeanDetailMode==0) {	

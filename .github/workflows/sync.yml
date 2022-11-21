@@ -3,7 +3,7 @@ name: Sync Fork
 
 on: #push #时触发, 主要是为了测试配置有没有问题
   schedule:
-    - cron: '0 26,56 * * *' # 每25,55分触发
+    - cron: '25,55 * * * *' # 每25,55分触发
 jobs:
   sync:
     runs-on: ubuntu-latest

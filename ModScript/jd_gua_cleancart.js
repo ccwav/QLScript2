@@ -151,7 +151,7 @@ async function run(){
               // console.log(a.groupName)
               // if(a.groupName.indexOf('7天前加入购物车') > -1){
                 for(let s of a.groupDetails || []){
-                  if(toSDS(s.name)){
+                  if(toSDS(s.name) || num>130){
                     // console.log(s.unusable,s.skuUuid,s.name)
                     operNum += s.clearSkus && s.clearSkus.length || 1;
                     operations.push({

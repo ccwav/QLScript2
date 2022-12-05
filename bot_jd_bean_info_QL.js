@@ -209,9 +209,14 @@ function showtime(date) {
 		timeString += date.getHours() + ":";
 
 	if ((date.getMinutes()) < 10)
-		timeString += "0" + date.getMinutes() ;
+		timeString += "0" + date.getMinutes()+ ":" ;
 	else
-		timeString += date.getMinutes() ;
+		timeString += date.getMinutes()+ ":" ;
+	
+	if ((date.getSeconds()) < 10)
+		timeString += "0" + date.getSeconds();
+	else
+		timeString += date.getSeconds();
 
 	return timeString;
 }

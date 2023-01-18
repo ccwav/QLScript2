@@ -109,14 +109,6 @@ if(DisableIndex!=-1){
 	EnableJdZZ=false;
 }
 
-//京东秒杀
-let EnableJdMs=true;
-DisableIndex = strDisableList.findIndex((item) => item === "京东秒杀");
-if(DisableIndex!=-1){
-	console.log("检测到设定关闭京东秒杀查询");
-	EnableJdMs=false;	
-}
-	
 //东东农场
 let EnableJdFruit=true;
 DisableIndex = strDisableList.findIndex((item) => item === "东东农场");
@@ -275,7 +267,6 @@ if(DisableIndex!=-1){
 		 await Promise.all([
 		         getJoyBaseInfo(), //汪汪乐园
 		         getJdZZ(), //京东赚赚
-		         getMs(), //京东秒杀
 		         getjdfruitinfo(), //东东农场
 		         cash(), //极速金币
 		         jdJxMCinfo(), //京喜牧场
@@ -1088,7 +1079,7 @@ function redPacket() {
 						$.jdwxRed = $.jdwxRed.toFixed(2);
 						$.jdGeneralRed = $.jdGeneralRed.toFixed(2);
 						$.balance = data.balance;
-						$.expiredBalance = ($.jxRedExpire + $.jsRedExpire + $.jdRedExpire).toFixed(2);
+						$.expiredBalance = ($.jxRedExpire + $.jsRedExpire + $.jdRedExpire+$.jdhRedExpire+$.jdwxRedExpire+$.jdGeneralRedExpire).toFixed(2);
 						$.message += `【红包总额】${$.balance}(总过期${$.expiredBalance})元 \n`;
 						if ($.jxRed > 0)
 							$.message += `【京喜红包】${$.jxRed}(将过期${$.jxRedExpire.toFixed(2)})元 \n`;
@@ -1285,53 +1276,6 @@ function taskJDZZUrl(functionId, body = {}) {
 			'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
 			'Accept-Language': 'zh-cn',
 			'Accept-Encoding': 'gzip, deflate, br',
-		},
-		timeout: 10000
-	}
-}
-
-function getMs() {
-	if (!EnableJdMs)
-		return;
-	return new Promise(resolve => {
-		$.post(taskMsPostUrl('homePageV2', {}, 'appid=SecKill2020'), (err, resp, data) => {
-			try {
-				if (err) {
-					console.log(`${err},${jsonParse(resp.body)['message']}`)
-					console.log(`getMs API请求失败，请检查网路重试`)
-				} else {
-					if (safeGet(data)) {
-						//console.log("Debug :" + JSON.stringify(data));
-						data = JSON.parse(data);						
-						if (data.result.assignment.assignmentPoints) {
-							$.JdMsScore = data.result.assignment.assignmentPoints || 0
-						}
-					}
-				}
-			} catch (e) {
-				$.logErr(e, resp)
-			}
-			finally {
-				resolve(data);
-			}
-		})
-	})
-}
-
-function taskMsPostUrl(function_id, body = {}, extra = '', function_id2) {
-	let url = `${JD_API_HOST}`;
-	if (function_id2) {
-		url += `?functionId=${function_id2}`;
-	}
-	return {
-		url,
-		body: `functionId=${function_id}&body=${escape(JSON.stringify(body))}&client=wh5&clientVersion=1.0.0&${extra}`,
-		headers: {
-			"Cookie": cookie,
-			"origin": "https://h5.m.jd.com",
-			"referer": "https://h5.m.jd.com/babelDiy/Zeus/2NUvze9e1uWf4amBhe1AV6ynmSuH/index.html",
-			'Content-Type': 'application/x-www-form-urlencoded',
-			"User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
 		},
 		timeout: 10000
 	}

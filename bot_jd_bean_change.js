@@ -267,7 +267,6 @@ if(DisableIndex!=-1){
 		 await Promise.all([
 		         getJoyBaseInfo(), //汪汪乐园
 		         getJdZZ(), //京东赚赚
-		         getMs(), //京东秒杀
 		         getjdfruitinfo(), //东东农场
 		         cash(), //极速金币
 		         jdJxMCinfo(), //京喜牧场

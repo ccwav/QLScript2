@@ -228,7 +228,10 @@ async function dealReturn(type, res) {
 			console.log(`获得:${data.data.dailyAward.beanAward.beanCount || 0}京豆`)
 			$.bean += Number(data.data.dailyAward.beanAward.beanCount) || 0
 		} else {
-			console.log(data.data.dailyAward.title+`获得:${data.data.dailyAward.beanAward.beanCount || 0}京豆`)
+			if (data.data.dailyAward)
+				console.log(data.data.dailyAward.title+`获得:${data.data.dailyAward.beanAward.beanCount || 0}京豆`)
+			else
+				console.log(data)
 		}
       }else {
         console.log(res);

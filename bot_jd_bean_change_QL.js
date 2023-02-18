@@ -32,8 +32,6 @@ let TempBaipiao = "";
 let llgeterror=false;
 let time = new Date().getHours();
 const {getEnvByPtPin} = require('./ql');
-
-
 let userIndex2 = -1;
 let userIndex3 = -1;
 let userIndex4 = -1;
@@ -179,6 +177,14 @@ if(DisableIndex!=-1){
 	EnableCheckEcard=false
 }
 
+//点点券
+let EnableCoupon=true;
+DisableIndex=strDisableList.findIndex((item) => item === "点点券");
+if(DisableIndex!=-1){
+	console.log("检测到设定关闭点点券查询");
+	EnableCoupon=false
+}
+
 !(async() => {
     if (!cookiesArr[intcheckckseq]) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {
@@ -244,7 +250,7 @@ if(DisableIndex!=-1){
 		$.PlustotalScore=0;
         TempBaipiao = "";
         strGuoqi = "";
-
+		$.CoupontotalAmount=0;
 		await TotalBean();
 		
         if (!$.isLogin) {
@@ -255,7 +261,7 @@ if(DisableIndex!=-1){
             return
         }
 		
-		 await Promise.all([
+		await Promise.all([
 		         getJoyBaseInfo(), //汪汪乐园
 		         getJdZZ(), //京东赚赚
 		         getjdfruitinfo(), //东东农场
@@ -267,6 +273,7 @@ if(DisableIndex!=-1){
 		         GetJxBeaninfo(), //喜豆查询	
 				 GetJoyRuninginfo(), //汪汪赛跑 
 				 CheckEcard(), //E卡查询
+				 getCouponConfig(), //点点券
 				 queryScores() 
 		     ])
 
@@ -366,30 +373,12 @@ async function showMsg() {
 	}
 	
 	if($.ECardinfo)
-		ReturnMessage += `【礼卡余额】${$.ECardinfo}\n`;
+		ReturnMessage += `【礼卡余额】${$.ECardinfo}\n`;	
 	
-	if ($.joylevel || $.jdCash || $.JoyRunningAmount) {
-		ReturnMessage += `【其他信息】`;
-		if ($.joylevel) {
-			ReturnMessage += `汪汪:${$.joylevel}级`;			
-		}
-		if ($.jdCash) {
-			if ($.joylevel) {
-				ReturnMessage += ",";
-			}			
-			ReturnMessage += `领现金:${$.jdCash}元`;
-		}
-		if ($.JoyRunningAmount) {
-			if ($.joylevel || $.jdCash) {
-				ReturnMessage += ",";
-			}			
-			ReturnMessage += `汪汪赛跑:${$.JoyRunningAmount}元`;
-		}
-		
-		ReturnMessage += `\n`;
-
+	if ($.JoyRunningAmount) {
+		ReturnMessage += `【汪汪赛跑】${$.JoyRunningAmount}元\n`;
 	}
-
+	
 	if ($.JdFarmProdName != "") {
 		if ($.JdtreeEnergy != 0) {
 			if ($.treeState === 2 || $.treeState === 3) {
@@ -439,7 +428,29 @@ async function showMsg() {
 		TempBaipiao += `【金融养猪】${$.PigPet} 可以兑换了!\n`;
 
 	}
+	
+	if ($.joylevel || $.jdCash || $.CoupontotalAmount) {
+		ReturnMessage += `【其他信息】`;
+		if ($.joylevel) {
+			ReturnMessage += `汪汪:${$.joylevel}级`;			
+		}
+		if ($.jdCash) {
+			if ($.joylevel) {
+				ReturnMessage += ",";
+			}			
+			ReturnMessage += `领现金:${$.jdCash}元`;
+		}
 		
+		if ($.CoupontotalAmount) {	
+			if ($.joylevel || $.jdCash) {
+				ReturnMessage += ",";
+			}
+			ReturnMessage += `点点券:${$.CoupontotalAmount}元`;
+		}
+		ReturnMessage += `\n`;
+
+	}	
+	
 	if(strGuoqi){		
 		ReturnMessage += `💸💸💸临期京豆明细💸💸💸\n`;
 		ReturnMessage += `${strGuoqi}`;
@@ -653,40 +664,100 @@ function apptaskUrl(functionId = "", body = "") {
     timeout: 10000
   }
 }
-function getSign(functionId, body) {
-  return new Promise(async resolve => {
-    let data = {
-      functionId,
-      body: JSON.stringify(body),
-      "client":"apple",
-      "clientVersion":"10.3.0"
-    }
-    let HostArr = ['jdsign.cf', 'signer.nz.lu']
-    let Host = HostArr[Math.floor((Math.random() * HostArr.length))]
-    let options = {
-      url: `https://cdn.nz.lu/ddo`,
-      body: JSON.stringify(data),
-      headers: {
-        Host,
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-      },
-      timeout: 30 * 1000
-    }
-    $.post(options, (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(JSON.stringify(err))
-          console.log(`${$.name} getSign API请求失败，请检查网路重试`)
-        } else {
 
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
+async function getCouponConfig() {
+    if (!EnableCoupon)
+        return;
+    let functionId = `getCouponConfig`;
+    let body = {
+        "childActivityUrl": "openapp.jdmobile://virtual?params={\"category\":\"jump\",\"des\":\"couponCenter\"}",
+        "incentiveShowTimes": 0,
+        "monitorRefer": "",
+        "monitorSource": "ccresource_android_index_config",
+        "pageClickKey": "Coupons_GetCenter",
+        "rewardShowTimes": 0,
+        "sourceFrom": "1"
+    }
+    let sign = await getSign(functionId, body);
+    return new Promise(async resolve => {
+        $.post(CoupontaskUrl(functionId, sign), async(err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`);
+                    console.log(`${$.name} getCouponConfig API请求失败，请检查网路重试`);
+                } else {
+                    if (data) {
+                        data = JSON.parse(data);
+                        if (data?.result?.couponConfig?.signNecklaceDomain?.roundData?.totalScore)
+                            $.CoupontotalAmount = data.result.couponConfig.signNecklaceDomain.roundData.totalScore;						
+							$.CoupontotalAmount=($.CoupontotalAmount/1000).toFixed(2)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
     })
-  })
+}
+
+function getSign(functionId, body) {	
+    var strsign = '';
+	let data = {
+      "fn":functionId,
+      "body": body
+    }
+    return new Promise((resolve) => {
+        let url = {
+            url: 'https://api.nolanstore.top/sign',
+            body: JSON.stringify(data),
+		    followRedirect: false,
+		    headers: {
+		        'Accept': '*/*',
+		        "accept-encoding": "gzip, deflate, br",
+		        'Content-Type': 'application/json'
+		    },
+		    timeout: 30000
+        }
+        $.post(url, async(err, resp, data) => {
+            try {				
+                data = JSON.parse(data);
+                if (data && data.body) {                    
+                    if (data.body)
+                        strsign = data.body || '';
+                    if (strsign != '')
+                        resolve(strsign);
+                    else
+                        console.log("签名获取失败.");
+                } else {
+                    console.log("签名获取失败.");
+                }				
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+				resolve(strsign);
+			}
+        })
+    })
+}
+
+function CoupontaskUrl(functionId, body) {
+  return {
+    url: `${JD_API_HOST}?functionId=${functionId}`,
+    body,
+    headers: {
+      "Host": "api.m.jd.com",
+      "Connection": "keep-alive",
+      "User-Agent": "okhttp/3.12.1;jdmall;android;version/10.1.2;build/89743;screen/1080x2030;os/9;network/wifi;",
+      "Accept": "*/*",
+      "Referer": "https://h5.m.jd.com/rn/42yjy8na6pFsq1cx9MJQ5aTgu3kX/index.html",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+      "Cookie": cookie,
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+  }
 }
 
 /* function TotalBean() {

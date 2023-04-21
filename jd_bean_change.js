@@ -1128,24 +1128,6 @@ function apptaskUrl(functionId = "", body = "") {
   }
 }
 
-function CoupontaskUrl(functionId, body) {
-  return {
-    url: `${JD_API_HOST}?functionId=${functionId}`,
-    body,
-    headers: {
-      "Host": "api.m.jd.com",
-      "Connection": "keep-alive",
-      "User-Agent": "okhttp/3.12.1;jdmall;android;version/10.1.2;build/89743;screen/1080x2030;os/9;network/wifi;",
-      "Accept": "*/*",
-      "Referer": "https://h5.m.jd.com/rn/42yjy8na6pFsq1cx9MJQ5aTgu3kX/index.html",
-      "Accept-Encoding": "gzip, deflate",
-      "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-      "Cookie": cookie,
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-    }
-  }
-}
-
 function TotalBean() {
     return new Promise(async resolve => {
         const options = {
@@ -1359,50 +1341,6 @@ function queryexpirejingdou() {
 		})
 	})
 }
-function exchangejxbeans(o) {
-    return new Promise(async resolve => {
-		var UUID = getUUID('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');		
-		var JXUA = `jdpingou;iPhone;4.13.0;14.4.2;${UUID};network/wifi;model/iPhone10,2;appBuild/100609;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/1;hasOCPay/0;supportBestPay/0;session/${Math.random * 98 + 1};pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`;
-        const options = {
-            "url": `https://m.jingxi.com/deal/masset/jd2xd?use=${o}&canpintuan=&setdefcoupon=0&r=${Math.random()}&sceneval=2`,
-            "headers": {
-                "Host": "m.jingxi.com",
-                "Accept": "*/*",
-                "Cookie": cookie,
-                "Connection": "keep-alive",
-                "User-Agent": JXUA,
-                "Accept-Language": "zh-cn",
-                "Referer": "https://m.jingxi.com/deal/confirmorder/main",
-                "Accept-Encoding": "gzip, deflate, br",
-            }
-        }
-        $.get(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(err);
-                } else {
-                    data = JSON.parse(data);
-                    if (data && data.data && JSON.stringify(data.data) === '{}') {
-                        console.log(JSON.stringify(data))
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data || {});
-            }
-        })
-    })
-}
-function getUUID(x = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", t = 0) {
-    return x.replace(/[xy]/g, function (x) {
-        var r = 16 * Math.random() | 0,
-        n = "x" == x ? r : 3 & r | 8;
-        return uuid = t ? n.toString(36).toUpperCase() : n.toString(36),
-        uuid
-    })
-}
-
 
 function redPacket() {
 	return new Promise(async resolve => {
@@ -2095,15 +2033,6 @@ Date.prototype.Format = function (fmt) {
 		}
 	}
 	return d;
-}
-
-function generateFp() {
-	let e = "0123456789";
-	let a = 13;
-	let i = '';
-	for (; a--; )
-		i += e[Math.random() * e.length | 0];
-	return (i + Date.now()).slice(0, 16)
 }
 
 function jsonParse(str) {

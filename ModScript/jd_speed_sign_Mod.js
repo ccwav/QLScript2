@@ -66,7 +66,7 @@ const JD_API_HOST = 'https://api.m.jd.com/', actCode = 'visa-card-001';
 async function jdGlobal() {
   try {
 	 
-    await richManIndex()
+    //await richManIndex()
 
     await wheelsHome()
     await apTaskList()

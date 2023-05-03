@@ -35,6 +35,8 @@ pin3@&@不清空👉该pin不清空
 
 */
 let jdSignUrl = 'https://api.nolanstore.top/sign'
+if (process.env.SIGNURL)
+	jdSignUrl = process.env.SIGNURL;
 let cleancartRun = 'false'
 let cleancartProducts = ''
 const $ = new Env('清空购物车');

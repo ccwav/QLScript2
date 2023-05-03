@@ -27,6 +27,8 @@ cron "2 0-23/4 * * *" script-path=jd_cash.js,tag=签到领现金
  */
 const $ = new Env('签到领现金');
 let jdSignUrl = 'https://api.nolanstore.top/sign'
+if (process.env.SIGNURL)
+	jdSignUrl = process.env.SIGNURL;
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';

@@ -21,7 +21,7 @@ const querystring = require('querystring');
 const exec = require('child_process').exec;
 const $ = new Env();
 const timeout = 15000; //超时时间(单位毫秒)
-console.log("加载sendNotify，当前版本: 20230506");
+console.log("加载sendNotify，当前版本: 20230506V2");
 // =======================================go-cqhttp通知设置区域===========================================
 //gobot_url 填写请求地址http://127.0.0.1/send_private_msg
 //gobot_token 填写在go-cqhttp文件设置的访问密钥
@@ -633,11 +633,14 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
         if (process.env["TG_USER_ID" + UseGroupNotify] && Use_tgBotNotify) {
             TG_USER_ID = process.env["TG_USER_ID" + UseGroupNotify];
         }
-
-        TG_PROXY_AUTH = process.env["TG_PROXY_AUTH"];
-        TG_PROXY_HOST = process.env["TG_PROXY_HOST"];
-        TG_PROXY_PORT = process.env["TG_PROXY_PORT"];
-        TG_API_HOST = process.env["TG_API_HOST"];
+		if (process.env["TG_PROXY_AUTH"]) 
+			TG_PROXY_AUTH = process.env["TG_PROXY_AUTH"];
+		if (process.env["TG_PROXY_HOST"]) 
+			TG_PROXY_HOST = process.env["TG_PROXY_HOST"];
+		if (process.env["TG_PROXY_PORT"]) 
+			TG_PROXY_PORT = process.env["TG_PROXY_PORT"];		
+		if (process.env["TG_API_HOST"]) 
+			TG_API_HOST = process.env["TG_API_HOST"];
 
         if (process.env["DD_BOT_TOKEN" + UseGroupNotify] && Use_ddBotNotify) {
             DD_BOT_TOKEN = process.env["DD_BOT_TOKEN" + UseGroupNotify];

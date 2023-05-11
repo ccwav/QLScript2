@@ -8,13 +8,12 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 
-let maxThread = 40; //并发数
+let maxThread = 5; //并发数
 if ($.isNode() && process.env.JDSPEED_MAXTHREAD){
 	maxThread=process.env.JDSPEED_MAXTHREAD*1;
 }
 
 let TaskList = [];
-
 let llAPIError = false;
 let cookiesArr = [], message;
 if ($.isNode()) {
@@ -44,12 +43,24 @@ if (new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate() == date.getDa
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       var cookie = cookiesArr[i];
-      //var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])   
+	    var url_uuid = randomString(16);
+
       message = '';
-      TaskList.push(jdGlobal(cookie));
+      TaskList.push(jdGlobal(cookie,url_uuid));
       if (i == (cookiesArr.length - 1) || TaskList.length == maxThread) {
         await Promise.all(TaskList);
-        await $.wait(10 * 1000)
+		if (!llAPIError){
+			if (TaskList.length != maxThread){
+				console.log(`当前批量完成，等待30秒`);
+				await $.wait(30 * 1000);
+			}			
+		}else{
+			console.log(`检测到403，暂停2分钟后重试`);
+			await $.wait(2*60 * 1000);
+			llAPIError=false;
+			await Promise.all(TaskList);
+		}
+		
         TaskList = [];
       }
       
@@ -67,17 +78,20 @@ if (new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate() == date.getDa
     $.done();
   })
 
-async function jdGlobal(cookie) {
+async function jdGlobal(cookie,url_uuid) {
   try {
-
+	var isLogin= await isLoginByX1a0He(cookie);
+	if (!isLogin)
+		return;
+	
     await wheelsHome(cookie)
     await apTaskList(cookie)
     await wheelsHome(cookie)
-    await taskList(cookie)
+    await taskList(cookie,url_uuid)
     if (llAPIError) {      
       return;
     }
-    await queryJoy(cookie)
+    await queryJoy(cookie,url_uuid)
     if (llAPIError) {      
       return;
     }
@@ -90,8 +104,8 @@ async function jdGlobal(cookie) {
 }
 
 async function orderReward(type, cookie) {
-  var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-  let t = +new Date()
+  var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+  var t = +new Date()
   var headers = {
     'Host': 'api.m.jd.com',
     'accept': 'application/json, text/plain, */*',
@@ -123,7 +137,7 @@ async function orderReward(type, cookie) {
           if (data.code === 0 && data.isSuccess) {
             if (data.data.details) {
               $.details = data.data.details
-              for (let item of $.details) {
+              for (var item of $.details) {
                 if (item.status === 2) {
 
                   console.log(UserName + `:检测到【下单领红包】有奖励可领取，开始领取奖励`)
@@ -153,9 +167,9 @@ async function orderReward(type, cookie) {
 }
 
 
-async function taskList(cookie) {
+async function taskList(cookie,url_uuid) {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie, {
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid, {
       "version": "3.1.0",
       "method": "newTaskCenterPage",
       "data": { "channel": 1 }
@@ -168,19 +182,19 @@ async function taskList(cookie) {
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
-              for (let task of data.data) {
+              for (var task of data.data) {
                 $.taskName = task.taskInfo.mainTitle;
                 if (task.taskInfo.status === 0) {
                   if (task.taskType >= 1000) {
-                    await doTask(task.taskType, cookie)
+                    await doTask(task.taskType, cookie,url_uuid)
                     await $.wait(1000)
                   } else {
                     $.canStartNewItem = true
                     while ($.canStartNewItem) {
                       if (task.taskType !== 3) {
-                        await queryItem(cookie, task.taskType)
+                        await queryItem(cookie,url_uuid, task.taskType)
                       } else {
-                        await startItem("", task.taskType, cookie)
+                        await startItem("", task.taskType, cookie,url_uuid)
                       }
                     }
                   }
@@ -203,9 +217,9 @@ async function taskList(cookie) {
   })
 }
 
-async function doTask(taskId, cookie) {
+async function doTask(taskId, cookie,url_uuid) {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie, {
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid, {
       "method": "marketTaskRewardPayment",
       "data": { "channel": 1, "clientTime": +new Date() + 0.588, "activeType": taskId }
     }), async (err, resp, data) => {
@@ -234,9 +248,9 @@ async function doTask(taskId, cookie) {
   })
 }
 
-async function queryJoy(cookie) {
+async function queryJoy(cookie,url_uuid) {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie, { "method": "queryJoyPage", "data": { "channel": 1 } }),
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid, { "method": "queryJoyPage", "data": { "channel": 1 } }),
       async (err, resp, data) => {
         try {
           if (err) {
@@ -246,8 +260,8 @@ async function queryJoy(cookie) {
             if (safeGet(data)) {
               data = JSON.parse(data);
               if (data.data.taskBubbles)
-                for (let task of data.data.taskBubbles) {
-                  await rewardTask(task.id, task.activeType, cookie)
+                for (var task of data.data.taskBubbles) {
+                  await rewardTask(task.id, task.activeType, cookie,url_uuid)
                   await $.wait(500)
                 }
             }
@@ -261,9 +275,9 @@ async function queryJoy(cookie) {
   })
 }
 
-async function rewardTask(id, taskId, cookie) {
+async function rewardTask(id, taskId, cookie,url_uuid) {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie, {
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid, {
       "method": "joyTaskReward",
       "data": { "id": id, "channel": 1, "clientTime": +new Date() + 0.588, "activeType": taskId }
     }), async (err, resp, data) => {
@@ -292,9 +306,9 @@ async function rewardTask(id, taskId, cookie) {
 }
 
 
-async function queryItem(cookie, activeType = 1) {
+async function queryItem(cookie,url_uuid, activeType = 1) {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie, {
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid, {
       "method": "queryNextTask",
       "data": { "channel": 1, "activeType": activeType }
     }), async (err, resp, data) => {
@@ -308,7 +322,7 @@ async function queryItem(cookie, activeType = 1) {
           if (safeGet(data)) {
             data = JSON.parse(data);
             if (data.code === 0 && data.data) {
-              await startItem(data.data.nextResource, activeType,cookie)
+              await startItem(data.data.nextResource, activeType,cookie,url_uuid)
             } else {
               var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
               console.log(`${UserName}:商品任务开启失败，${data.message}`)
@@ -325,9 +339,9 @@ async function queryItem(cookie, activeType = 1) {
   })
 }
 
-async function startItem(activeId, activeType, cookie) {
+async function startItem(activeId, activeType, cookie,url_uuid) {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie, {
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid, {
       "method": "enterAndLeave",
       "data": {
         "activeId": activeId,
@@ -349,13 +363,13 @@ async function startItem(activeId, activeType, cookie) {
             data = JSON.parse(data);
             if (data.code === 0 && data.data) {
               if (data.data.taskInfo.isTaskLimit === 0) {
-                let { videoBrowsing, taskCompletionProgress, taskCompletionLimit } = data.data.taskInfo
+                var { videoBrowsing, taskCompletionProgress, taskCompletionLimit } = data.data.taskInfo
                 if (activeType !== 3)
                   videoBrowsing = activeType === 1 ? 5 : 10
                 console.log(`${UserName}:【${taskCompletionProgress + 1}/${taskCompletionLimit}】浏览商品任务记录成功，等待${videoBrowsing}秒`)
                 await $.wait(videoBrowsing * 1000)
                 await $.wait(3000);
-                await endItem(data.data.uuid, activeType, cookie, activeId, activeType === 3 ? videoBrowsing : "")
+                await endItem(data.data.uuid, activeType, cookie,url_uuid, activeId, activeType === 3 ? videoBrowsing : "")
                 await $.wait(1000);
               } else {
                 console.log(`${UserName}:${$.taskName}任务已达上限`)
@@ -376,9 +390,9 @@ async function startItem(activeId, activeType, cookie) {
   })
 }
 
-async function endItem(uuid, activeType, cookie, activeId = "", videoTimeLength = "") {
+async function endItem(uuid, activeType, cookie,url_uuid, activeId = "", videoTimeLength = "") {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie,
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid,
       {
         "method": "enterAndLeave",
         "data": {
@@ -400,7 +414,7 @@ async function endItem(uuid, activeType, cookie, activeId = "", videoTimeLength 
             if (safeGet(data)) {
               data = JSON.parse(data);
               if (data.code === 0 && data.isSuccess) {
-                await rewardItem(uuid, activeType, cookie, activeId, videoTimeLength)
+                await rewardItem(uuid, activeType, cookie,url_uuid, activeId, videoTimeLength)
               } else {
                 var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
                 console.log(`${UserName}:${$.taskName}任务结束失败，${data.message}`)
@@ -416,9 +430,9 @@ async function endItem(uuid, activeType, cookie, activeId = "", videoTimeLength 
   })
 }
 
-async function rewardItem(uuid, activeType, cookie, activeId = "", videoTimeLength = "") {
+async function rewardItem(uuid, activeType, cookie,url_uuid, activeId = "", videoTimeLength = "") {
   return new Promise(resolve => {
-    $.get(taskUrl('ClientHandleService.execute', cookie,
+    $.get(taskUrl('ClientHandleService.execute', cookie,url_uuid,
       {
         "method": "rewardPayment",
         "data": {
@@ -532,7 +546,7 @@ function apTaskList(cookie) {
               data = JSON.parse(data);
               if (data.code === 0) {
                 var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-                for (let task of data.data) {
+                for (var task of data.data) {
                   // {"linkId":"toxw9c5sy9xllGBr3QFdYg","taskType":"SIGN","taskId":67,"channel":4}
                   if (!task.taskFinished && ['SIGN', 'BROWSE_CHANNEL'].includes(task.taskType)) {
                     console.log(`${UserName}:去做任务${task.taskTitle}`)
@@ -581,24 +595,28 @@ function apDoTask(taskType, taskId, channel, itemId, cookie) {
   })
 }
 
-function taskUrl(_0x7683x2, cookie, _0x7683x3 = {}) {
-  let _0x7683x4 = +new Date();
-  let _0x7683x5 = `${"lite-android&"}${JSON["stringify"](_0x7683x3)}${"&android&3.1.0&"}${_0x7683x2}${"&"}${_0x7683x4}${"&846c4c32dae910ef"}`;
-  let _0x7683x6 = "12aea658f76e453faf803d15c40a72e0";
-  const _0x7683x7 = $["isNode"]() ? require("crypto-js") : CryptoJS;
-  let _0x7683x8 = _0x7683x7.HmacSHA256(_0x7683x5, _0x7683x6).toString();
-  return {
-    url: `${""}${JD_API_HOST}${"api?functionId="}${_0x7683x2}${"&body="}${escape(JSON["stringify"](_0x7683x3))}${"&appid=lite-android&client=android&uuid=846c4c32dae910ef&clientVersion=3.1.0&t="}${_0x7683x4}${"&sign="}${_0x7683x8}${""}`,
-    headers: {
-      'Host': "api.m.jd.com",
-      'accept': "*/*",
-      'kernelplatform': "RN",
-      'user-agent': "JDMobileLite/3.1.0 (iPad; iOS 14.4; Scale/2.00)",
-      'accept-language': "zh-Hans-CN;q=1, ja-CN;q=0.9",
-      'Cookie': cookie
-    }
-  }
+function taskUrl(functionId, cookie,url_uuid, body = {}) {
+	const struuid = url_uuid;
+	let nowTime = Date.now();
+	let _0x7683x5 = `${"lite-android&"}${JSON["stringify"](body)}${"&android&3.1.0&"}${functionId}&${nowTime}&${struuid}`;
+	let _0x7683x6 = "12aea658f76e453faf803d15c40a72e0";
+	const _0x7683x7 = $["isNode"]() ? require("crypto-js") : CryptoJS;
+	let sign = _0x7683x7.HmacSHA256(_0x7683x5, _0x7683x6).toString();
+	let strurl=JD_API_HOST+"api?functionId="+functionId+"&body="+`${escape(JSON["stringify"](body))}&appid=lite-android&client=android&uuid=`+struuid+`&clientVersion=3.1.0&t=${nowTime}&sign=${sign}`;
+	return {
+		url: strurl,
+		headers: {
+			'Host': "api.m.jd.com",
+			'accept': "*/*",
+			'kernelplatform': "RN",
+			'user-agent': "JDMobileLite/3.1.0 (iPad; iOS 14.4; Scale/2.00)",
+			'accept-language': "zh-Hans-CN;q=1, ja-CN;q=0.9",
+			'Cookie': cookie
+		},
+		timeout: 10000
+	}
 }
+
 
 function taskGetUrl(function_id, cookie, body) {
   return {
@@ -639,6 +657,51 @@ function jsonParse(str) {
       return [];
     }
   }
+}
+
+function randomString(e) {
+	e = e || 32;
+	let t = "0123456789abcdef",
+	a = t.length,
+	n = "";
+	for (let i = 0; i < e; i++)
+		n += t.charAt(Math.floor(Math.random() * a));
+	return n
+}
+
+function isLoginByX1a0He(cookie) {
+	var UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+    return new Promise((resolve) => {
+        const options = {
+            url: 'https://plogin.m.jd.com/cgi-bin/ml/islogin',
+            headers: {
+                "Cookie": cookie,
+                "referer": "https://h5.m.jd.com/",
+                "User-Agent": "jdapp;iPhone;10.1.2;15.0;network/wifi;Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1",
+            },
+        }
+        $.get(options, (err, resp, data) => {
+			var isLogin=false;			
+            try {
+                if (data) {
+                    data = JSON.parse(data);                    
+                    if (data.islogin === "1") {
+                        isLogin= true;
+                    } else if (data.islogin === "0") {
+                        console.log(UserName + `: Cookie无效\n`)
+                        isLogin= false;
+                    } else {
+                        console.log(UserName + `: Cookie状态返回未知...\n`)
+                        isLogin= false;
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+            } finally {
+                resolve(isLogin);
+            }
+        });
+    });
 }
 
 !function (t, r) { "object" == typeof exports ? module.exports = exports = r() : "function" == typeof define && define.amd ? define([], r) : t.CryptoJS = r() }(this, function () {

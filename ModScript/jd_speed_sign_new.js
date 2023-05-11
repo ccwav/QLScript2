@@ -50,7 +50,7 @@ if (new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate() == date.getDa
       if (i == (cookiesArr.length - 1) || TaskList.length == maxThread) {
         await Promise.all(TaskList);
 		if (!llAPIError){
-			if (TaskList.length != maxThread){
+			if (TaskList.length == maxThread){
 				console.log(`当前批量完成，等待30秒`);
 				await $.wait(30 * 1000);
 			}			

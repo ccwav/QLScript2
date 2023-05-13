@@ -1342,7 +1342,7 @@ function jingBeanDetail() {
   
 function getepsign(n, o, t = "sign") {
   let e = {
-    url: "http://192.168.1.23:8888/jd/sign", 
+    url: epsignurl, 
     form: {
       functionId: n, body: $.toStr(o),
     }, headers: {

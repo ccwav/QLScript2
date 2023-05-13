@@ -1340,7 +1340,7 @@ function jingBeanDetail() {
 	})
   } 
   
-function getSign3(n, o, t = "sign") {
+function getepsign(n, o, t = "sign") {
   let e = {
     url: "http://192.168.1.23:8888/jd/sign", 
     form: {

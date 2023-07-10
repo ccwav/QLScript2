@@ -227,8 +227,7 @@ if(DisableIndex!=-1){
 		         jdCash(), //领现金
 		         GetJxBeaninfo(), //喜豆查询	
 				 GetJoyRuninginfo(), //汪汪赛跑 
-				 CheckEcard(), //E卡查询
-				 queryScores() 
+				 CheckEcard() //E卡查询
 		     ])
 
         await showMsg();        
@@ -1524,32 +1523,6 @@ function IsNumber(value) {
         return false;
     else
         return true;
-}
-
-async function queryScores() {
-	if (!$.isPlusVip)
-		return
-    let res = ''
-    let url = {
-      url: `https://rsp.jd.com/windControl/queryScore/v1?lt=m&an=plus.mobile&stamp=${Date.now()}`,
-      headers: {
-        'Cookie': cookie,
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Redmi Note 8 Pro Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045715 Mobile Safari/537.36',
-        'Referer': 'https://plus.m.jd.com/rights/windControl'
-      }
-    };
-	
-    $.get(url, async (err, resp, data) => {
-      try {
-        const result = JSON.parse(data)
-        if (result.code == 1000) {
-		  $.PlustotalScore=result.rs.userSynthesizeScore.totalScore;
-        } 
-      } catch (e) {
-        $.logErr(e, resp);
-      }
-    })
-  
 }
 
 // prettier-ignore

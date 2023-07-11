@@ -365,25 +365,26 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 
                                 if (DisableCkBody.code == 200) {
                                     console.log(`京东账号` + strdecPtPin + `已失效,自动禁用成功!\n`);
-
+                                    strsummary = `京东账号` + strdecPtPin + `已失效,自动禁用成功`;
                                     strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效,自动禁用成功!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
                                     strNotifyOneTemp += "\n任务标题：" + strtext;
                                     if (strAllNotify)
                                         strNotifyOneTemp += `\n` + strAllNotify;
                                     desp = strNotifyOneTemp;
                                     if (WP_APP_TOKEN_ONE) {
-                                        await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
+                                        await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin, strsummary);
                                     }
 
                                 } else {
                                     console.log(`京东账号` + strPtPin + `已失效,自动禁用失败!\n`);
+                                    strsummary = `京东账号` + strdecPtPin + `已失效,自动禁用失败`;
                                     strNotifyOneTemp = `京东账号: ` + strdecPtPin + ` 已失效!\n如果要继续挂机，请联系管理员重新登录账号，账号有效期为30天.`;
                                     strNotifyOneTemp += "\n任务标题：" + strtext;
                                     if (strAllNotify)
                                         strNotifyOneTemp += `\n` + strAllNotify;
                                     desp = strNotifyOneTemp;
                                     if (WP_APP_TOKEN_ONE) {
-                                        await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin);
+                                        await sendNotifybyWxPucher(`账号过期下线通知`, strNotifyOneTemp, strdecPtPin, strsummary);
                                     }
                                 }
                             } else {

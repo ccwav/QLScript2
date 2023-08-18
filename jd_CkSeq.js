@@ -87,7 +87,7 @@ if (UidFileexists) {
             if (arrEnvStatus[i] == 1) {
                 strNoFoundCk += "(已禁用)"
                 if ($.isNode() && WP_APP_TOKEN_ONE) {
-                    await notify.sendNotifybyWxPucher("账号下线通知", strNotify, tempptpin);
+                    await notify.sendNotifybyWxPucher("账号下线通知", strNotify, tempptpin,'\n\n本通知 By ccwav Mod',"账号下线通知");
 					await $.wait(1000);
                 }
             }

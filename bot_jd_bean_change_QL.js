@@ -8,12 +8,12 @@ const $ = new Env('机器人查询专用脚本');
 const JXUserAgent = $.isNode() ? (process.env.JX_USER_AGENT ? process.env.JX_USER_AGENT : ``) : ``;
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+const axios = require('axios');
 let NowHour = new Date().getHours();
 let allMessage = '';
 let allReceiveMessage = '';
 let allWarnMessage = '';
 let ReturnMessage = '';
-
 let notifySkipList = "";
 let isSignError = false;
 let ReturnMessageTitle="";
@@ -185,11 +185,10 @@ if(DisableIndex!=-1){
         $.YunFeiQuanEndTime2 = "";
 		$.ECardinfo = "";
 		$.PlustotalScore=0;
+		$.marketCardTotal=0;
         TempBaipiao = "";
         strGuoqi = "";
-		
 		await TotalBean();
-		
         if (!$.isLogin) {
             await isLoginByX1a0He();
         }
@@ -204,10 +203,10 @@ if(DisableIndex!=-1){
 		         bean(), //京豆查询
 		         jdCash(), //领现金
 		         GetJxBeaninfo(), //喜豆查询	
-				 CheckEcard() //E卡查询
+				 CheckEcard(), //E卡查询
+				 getmarketCard()	 
 		     ])
-
-        await showMsg();        
+        await showMsg();    
     }
 
 })()
@@ -298,7 +297,10 @@ async function showMsg() {
 	}
 		
 	if($.ECardinfo)
-		ReturnMessage += `【礼卡余额】${$.ECardinfo}\n`;	
+		ReturnMessage += `【礼品卡余额】${$.ECardinfo}\n`;	
+	
+	if($.marketCardTotal)
+		ReturnMessage += `【超市卡余额】${$.marketCardTotal}元\n`;	
 	
 	if ($.JdFarmProdName != "") {
 		if ($.JdtreeEnergy != 0) {
@@ -465,56 +467,113 @@ async function jdCash() {
             })
         })
 }
+function randomUserAgent() {
+    const uuid = generateRandomString('abcdefghijklmnopqrstuvwxyz0123456789', 40);
+    const addressid = generateRandomString('1234567898647', 10);
+    const iosVer = selectRandomFromArray(["15.1.1", "14.5.1", "14.4", "14.3", "14.2", "14.1", "14.0.1"]);
+    const iosV = iosVer.replace(/\./g, '_');
+    const clientVersion = selectRandomFromArray(["10.3.0", "10.2.7", "10.2.4"]);
+    const iPhone = selectRandomFromArray(["8", "9", "10", "11", "12", "13"]);
+    const ADID = `${generateRandomString('0987654321ABCDEF', 8)}-${generateRandomString('0987654321ABCDEF', 4)}-${generateRandomString('0987654321ABCDEF', 4)}-${generateRandomString('0987654321ABCDEF', 4)}-${generateRandomString('0987654321ABCDEF', 12)}`;
+    const area = `${generateRandomString('0123456789', 2)}_${generateRandomString('0123456789', 4)}_${generateRandomString('0123456789', 5)}_${generateRandomString('0123456789', 4)}`;
+    const lng = `119.31991256596${randomInt(100, 999)}`;
+    const lat = `26.1187118976${randomInt(100, 999)}`;
 
-async function CheckEcard() {
-    if (!EnableCheckEcard)
-        return;
-    var balEcard = 0;
-    var body = "pageNo=1&queryType=1&cardType=-1&pageSize=20";
-    var stroption = {
-        url: 'https://mygiftcard.jd.com/giftcard/queryGiftCardItem/app?source=JDAP',
-        body,
-        headers: {
-            "accept": "application/json, text/plain, */*",
-            "accept-encoding": "gzip, deflate, br",
-            "accept-language": "zh-CN,zh-Hans;q=0.9",
-            "content-length": "44",
-            "content-type": "application/x-www-form-urlencoded",
-            "cookie": cookie,
-            "origin": "https://mygiftcard.jd.com",
-            "referer": "https://mygiftcard.jd.com/giftcardForM.html?source=JDAP&sid=9f55a224c8286baa2fe3a7545bbd411w&un_area=16_1303_48712_48758",
-            "user-agent": "jdapp;iPhone;10.1.2;15.0;network/wifi;Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"
-        },
-        timeout: 10000
+    const UserAgent = `jdapp;iPhone;10.0.4;${iosVer};${uuid};network/wifi;ADID/${ADID};model/iPhone${iPhone},1;addressid/${addressid};appBuild/167707;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS ${iosV} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/null;supportJDSHWK/1`;
+    return UserAgent;
+}
+
+function generateRandomString(chars, length) {
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return new Promise((resolve) => {
-        $.post(stroption, async(err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`jdCash API请求失败，请检查网路重试`)
-                } else {
-                    //console.log(data);
-                    data = JSON.parse(data);
-                    let useable = data.couponVOList;
-                    if (useable) {
-                        for (let k = 0; k < useable.length; k++) {
-							if(useable[k].balance>0)
-								balEcard += useable[k].balance;
-                        }
-						if(balEcard)
-							$.ECardinfo = '共' + useable.length + '张E卡,合计' + parseFloat(balEcard).toFixed(2) + '元';
-                    }
+    return result;
+}
 
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            }
-            finally {
-                resolve(data);
-            }
-        })
-    })
+function selectRandomFromArray(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+async function CheckEcard(ck) {
+	if (!EnableCheckEcard)
+        return;
+	const UA=randomUserAgent();
+    const url = 'https://mygiftcard.jd.com/giftcard/queryGiftCardItem/app?source=JDAP';
+    const headers = {
+        "accept": "application/json, text/plain, */*",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "zh-CN,zh-Hans;q=0.9",
+        "content-length": "44",
+        "content-type": "application/x-www-form-urlencoded",
+        "cookie": cookie,
+        "origin": "https://mygiftcard.jd.com",
+        "referer": "https://mygiftcard.jd.com/giftcardForM.html?source=JDAP&sid=9f55a224c8286baa2fe3a7545bbd411w&un_area=16_1303_48712_48758",
+        "user-agent": UA
+    };
+    
+    let balance = 0;
+	let TotalCard = 0;
+    try {
+		var data = 'pageNo=1&queryType=1&cardType=-1&pageSize=20';
+        var response = await axios.post(url, data, { headers: headers });
+        var couponVOList = response.data.couponVOList;
+		
+		TotalCard+=couponVOList.length;
+        for (let i = 0; i < couponVOList.length; i++) {
+            balance += couponVOList[i]['balance'];
+        }
+		
+		if (TotalCard==20){
+			data = 'pageNo=2&queryType=1&cardType=-1&pageSize=20';
+			response = await axios.post(url, data, { headers: headers });
+			couponVOList = response.data.couponVOList;
+			TotalCard+=couponVOList.length;
+			for (let i = 0; i < couponVOList.length; i++) {
+				balance += couponVOList[i]['balance'];
+			}
+		}
+		
+        if (balance > 0) 
+			$.ECardinfo = '共' + TotalCard + '张E卡,合计' + parseFloat(balance).toFixed(2) + '元';
+		
+    } catch (e) {
+        console.error(e);
+    }
+}
+async function getmarketCard() {
+    const url = 'https://api.m.jd.com/atop_channel_marketCard_cardInfo';
+	const UA=randomUserAgent();
+    const headers = {
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "zh-CN,zh-Hans;q=0.9",
+        "content-length": "1250",
+        "content-type": "application/x-www-form-urlencoded",
+        "cookie": cookie,
+        "origin": "https://pro.m.jd.com",
+        "referer": "https://pro.m.jd.com/mall/active/3KehY4eAj3D1iLzFB7p5pb68qXkT/index.html?stath=54&navh=44&topNavStyle=1&babelChannel=ttt9&hideAnchorBottomTab=1&hideBack=1&tttparams=ib0MwweyJnTGF0IjoiMjYuMTE5OTQ2IiwidW5fYXJlYSI6IjE2XzEzMDNfNDg3MTJfNDg3NTgiLCJkTGF0IjoiIiwicHJzdGF0ZSI6IjAiLCJhZGRyZXNzSWQiOiI5MjU4MDQyNTg3IiwibGF0IjoiMC4wMDAwMDAiLCJwb3NMYXQiOiIyNi4xMTk5NDYiLCJwb3NMbmciOiIxMTkuMzIwMzM5IiwiZ3BzX2FyZWEiOiIwXzBfMF8wIiwibG5nIjoiMC4wMDAwMDAiLCJ1ZW1wcyI6IjAtMC0yIiwiZ0xuZyI6IjExOS4zMjAzMzkiLCJtb2RlbCI6ImlQaG9uZTE1LDIiLCJkTG5nIjoiIn60%3D&forceCurrentView=1&showhead=no",
+        "request-from": "native",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "user-agent": UA,
+        "x-referer-page": "https://pro.m.jd.com/mall/active/3KehY4eAj3D1iLzFB7p5pb68qXkT/index.html",
+        "x-rp-client": "h5_1.0.0"
+    };
+	const data='appid=jd-super-market&t=1705212843271&functionId=atop_channel_marketCard_cardInfo&client=m&uuid=1201e4461b24640164a706c0a3444fd79de6577f&body=%7B%22babelChannel%22%3A%22ttt9%22%2C%22isJdApp%22%3A%221%22%2C%22isWx%22%3A%220%22%7D&h5st=20240114141403366%3Btnyqq56fhh69dd12%3B35fa0%3Btk02w847d1aac41lMXgyKzErM2w1k33PAhGy9ZX69M3Rvtgag743srkufMW1LE0zE5Crn405w3HPl20IgdET8DfgM32d%3B87c14a095a901f37feabf4d6616b8e149539de48e2fd715bedda5baea9729c41%3B4.3%3B1705212843366%3B5fb5b0eea0d604be5747ccee135178e687458f7f659003bdc2ca943d6e3006043ae4bf75ab450370c9d309909a15a988f37ccb53c9ced6e3017095a1065b75238ed637a529a266eb3370fc34ce5a9036017e96632bec64838fdb2f9b39c675cdc7d19ddc121504a7a32f7e1da54fc20c2f8ce6b879c255b77a506eb644aa4e532df91f2c44c6e7412b713f82847feb7e76668e7b0dd6e97685dfff3708e0fa5d4a08ca7a4eba27b71f0d5ecbc75cb17e6c4a6052b5b7b30d17005a24eb576981c7dd1b066a8ac01ffee3f77faa4cba708daf2be433c83204e302ac610d3eba913f78a2d39a82d2f74c9f05fee1768d97ffae5668989394f4412c7de5dd105e663aca420a85fa949e412ff869d0199814a265a0f13cad4ff8e0a4e6c3ccebbd22cb1f0398da3ef6eedb3b6941fdc55d7449823c957977e607ddbdf39a6e016f98&x-api-eid-token=jdd03NK6FVUZZ5D76SCVX2RZCJX3PGM7JVJNWMQ56NLLLQEEVURFKGHP537UFXMCBYWZUBFICVZMQJNXLODQMJOA6B3YOIAAAAAMNA2NP7SQAAAAAD5BK47RNLM7UAYX'
+    try {
+		const response = await axios.post(url, data, { headers });
+        if (response.data.success && response.data.data?.floorData?.items) {
+            $.marketCardTotal = response.data.data?.floorData?.items[0].marketCardVO.balance;
+        }
+	} catch (e) {
+		console.error(e);
+	}
 }
 
 function apptaskUrl(functionId = "", body = "") {
@@ -1339,6 +1398,8 @@ function IsNumber(value) {
     else
         return true;
 }
+
+
 // prettier-ignore
 function Env(t, e) {
 	"undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0);

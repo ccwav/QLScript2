@@ -328,7 +328,7 @@ if(DisableIndex!=-1){
 			TempBaipiao = "";
 			strGuoqi="";
 			
-			console.log(`******开始查询【京东账号${$.index}】${$.nickName || $.UserName}*********`);
+			console.log(`******开始查询【京东账号${$.index}】${$.nickName || $.UserName}*********`);			
 			await TotalBean();			
 		    //await TotalBean2();
 			if ($.beanCount == 0) {
@@ -1198,106 +1198,55 @@ function apptaskUrl(functionId = "", body = "") {
 }
 
 function TotalBean() {
-    return new Promise(async resolve => {
-        const options = {
-            "url": `https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2`,
-            "headers": {
-                "Accept": "application/json,text/plain, */*",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Accept-Language": "zh-cn",
-                "Connection": "keep-alive",
-                "Cookie": cookie,
-                "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        }
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        if (data['retcode'] === 13) {
-                            $.isLogin = false; //cookie过期
-                            return
-                        }
-                        if (data['retcode'] === 0) {
-                            $.nickName = (data['base'] && data['base'].nickname) || $.UserName;
-							$.isPlusVip=data['isPlusVip'];
-							$.isRealNameAuth=data['isRealNameAuth'];
-							$.beanCount=(data['base'] && data['base'].jdNum) || 0 ;		
-							$.JingXiang = (data['base'] && data['base'].jvalue) || 0 ;						
-                        } else {
-                            $.nickName = $.UserName
-                        }
-						
-							
-							
-                    } else {
-                        console.log(`京东服务器返回空数据`)
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve();
-            }
-        })
-    })
-}
-
-function TotalBean2() {
-	return new Promise(async(resolve) => {
+	return new Promise(async resolve => {
 		const options = {
-			url: `https://wxapp.m.jd.com/kwxhome/myJd/home.json?&useGuideModule=0&bizId=&brandId=&fromType=wxapp&timestamp=${Date.now()}`,
+			url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
 			headers: {
+				"Accept": "application/json, text/plain",
+				"accept-encoding": "gzip, deflate, br",
+				"content-type": "application/json;charset=UTF-8",
 				Cookie: cookie,
-				'content-type': `application/x-www-form-urlencoded`,
-				Connection: `keep-alive`,
-				'Accept-Encoding': `gzip,compress,br,deflate`,
-				Referer: `https://servicewechat.com/wxa5bf5ee667d91626/161/page-frame.html`,
-				Host: `wxapp.m.jd.com`,
-				'User-Agent': `Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.10(0x18000a2a) NetType/WIFI Language/zh_CN`,
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42"
 			},
 			timeout: 10000
-		};
-		$.post(options, (err, resp, data) => {
+		}
+		$.get(options, (err, resp, data) => {
 			try {
 				if (err) {
-					$.logErr(err);
+					$.logErr(err)
 				} else {					
-					if (data) {								
+					if (data) {
 						data = JSON.parse(data);
-						
-						if (!data.user) {
+
+						if (data['retcode'] === "1001") {
+							$.isLogin = false; //cookie过期
 							return;
 						}
-						const userInfo = data.user;						
-						if (userInfo) {
-							if (!$.nickName)
-								$.nickName = userInfo.petName;
-							if ($.beanCount == 0) {
-								$.beanCount = userInfo.jingBean;
-							}
-							$.JingXiang = userInfo.uclass;
+						if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
+							$.nickName = data.data.userInfo.baseInfo.nickname;
+							$.levelName = data.data.userInfo.baseInfo.levelName;
+							$.isPlusVip = data.data.userInfo.isPlusVip;
+
+						}
+						if (data['retcode'] === '0' && data.data && data.data['assetInfo']) {
+							if ($.beanCount == 0)
+								$.beanCount = data.data && data.data['assetInfo']['beanNum'];
+						} else {
+							$.errorMsg = `数据异常`;
 						}
 					} else {
-						$.log('京东服务器返回空数据');
+						$.log('京东服务器返回空数据,将无法获取等级及VIP信息');
 					}
 				}
 			} catch (e) {
-				$.logErr(e);
+				$.logErr(e)
 			}
 			finally {
 				resolve();
 			}
-		});
-	});
-}
-
+		})
+	})
+} 
 function isLoginByX1a0He() {
 	return new Promise((resolve) => {
 		const options = {
@@ -1973,7 +1922,7 @@ async function getuserinfo() {
     return new Promise(resolve => {
         $.post(config, async(err, resp, data) => {
             try {
-                //console.log(data)
+                console.log(data)
                 if (err) {
                     console.log(err)
                 } else {					

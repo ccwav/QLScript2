@@ -204,8 +204,14 @@ if(DisableIndex!=-1){
             console.log(`【提示】cookie已失效,\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`);
             return
         }
-		
-		 await Promise.all([
+		if ($.beanCount == 0) {
+		    console.log("疑似获取失败,用第二个接口试试....")
+		    var userdata = await getuserinfo();
+		    if (userdata.code == 1) {
+		        $.beanCount = userdata.content.jdBean;
+		    }
+		}
+		await Promise.all([
 		         getjdfruitinfo(), //东东农场
 		         cash(), //极速金币
 		         bean(), //京豆查询
@@ -644,6 +650,68 @@ function TotalBean() {
 	})
 } 
 
+async function getuserinfo() {
+	var body=[{"pin": "$cooMrdGatewayUid$"}];
+	var ua = `jdapp;iPhone;${random(["11.1.0", "10.5.0", "10.3.6"])};${random(["13.5", "14.0", "15.0"])};${uuidRandom()};network/wifi;supportApplePay/0;hasUPPay/0;hasOCPay/0;model/iPhone11,6;addressid/7565095847;supportBestPay/0;appBuild/167541;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 13_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1`;
+
+    let config = {
+        url: 'https://lop-proxy.jd.com/JingIntegralApi/userAccount',
+        body: JSON.stringify(body),
+        headers: {
+            "host": "lop-proxy.jd.com",
+            "jexpress-report-time": Date.now().toString(),
+            "access": "H5",
+            "source-client": "2",
+            "accept": "application/json, text/plain, */*",
+            "d_model": "iPhone11,6",
+            "accept-encoding": "gzip",
+            "lop-dn": "jingcai.jd.com",
+            "user-agent": ua,
+            "partner": "",
+            "screen": "375*812",
+            "cookie": cookie,
+            "x-requested-with": "XMLHttpRequest",
+            "version": "1.0.0",
+            "uuid": randomNumber(10),
+            "clientinfo": "{\"appName\":\"jingcai\",\"client\":\"m\"}",
+            "d_brand": "iPhone",
+            "appparams": "{\"appid\":158,\"ticket_type\":\"m\"}",
+            "sdkversion": "1.0.7",
+            "area": area(),
+            "client": "iOS",
+            "referer": "https://jingcai-h5.jd.com/",
+            "eid": "",
+            "osversion": random(["13.5", "14.0", "15.0"]),
+            "networktype": "wifi",
+            "jexpress-trace-id": uuid(),
+            "origin": "https://jingcai-h5.jd.com",
+            "app-key": "jexpress",
+            "event-id": uuid(),
+            "clientversion": random(["11.1.0", "10.5.0", "10.3.6"]),
+            "content-type": "application/json;charset=utf-8",
+            "build": "167541",
+            "biz-type": "service-monitor",
+            "forcebot": "0"
+        }
+    }
+    return new Promise(resolve => {
+        $.post(config, async(err, resp, data) => {
+            try {
+                //console.log(data)
+                if (err) {
+                    console.log(err)
+                } else {					
+                    data = JSON.parse(data);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            }
+            finally {
+                resolve(data || '');
+            }
+        })
+    })
+}
 
 function isLoginByX1a0He() {
 	return new Promise((resolve) => {

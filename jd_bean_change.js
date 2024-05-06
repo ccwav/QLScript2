@@ -330,15 +330,9 @@ if(DisableIndex!=-1){
 			
 			console.log(`******开始查询【京东账号${$.index}】${$.nickName || $.UserName}*********`);			
 			await TotalBean();			
-		    //await TotalBean2();
+		    //await TotalBean2();			
 			if ($.beanCount == 0) {
-				console.log("数据获取失败，等待30秒后重试....")
-				await $.wait(30*1000);
-				await TotalBean();		
-			}
-			if ($.beanCount == 0) {
-				console.log("疑似获取失败,等待10秒后用第二个接口试试....")
-				await $.wait(10*1000);
+				console.log("疑似获取失败,用第二个接口试试....")
 			    var userdata = await getuserinfo();
 			    if (userdata.code == 1) {
 			        $.beanCount = userdata.content.jdBean;
@@ -1119,25 +1113,28 @@ async function CheckEcard(ck) {
     try {
 		var data = 'pageNo=1&queryType=1&cardType=-1&pageSize=20';
         var response = await axios.post(url, data, { headers: headers });
-        var couponVOList = response.data.couponVOList;
-		
-		TotalCard+=couponVOList.length;
-        for (let i = 0; i < couponVOList.length; i++) {
-            balance += couponVOList[i]['balance'];
-        }
-		
-		if (TotalCard==20){
-			data = 'pageNo=2&queryType=1&cardType=-1&pageSize=20';
-			response = await axios.post(url, data, { headers: headers });
-			couponVOList = response.data.couponVOList;
-			TotalCard+=couponVOList.length;
-			for (let i = 0; i < couponVOList.length; i++) {
-				balance += couponVOList[i]['balance'];
-			}
+		if (response.data?.couponVOList) {
+		    var couponVOList = response.data.couponVOList;
+		    TotalCard += couponVOList.length;
+		    for (let i = 0; i < couponVOList.length; i++) {
+		        balance += couponVOList[i]['balance'];
+		    }
+
+		    if (TotalCard == 20) {
+		        data = 'pageNo=2&queryType=1&cardType=-1&pageSize=20';
+		        response = await axios.post(url, data, {
+		            headers: headers
+		        });
+		        couponVOList = response.data.couponVOList;
+		        TotalCard += couponVOList.length;
+		        for (let i = 0; i < couponVOList.length; i++) {
+		            balance += couponVOList[i]['balance'];
+		        }
+		    }
+
+		    if (balance > 0)
+		        $.ECardinfo = '共' + TotalCard + '张E卡,合计' + parseFloat(balance).toFixed(2) + '元';
 		}
-		
-        if (balance > 0) 
-			$.ECardinfo = '共' + TotalCard + '张E卡,合计' + parseFloat(balance).toFixed(2) + '元';
 		
     } catch (e) {
         console.error(e);
@@ -1922,7 +1919,7 @@ async function getuserinfo() {
     return new Promise(resolve => {
         $.post(config, async(err, resp, data) => {
             try {
-                console.log(data)
+                //console.log(data)
                 if (err) {
                     console.log(err)
                 } else {					

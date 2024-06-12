@@ -123,7 +123,6 @@ RemainMessage += "⭕活动攻略:⭕" + '\n';
 RemainMessage += '【礼品卡】京东->我的->礼品卡,仅自营商品和一号店app可用\n';
 RemainMessage += '【超市卡】京东->我的->礼品卡->京东超市,仅京东超市商品可用\n';
 RemainMessage += '【特价金币】京东特价版->我的->金币(特价版使用)\n';
-RemainMessage += '【领现金】京东->搜索领现金(微信提现+京东红包)\n';
 RemainMessage += '【东东农场】京东->我的->东东农场,完成是京东红包,可以用于京东app的任意商品\n';
 RemainMessage += '【京东金融】京东金融app->我的->养猪猪,完成是白条支付券,支付方式选白条支付时立减.\n';
 RemainMessage += '【其他】京喜红包只能在京喜使用,其他同理';
@@ -227,22 +226,6 @@ if(DisableIndex!=-1){
 	EnableJdFruit=false;	
 }
 
-//特价金币
-let EnableJdSpeed=true;
-DisableIndex = strDisableList.findIndex((item) => item === "极速金币");
-if(DisableIndex!=-1){
-	console.log("检测到设定关闭特价金币查询");
-	EnableJdSpeed=false;	
-}
-
-//领现金
-let EnableCash=true;
-DisableIndex=strDisableList.findIndex((item) => item === "领现金");
-if(DisableIndex!=-1){
-	console.log("检测到设定关闭领现金查询");
-	EnableCash=false;	
-}	
-
 //7天过期京豆
 let EnableOverBean=true;
 DisableIndex=strDisableList.findIndex((item) => item === "过期京豆");
@@ -294,7 +277,6 @@ if(DisableIndex!=-1){
 			$.todayOutcomeBean = 0;
 			$.errorMsg = '';
 			$.isLogin = true;
-			$.nickName = '';
 			$.levelName = '';
 			$.message = '';
 			$.balance = 0;
@@ -306,8 +288,6 @@ if(DisableIndex!=-1){
 			$.JdwaterTotalT = 0;
 			$.JdwaterD = 0;
 			$.JDwaterEveryDayT = 0;
-			$.JDtotalcash = 0;
-			$.jdCash = 0;
 			$.isPlusVip = false;
 			$.isRealNameAuth = false;
 			$.JingXiang = "";
@@ -328,7 +308,7 @@ if(DisableIndex!=-1){
 			TempBaipiao = "";
 			strGuoqi="";
 			
-			console.log(`******开始查询【京东账号${$.index}】${$.nickName || $.UserName}*********`);			
+			console.log(`******开始查询【京东账号${$.index}】${$.UserName}*********`);			
 			await TotalBean();			
 		    //await TotalBean2();			
 			if ($.beanCount == 0) {
@@ -344,7 +324,7 @@ if(DisableIndex!=-1){
 				await isLoginByX1a0He();
 			}
 			if (!$.isLogin) {
-				$.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
+				$.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
 					"open-url": "https://bean.m.jd.com/bean/signIndex.action"
 				});
 
@@ -401,10 +381,8 @@ if(DisableIndex!=-1){
 			await getjdfruitinfo(); //东东农场
 			await $.wait(1000);
 			
-			await Promise.all([        
-			        cash(), //特价金币
+			await Promise.all([
 			        bean(), //京豆查询
-			        jdCash(), //领现金
 					CheckEcard(), //E卡查询
 					getmarketCard()
 			    ])
@@ -628,19 +606,19 @@ async function showMsg() {
 	
 	if (userIndex2 != -1) {
 		IndexGp2 += 1;
-		ReturnMessageTitle = `【账号${IndexGp2}🆔】${$.nickName || $.UserName}`;
+		ReturnMessageTitle = `【账号${IndexGp2}🆔】${$.UserName}`;
 	}
 	if (userIndex3 != -1) {
 		IndexGp3 += 1;
-		ReturnMessageTitle = `【账号${IndexGp3}🆔】${$.nickName || $.UserName}`;
+		ReturnMessageTitle = `【账号${IndexGp3}🆔】${$.UserName}`;
 	}
 	if (userIndex4 != -1) {
 		IndexGp4 += 1;
-		ReturnMessageTitle = `【账号${IndexGp4}🆔】${$.nickName || $.UserName}`;
+		ReturnMessageTitle = `【账号${IndexGp4}🆔】${$.UserName}`;
 	}
 	if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
 		IndexAll += 1;
-		ReturnMessageTitle = `【账号${IndexAll}🆔】${$.nickName || $.UserName}`;
+		ReturnMessageTitle = `【账号${IndexAll}🆔】${$.UserName}`;
 	}
 	
 		
@@ -729,11 +707,8 @@ async function showMsg() {
 		else{
 			ReturnMessage += `【当前京豆】${$.beanCount-$.beanChangeXi}豆(≈${(($.beanCount-$.beanChangeXi)/ 100).toFixed(2)}元)\n`;
 		}			
-	}	
+	}
 	
-	if ($.JDtotalcash) {
-		ReturnMessage += `【特价金币】${$.JDtotalcash}币(≈${($.JDtotalcash / 10000).toFixed(2)}元)\n`;
-	}	
 	if($.ECardinfo)
 		ReturnMessage += `【礼品卡余额】${$.ECardinfo}\n`;
 
@@ -747,16 +722,16 @@ async function showMsg() {
 				ReturnMessage += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
 				TempBaipiao += `【东东农场】${$.JdFarmProdName} 可以兑换了!\n`;
 				if (userIndex2 != -1) {
-					ReceiveMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					ReceiveMessageGp2 += `【账号${IndexGp2} ${$.UserName}】${$.JdFarmProdName} (东东农场)\n`;
 				}
 				if (userIndex3 != -1) {
-					ReceiveMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					ReceiveMessageGp3 += `【账号${IndexGp3} ${$.UserName}】${$.JdFarmProdName} (东东农场)\n`;
 				}
 				if (userIndex4 != -1) {
-					ReceiveMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					ReceiveMessageGp4 += `【账号${IndexGp4} ${$.UserName}】${$.JdFarmProdName} (东东农场)\n`;
 				}
 				if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
-					allReceiveMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】${$.JdFarmProdName} (东东农场)\n`;
+					allReceiveMessage += `【账号${IndexAll} ${$.UserName}】${$.JdFarmProdName} (东东农场)\n`;
 				}
 			} else {
 				if ($.JdwaterD != 'Infinity' && $.JdwaterD != '-Infinity') {
@@ -771,16 +746,16 @@ async function showMsg() {
 				TempBaipiao += `【东东农场】水果领取后未重新种植!\n`;
 
 				if (userIndex2 != -1) {
-					WarnMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
+					WarnMessageGp2 += `【账号${IndexGp2} ${$.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 				if (userIndex3 != -1) {
-					WarnMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
+					WarnMessageGp3 += `【账号${IndexGp3} ${$.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 				if (userIndex4 != -1) {
-					WarnMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
+					WarnMessageGp4 += `【账号${IndexGp4} ${$.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 				if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
-					allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】水果领取后未重新种植! (东东农场)\n`;
+					allWarnMessage += `【账号${IndexAll} ${$.UserName}】水果领取后未重新种植! (东东农场)\n`;
 				}
 
 			} else if ($.treeState === 1) {
@@ -788,31 +763,20 @@ async function showMsg() {
 			} else {
 				TempBaipiao += `【东东农场】状态异常!\n`;
 				if (userIndex2 != -1) {
-					WarnMessageGp2 += `【账号${IndexGp2} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					WarnMessageGp2 += `【账号${IndexGp2} ${$.UserName}】状态异常! (东东农场)\n`;
 				}
 				if (userIndex3 != -1) {
-					WarnMessageGp3 += `【账号${IndexGp3} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					WarnMessageGp3 += `【账号${IndexGp3} ${$.UserName}】状态异常! (东东农场)\n`;
 				}
 				if (userIndex4 != -1) {
-					WarnMessageGp4 += `【账号${IndexGp4} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					WarnMessageGp4 += `【账号${IndexGp4} ${$.UserName}】状态异常! (东东农场)\n`;
 				}
 				if (userIndex2 == -1 && userIndex3 == -1 && userIndex4 == -1) {
-					allWarnMessage += `【账号${IndexAll} ${$.nickName || $.UserName}】状态异常! (东东农场)\n`;
+					allWarnMessage += `【账号${IndexAll} ${$.UserName}】状态异常! (东东农场)\n`;
 				}
 				//ReturnMessage += `【东东农场】${$.JdFarmProdName}状态异常${$.treeState}...\n`;
 			}
 		}
-	}
-	
-	if ($.jdCash) {
-		ReturnMessage += `【其他信息】`;
-		
-		if ($.jdCash) {						
-			ReturnMessage += `领现金:${$.jdCash}元`;
-		}		
-		
-		ReturnMessage += `\n`;
-
 	}
 	
 	if(strGuoqi){		
@@ -857,17 +821,17 @@ async function showMsg() {
 		if($.JingXiang){
 			if ($.isRealNameAuth)
 				if (cookie.includes("app_open"))
-					ReturnMessage=`【账号名称】${$.nickName || $.UserName}(wskey已实名)\n`+ReturnMessage;
+					ReturnMessage=`【账号名称】${$.UserName}(wskey已实名)\n`+ReturnMessage;
 				else
-					ReturnMessage=`【账号名称】${$.nickName || $.UserName}(已实名)\n`+ReturnMessage;
+					ReturnMessage=`【账号名称】${$.UserName}(已实名)\n`+ReturnMessage;
 			else
 				if (cookie.includes("app_open"))
-					ReturnMessage=`【账号名称】${$.nickName || $.UserName}(wskey未实名)\n`+ReturnMessage;
+					ReturnMessage=`【账号名称】${$.UserName}(wskey未实名)\n`+ReturnMessage;
 				else
-					ReturnMessage=`【账号名称】${$.nickName || $.UserName}(未实名)\n`+ReturnMessage;
+					ReturnMessage=`【账号名称】${$.UserName}(未实名)\n`+ReturnMessage;
 			
 		}else{
-			ReturnMessage=`【账号名称】${$.nickName || $.UserName}\n`+ReturnMessage;
+			ReturnMessage=`【账号名称】${$.UserName}\n`+ReturnMessage;
 		}
 		if (TempBaipiao) {			
 			TempBaipiao = `【⏰商品白嫖活动提醒⏰】\n` + TempBaipiao;
@@ -923,7 +887,7 @@ async function bean() {
 	                }
 	            } else {
 	                $.errorMsg = `数据异常`;
-	                $.msg($.name, ``, `账号${$.index}：${$.nickName}\n${$.errorMsg}`);
+	                $.msg($.name, ``, `账号${$.index}：${$.UserName}\n${$.errorMsg}`);
 	                t = 1;
 	            }
 	        } else if (response && response.code === "3") {
@@ -1006,7 +970,7 @@ async function Monthbean() {
 				}
 			} else {
 				$.errorMsg = `数据异常`;
-				$.msg($.name, ``, `账号${$.index}：${$.nickName}\n${$.errorMsg}`);
+				$.msg($.name, ``, `账号${$.index}：${$.UserName}\n${$.errorMsg}`);
 				allt = 1;
 			}
 		} else if (response && response.code === "3") {
@@ -1027,36 +991,6 @@ async function Monthbean() {
 		}
 	}
 
-}
-
-async function jdCash() {
-	if (!EnableCash)
-		return;
-	let functionId = "cash_homePage";
-	let sign = await getSignfromNolan(functionId, {});
-		return new Promise((resolve) => {
-			$.post(apptaskUrl(functionId, sign), async (err, resp, data) => {
-				try {
-					if (err) {
-						console.log(`${JSON.stringify(err)}`)
-						console.log(`jdCash API请求失败，请检查网路重试`)
-					} else {
-						if (safeGet(data)) {
-							data = JSON.parse(data);
-							if (data.code === 0 && data.data.result) {
-								$.jdCash = data.data.result.totalMoney || 0;								
-								return
-							}
-						}
-					}
-				} catch (e) {
-					$.logErr(e, resp)
-				}
-				finally {
-					resolve(data);
-				}
-			})
-		})
 }
 
 function randomUserAgent() {
@@ -1220,7 +1154,6 @@ function TotalBean() {
 							return;
 						}
 						if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
-							$.nickName = data.data.userInfo.baseInfo.nickname;
 							$.levelName = data.data.userInfo.baseInfo.levelName;
 							$.isPlusVip = data.data.userInfo.isPlusVip;
 
@@ -1266,7 +1199,7 @@ function isLoginByX1a0He() {
 						console.log(`使用X1a0He写的接口加强检测: Cookie无效\n`)
 					} else {
 						console.log(`使用X1a0He写的接口加强检测: 未知返回，不作变更...\n`)
-						$.error = `${$.nickName} :` + `使用X1a0He写的接口加强检测: 未知返回...\n`
+						$.error = `${$.UserName} :` + `使用X1a0He写的接口加强检测: 未知返回...\n`
 					}
 				}
 			} catch (e) {
@@ -1720,42 +1653,6 @@ function safeGet(data) {
 		console.log(`京东服务器访问数据为空，请检查自身设备网络情况`);
 		return false;
 	}
-}
-
-function cash() {
-	if (!EnableJdSpeed)
-		return;
-	return new Promise(resolve => {
-		$.get(taskcashUrl('MyAssetsService.execute', {
-				"method": "userCashRecord",
-				"data": {
-					"channel": 1,
-					"pageNum": 1,
-					"pageSize": 20
-				}
-			}),
-			async(err, resp, data) => {
-			try {
-				if (err) {
-					console.log(`${JSON.stringify(err)}`)
-					console.log(`cash API请求失败，请检查网路重试`)
-				} else {					
-					if (safeGet(data)) {
-						data = JSON.parse(data);
-						if (data.data.goldBalance)
-							$.JDtotalcash = data.data.goldBalance;
-						else
-							console.log(`领现金查询失败，服务器没有返回具体值.`)
-					}
-				}
-			} catch (e) {
-				$.logErr(e, resp)
-			}
-			finally {
-				resolve(data);
-			}
-		})
-	})
 }
 
 function taskcashUrl(functionId, body = {}) {

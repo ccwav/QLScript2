@@ -21,7 +21,7 @@ const querystring = require('querystring');
 const exec = require('child_process').exec;
 const $ = new Env();
 const timeout = 15000; //超时时间(单位毫秒)
-console.log("加载sendNotify，当前版本: 20230712");
+console.log("加载sendNotify，当前版本: 20240612");
 // =======================================go-cqhttp通知设置区域===========================================
 //gobot_url 填写请求地址http://127.0.0.1/send_private_msg
 //gobot_token 填写在go-cqhttp文件设置的访问密钥
@@ -136,26 +136,12 @@ const {
 } = require('./ql');
 const fs = require('fs');
 let isnewql = fs.existsSync('/ql/data/config/auth.json');
-let strCKFile = "";
+
 let strUidFile = "";
 if (isnewql) {
-    strCKFile = '/ql/data/scripts/CKName_cache.json';
     strUidFile = '/ql/data/scripts/CK_WxPusherUid.json';
 } else {
-    strCKFile = '/ql/scripts/CKName_cache.json';
     strUidFile = '/ql/scripts/CK_WxPusherUid.json';
-}
-
-
-let Fileexists = fs.existsSync(strCKFile);
-let TempCK = [];
-if (Fileexists) {
-    console.log("检测到别名缓存文件CKName_cache.json，载入...");
-    TempCK = fs.readFileSync(strCKFile, 'utf-8');
-    if (TempCK) {
-        TempCK = TempCK.toString();
-        TempCK = JSON.parse(TempCK);
-    }
 }
 
 let UidFileexists = fs.existsSync(strUidFile);
@@ -697,58 +683,20 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                     cookie = envs[i].value;
                     $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
                     $.Remark = getRemark(envs[i].remarks);
-                    $.nickName = "";
                     $.FoundnickName = "";
                     $.FoundPin = "";
                     //判断有没有Remark，没有搞个屁，有的继续
-                    if ($.Remark) {
-                        //先查找缓存文件中有没有这个账号，有的话直接读取别名
-                        if (envs[i].status == 0) {
-                            if (TempCK) {
-                                for (let j = 0; j < TempCK.length; j++) {
-                                    if (TempCK[j].pt_pin == $.UserName) {
-                                        $.FoundPin = TempCK[j].pt_pin;
-                                        $.nickName = TempCK[j].nickName;
-                                    }
-                                }
-                            }
-                            if (!$.FoundPin) {
-                                //缓存文件中有没有这个账号，调用京东接口获取别名,并更新缓存文件
-                                console.log($.UserName + "好像是新账号，尝试获取别名.....");
-                                await GetnickName();
-                                if (!$.nickName) {
-                                    console.log("别名获取失败，尝试调用另一个接口获取别名.....");
-                                    await GetnickName2();
-                                }
-                                if ($.nickName) {
-                                    console.log("好像是新账号，从接口获取别名" + $.nickName);
-                                } else {
-                                    console.log($.UserName + "该账号没有别名.....");
-                                }
-                                tempAddCK = {
-                                    "pt_pin": $.UserName,
-                                    "nickName": $.nickName
-                                };
-                                TempCK.push(tempAddCK);
-                                //标识，需要更新缓存文件
-                                boolneedUpdate = true;
-                            }
-                        }
-
-                        $.nickName = $.nickName || $.UserName;
+                    if ($.Remark) {                        
 
                         //开始替换内容中的名字
-                        if (ShowRemarkType == "2") {
-                            $.Remark = $.nickName + "(" + $.Remark + ")";
-                        }
-                        if (ShowRemarkType == "3") {
+                        if (ShowRemarkType == "2" || ShowRemarkType == "3") {
                             $.Remark = $.UserName + "(" + $.Remark + ")";
                         }
 
                         try {
                             //额外处理1，nickName包含星号
-                            $.nickName = $.nickName.replace(new RegExp(`[*]`, 'gm'), "[*]");
-                            text = text.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
+                            $.UserName = $.UserName.replace(new RegExp(`[*]`, 'gm'), "[*]");
+                            text = text.replace(new RegExp(`${$.UserName}`, 'gm'), $.Remark);
                             if (text == "京东资产变动" || text == "京东资产变动#2" || text == "京东资产变动#3" || text == "京东资产变动#4") {
                                 var Tempinfo = "";
                                 if (envs[i].created)
@@ -763,8 +711,8 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
                                 }
                             }
 
-                            desp = desp.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
-                            strsummary = strsummary.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), $.Remark);
+                            desp = desp.replace(new RegExp(`${$.UserName}`, 'gm'), $.Remark);
+                            strsummary = strsummary.replace(new RegExp(`${$.UserName}`, 'gm'), $.Remark);
                             //额外处理2，nickName不包含星号，但是确实是手机号
                             var tempname = $.UserName;
                             if (tempname.length == 13 && tempname.substring(8)) {
@@ -777,12 +725,9 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
 
                         } catch (err) {
                             console.log("替换出错了");
-                            console.log("Debug Name1 :" + $.UserName);
-                            console.log("Debug Name2 :" + $.nickName);
+                            console.log("Debug Name :" + $.UserName);
                             console.log("Debug Remark :" + $.Remark);
                         }
-
-                        //console.log($.nickName+$.Remark);
 
                     }
 
@@ -796,19 +741,7 @@ async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By cc
         }
     } catch (error) {
         console.error(error);
-    }
-
-    if (boolneedUpdate) {
-        var str = JSON.stringify(TempCK, null, 2);
-        fs.writeFile(strCKFile, str, function (err) {
-            if (err) {
-                console.log(err);
-                console.log("更新CKName_cache.json失败!");
-            } else {
-                console.log("缓存文件CKName_cache.json更新成功!");
-            }
-        })
-    }
+    }    
 
     //提供6种通知
     desp = buildLastDesp(desp, author);
@@ -969,33 +902,10 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
 
                     if (text == "京东资产变动") {
                         try {
-                            $.nickName = "";
-                            $.FoundPin = "";
                             $.UserName = PtPin;
-                            if (tempEnv.status == 0) {
-                                if (TempCK) {
-                                    for (let j = 0; j < TempCK.length; j++) {
-                                        if (TempCK[j].pt_pin == $.UserName) {
-                                            $.FoundPin = TempCK[j].pt_pin;
-                                            $.nickName = TempCK[j].nickName;
-                                        }
-                                    }
-                                }
-                                if (!$.FoundPin) {
-                                    //缓存文件中有没有这个账号，调用京东接口获取别名,并更新缓存文件
-                                    console.log($.UserName + "好像是新账号，尝试获取别名.....");
-                                    await GetnickName();
-                                    if (!$.nickName) {
-                                        console.log("别名获取失败，尝试调用另一个接口获取别名.....");
-                                        await GetnickName2();
-                                    }
-                                }
-                            }
-
-                            $.nickName = $.nickName || $.UserName;
 
                             //额外处理1，nickName包含星号
-                            $.nickName = $.nickName.replace(new RegExp(`[*]`, 'gm'), "[*]");
+                            $.UserName = $.UserName.replace(new RegExp(`[*]`, 'gm'), "[*]");
 
                             var Tempinfo = "";
                             if (tempEnv.created)
@@ -1007,8 +917,8 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                                     Tempinfo = getQLinfo(cookie, tempEnv.createdAt, tempEnv.timestamp, tempEnv.remarks);
 
                             if (Tempinfo) {
-                                Tempinfo = $.nickName + Tempinfo;
-                                desp = desp.replace(new RegExp(`${$.UserName}|${$.nickName}`, 'gm'), Tempinfo);
+                                Tempinfo = $.UserName + Tempinfo;
+                                desp = desp.replace(new RegExp(`${$.UserName}`, 'gm'), Tempinfo);
                             }
 
                             //额外处理2，nickName不包含星号，但是确实是手机号
@@ -1021,7 +931,6 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                         } catch (err) {
                             console.log("替换出错了");
                             console.log("Debug Name1 :" + $.UserName);
-                            console.log("Debug Name2 :" + $.nickName);
                             console.log("Debug Remark :" + $.Remark);
                         }
                     }
@@ -1056,27 +965,15 @@ async function GetPtPin(text) {
     try {
         const TempList = text.split('- ');
         if (TempList.length > 1) {
-            var strNickName = TempList[TempList.length - 1];
-            var strPtPin = "";
-            console.log(`捕获别名:` + strNickName);
-            if (TempCK) {
-                for (let j = 0; j < TempCK.length; j++) {
-                    if (TempCK[j].nickName == strNickName) {
-                        strPtPin = TempCK[j].pt_pin;
-                        break;
-                    }
-                    if (TempCK[j].pt_pin == strNickName) {
-                        strPtPin = TempCK[j].pt_pin;
-                        break;
-                    }
-                }
-                if (strPtPin) {
-                    console.log(`反查PtPin成功:` + strPtPin);
-                    return strPtPin;
-                } else {
-                    console.log(`别名反查PtPin失败: 1.用户更改了别名 2.可能是新用户，别名缓存还没有。`);
-                    return "";
-                }
+            var strPtPin = TempList[TempList.length - 1];
+            console.log(`捕获PT Pin:` + strPtPin);
+            var temptest = await getEnvByPtPin(strPtPin);
+            if (temptest) {
+                console.log(`反查PtPin成功:` + strPtPin);
+                return strPtPin;
+            } else {
+                console.log(`反查PtPin失败: ${text}`);
+                return "";
             }
         } else {
             console.log(`标题格式无法捕获别名...`);
@@ -1944,92 +1841,6 @@ function GetDateTime(date) {
         timeString += date.getSeconds();
 
     return timeString;
-}
-
-function GetnickName() {
-    return new Promise(async resolve => {
-        const options = {
-            url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
-            headers: {
-                Host: "me-api.jd.com",
-                Accept: "*/*",
-                Connection: "keep-alive",
-                Cookie: cookie,
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42",
-                "Accept-Language": "zh-cn",
-                "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
-                "Accept-Encoding": "gzip, deflate, br"
-            }
-        }
-        $.get(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    $.logErr(err)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        if (data['retcode'] === "1001") {
-                            return;
-                        }
-                        if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
-                            $.nickName = data.data.userInfo.baseInfo.nickname;
-                        }
-
-                    } else {
-                        $.log('京东服务器返回空数据');
-                    }
-                }
-            } catch (e) {
-                $.logErr(e)
-            }
-            finally {
-                resolve();
-            }
-        })
-    })
-}
-
-function GetnickName2() {
-    return new Promise(async (resolve) => {
-        const options = {
-            "url": `https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2`,
-            "headers": {
-                "Accept": "application/json,text/plain, */*",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Accept-Language": "zh-cn",
-                "Connection": "keep-alive",
-                "Cookie": cookie,
-                "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-            }
-        };
-        $.post(options, (err, resp, data) => {
-            try {
-                if (err) {
-                    $.logErr(err);
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        if (data['retcode'] === 13) {
-                            $.isLogin = false; //cookie过期
-                            return
-                        }
-                        if (data['retcode'] === 0) {
-                            $.nickName = (data['base'] && data['base'].nickname) || "";
-                        }
-                    } else {
-                        $.log('京东服务器返回空数据');
-                    }
-                }
-            } catch (e) {
-                $.logErr(e);
-            }
-            finally {
-                resolve();
-            }
-        });
-    });
 }
 
 module.exports = {

@@ -12,6 +12,8 @@ const {
 	getEnvById,
     DisableCk,
     EnableCk,
+	delEnv,
+	getEnvinfoById,
     getstatus
 } = require('./ql');
 const api = got.extend({
@@ -24,6 +26,7 @@ const api = got.extend({
 let ShowSuccess = "false",
 CKAlwaysNotify = "false",
 CKAutoEnable = "false",
+CKAutoDelete = "false",
 NoWarnError = "false";
 
 let MessageUserGp2 = "";
@@ -113,6 +116,10 @@ if ($.isNode() && process.env.CHECKCK_CKAUTOENABLE) {
 }
 if ($.isNode() && process.env.CHECKCK_CKNOWARNERROR) {
     NoWarnError = process.env.CHECKCK_CKNOWARNERROR;
+}
+if ($.isNode() && process.env.CHECKCK_CKAUTODEL) {
+	console.log(`检测到设定了自动删除超过10天没有更新的CK`);
+    CKAutoDelete = process.env.CHECKCK_CKAUTODEL;
 }
 
 if ($.isNode() && process.env.CHECKCK_ALLNOTIFY) {
@@ -261,6 +268,17 @@ if ($.isNode() && process.env.CHECKCK_ALLNOTIFY) {
                     } else {
                         console.log(`京东账号${$.index} : ${$.nickName || $.UserName2} 已失效,已禁用!\n`);
                         TempErrorMessage = ReturnMessageTitle + ` 已失效,已禁用.\n`;
+						if (CKAutoDelete == "true") {
+							var envinfo=await getEnvinfoById(tempid)
+							if (envinfo!=null){							
+								if (isMoreThanTenDays(envinfo.updatedAt)){
+									console.log(`京东账号${$.index} : ${$.nickName || $.UserName2} 更新时间${envinfo.updatedAt},超过10天没有更新，删除!\n`);	
+									await delEnv(tempid);
+								}
+							}
+						}
+						
+						
                     }
                 } else {
                     if (strnowstatus == 1) {
@@ -593,6 +611,13 @@ function jsonParse(str) {
             return [];
         }
     }
+}
+function isMoreThanTenDays(ckupdatedate) {
+  const updateDate = new Date(ckupdatedate);
+  const now = new Date();
+  const diffInMilliseconds = now.getTime() - updateDate.getTime();
+  const diffInDays = diffInMilliseconds / (1000 * 60 * 60 * 24);
+  return diffInDays > 10;
 }
 
 // prettier-ignore

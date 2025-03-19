@@ -202,3 +202,21 @@ module.exports.delEnv = async (eid) => {
   }).json();
   return body;
 };
+
+module.exports.getEnvinfoById = async(eid) => {
+    const envs = await this.getEnvs();
+    var tempid = 0;
+    for (let i = 0; i < envs.length; i++) {
+        tempid = 0;
+        if (envs[i]._id) {
+            tempid = envs[i]._id;
+        }
+        if (envs[i].id) {
+            tempid = envs[i].id;
+        }
+        if (tempid == eid) {
+            return envs[i];
+        }
+    }
+    return null;
+};

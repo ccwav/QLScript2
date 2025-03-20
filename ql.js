@@ -1,34 +1,49 @@
 'use strict';
-
+const axios = require('axios');
 const got = require('got');
-require('dotenv').config();
-const { readFile } = require('fs/promises');
-const path = require('path');
 
-const qlDir = '/ql';
-const fs = require('fs');
-let Fileexists = fs.existsSync('/ql/data/config/auth.json');
-let authFile="";
-if (Fileexists) 
-	authFile="/ql/data/config/auth.json"
-else
-	authFile="/ql/config/auth.json"
-//const authFile = path.join(qlDir, 'config/auth.json');
+let strclientid= "",strclientsecret= "",strport="5700";
+
+if (process.env.CHECKCK_STRCLIENTID) {
+    strclientid = process.env.CHECKCK_STRCLIENTID;
+}
+if (process.env.CHECKCK_STRCLIENTSECRET) {
+    strclientsecret = process.env.CHECKCK_STRCLIENTSECRET;
+}
+if (process.env.CHECKCK_PORT) {
+    strport = process.env.CHECKCK_PORT;
+}
 
 const api = got.extend({
-  prefixUrl: 'http://127.0.0.1:5600',
+  prefixUrl: 'http://127.0.0.1:'+strport,
   retry: { limit: 0 },
 });
-
 async function getToken() {
-  const authConfig = JSON.parse(await readFile(authFile));
-  return authConfig.token;
+	var token = "";	
+	const response = await axios.get(`http://127.0.0.1:${strport}/open/auth/token`, {
+	    params: {
+	        client_id: strclientid,
+	        client_secret: strclientsecret
+	    },
+	    headers: {
+	        'Accept': 'application/json'
+	    }
+	});
+	
+	if (response.status === 200) {
+		token = response.data.data.token;
+	} else {
+		console.error("Error: " + response.status);
+	}
+	
+	return token;
+
 }
 
 module.exports.getEnvs = async () => {  
   const token = await getToken();
   const body = await api({
-    url: 'api/envs',
+    url: 'open/envs',
     searchParams: {
       searchValue: 'JD_COOKIE',
       t: Date.now(),
@@ -50,7 +65,7 @@ module.exports.addEnv = async (cookie, remarks) => {
   const token = await getToken();
   const body = await api({
     method: 'post',
-    url: 'api/envs',
+    url: 'open/envs',
     params: { t: Date.now() },
     json: [{
       name: 'JD_COOKIE',
@@ -70,7 +85,7 @@ module.exports.updateEnv = async (cookie, eid, remarks) => {
   const token = await getToken();
   const body = await api({
     method: 'put',
-    url: 'api/envs',
+    url: 'open/envs',
     params: { t: Date.now() },
     json: {
       name: 'JD_COOKIE',
@@ -91,7 +106,7 @@ module.exports.updateEnv11 = async (cookie, eid, remarks) => {
   const token = await getToken();
   const body = await api({
     method: 'put',
-    url: 'api/envs',
+    url: 'open/envs',
     params: { t: Date.now() },
     json: {
       name: 'JD_COOKIE',
@@ -112,7 +127,7 @@ module.exports.DisableCk = async (eid) => {
   const token = await getToken();
   const body = await api({
     method: 'put',
-    url: 'api/envs/disable',
+    url: 'open/envs/disable',
     params: { t: Date.now() },	
     body: JSON.stringify([eid]),
     headers: {
@@ -128,7 +143,7 @@ module.exports.EnableCk = async (eid) => {
   const token = await getToken();
   const body = await api({
     method: 'put',
-    url: 'api/envs/enable',
+    url: 'open/envs/enable',
     params: { t: Date.now() },	
     body: JSON.stringify([eid]),
     headers: {
@@ -191,7 +206,7 @@ module.exports.delEnv = async (eid) => {
   const token = await getToken();
   const body = await api({
     method: 'delete',
-    url: 'api/envs',
+    url: 'open/envs',
     params: { t: Date.now() },
     body: JSON.stringify([eid]),
     headers: {

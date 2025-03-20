@@ -29,6 +29,13 @@
 
 	https://t.me/ccwav
 	
+# 特别注意事项: 
+	ql.js 更新,修改获取token的方式
+	export CHECKCK_CKAUTODEL="true"		为true则自动删除超过10天没有更新的CK
+	export CHECKCK_STRCLIENTID=""		青龙环境变量的访问id
+	export CHECKCK_STRCLIENTSECRET=""	青龙环境变量的访问秘钥
+	export CHECKCK_PORT="5700"			青龙的访问端口，默认是5700
+	
 # 1. 注意事项: 
 （1）如果发现账户名称不能被正确处理，请手动删除ql\scripts\CKName_cache.json 文件.
 	
